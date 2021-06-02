@@ -8,7 +8,7 @@ struct SML {
     static void run_prompt();
     static void run_file(std::string const& fname);
     static void eval(std::string const& src);
-    void error(int line, std::string const& message);
+    static void error(int line, std::string const& message);
 };
 
 #endif

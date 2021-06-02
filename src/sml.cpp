@@ -59,7 +59,7 @@ void SML::run_prompt()
 void SML::error(int line, std::string const& message)
 {
     std::cout << "[line " << line << "] Error " << message << std::endl;
-    this->had_error = true;
+    SML::had_error = true;
 }
 
 /* start interpretation */

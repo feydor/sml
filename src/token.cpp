@@ -6,5 +6,5 @@ Token::Token(TokenType type, std::string lexeme, int line)
 
 std::string Token::to_string() 
 {
-    return this->type + " " + this->lexeme;
+    return this->lexeme;
 }

@@ -7,10 +7,17 @@ Lexer::Lexer(std::string const& src)
     : src(src) 
 {}
 
+/**
+ * For each character of ASCII text in the the source
+ * this function detects and adds a token to the tokens vector
+ * and returns it.
+ */
 std::vector<Token> Lexer::scan_tokens()
 {
+    // a lexeme is made by the substring of [start, curr-start)
+    // where curr is ahead of start depending on the char size of the token
     while (!this->at_end()) {
-        this->start = this->curr;
+        this->start = this->curr; // start is reset to curr
 
         char c = this->advance();
         switch(c) {
@@ -39,13 +46,24 @@ std::vector<Token> Lexer::scan_tokens()
                 break;
             case '/':
                 if (this->next_is('/')) {
-                    // comment goes until end of line
+                    // comment goes until end of line; skip it
+                    // curr ends up pointing to the comment's
+                    // new line character
                     while (this->peek() != '\n' && !this->at_end())
                         this->advance();
                 } else {
                     this->add_token(SLASH);
                 }
                 break;
+            case ' ':
+            case '\r':
+            case '\t':
+                // ignore whitespace
+                break;
+            case '\n':
+                this->line++;
+                break;
+            // case '"': this->string(); break;
             default:
                 // report unexpected characters
                 // TODO: combine these into a vector and report as one err
@@ -66,7 +84,6 @@ char Lexer::advance()
 
 void Lexer::add_token(TokenType type)
 {
-    // lexeme = src[start_index, end_index) where end_index = curr - start
     std::string lexeme(this->src.substr(start, curr - start));
     this->tokens.emplace_back(type, lexeme, this->line);
 }

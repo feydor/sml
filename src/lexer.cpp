@@ -5,7 +5,24 @@
 
 Lexer::Lexer(std::string const& src) 
     : src(src) 
-{}
+{
+    this->keywords.emplace("and", AND);
+    this->keywords.emplace("class", CLASS);
+    this->keywords.emplace("else", ELSE);
+    this->keywords.emplace("false", FALSE);
+    this->keywords.emplace("for", FOR);
+    this->keywords.emplace("fn", FN);
+    this->keywords.emplace("if", IF);
+    this->keywords.emplace("nil", NIL);
+    this->keywords.emplace("or", OR);
+    this->keywords.emplace("print", PRINT);
+    this->keywords.emplace("return", RETURN);
+    this->keywords.emplace("super", SUPER);
+    this->keywords.emplace("this", THIS);
+    this->keywords.emplace("true", TRUE);
+    this->keywords.emplace("let", LET);
+    this->keywords.emplace("while", WHILE);
+}
 
 /**
  * For each character of ASCII text in the the source
@@ -63,10 +80,12 @@ std::vector<Token> Lexer::scan_tokens()
             case '\n':
                 this->line++;
                 break;
-            case '"': this->str(); break;
+            case '"': str(); break;
             default:
                 if (is_digit(c)) {
-                    this->num();
+                    num();
+                } else if (is_alpha(c)) {
+                    identifier();
                 } else {
                     // report unexpected characters
                     // TODO: combine these into a vector 
@@ -159,11 +178,11 @@ void Lexer::str()
 
 void Lexer::num()
 {
-    // consume consequetive digits
+    // consume consecutive digits
     while (is_digit(peek()))
         advance();
 
-    // check for decimal and consume anymore consequetive digits
+    // check for decimal and consume anymore consecutive digits
     if (peek() == '.' && is_digit(peek_next())) {
         advance();
         while (is_digit(peek()))
@@ -175,6 +194,18 @@ void Lexer::num()
     add_token(NUMBER, literal);
 }
 
+void Lexer::identifier()
+{
+    while (is_alphanumeric(peek()))
+        advance();
+
+    std::string lexeme(this->start, this->curr - this->start);
+    auto type = this->keywords.find(lexeme);
+    type == this->keywords.end()
+        ? add_token(IDENTIFIER)
+        : add_token(type->second);
+}
+
 bool Lexer::at_end()
 {
     return this->curr >= (int)this->src.length(); 
@@ -183,4 +214,15 @@ bool Lexer::at_end()
 bool Lexer::is_digit(char c)
 {
     return c >= '0' && c <= '9';
+}
+
+bool Lexer::is_alpha(char c) {
+    return (c >= 'a' && c <= 'z') ||
+           (c >= 'A' && c <= 'Z') ||
+           c == '_';
+}
+
+bool Lexer::is_alphanumeric(char c)
+{
+    return is_alpha(c) || is_digit(c);
 }

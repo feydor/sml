@@ -1,5 +1,6 @@
 #ifndef TOKEN_H
 #define TOKEN_H
+#include <string>
 
 enum TokenType {
     // single-character tokens
@@ -20,7 +21,7 @@ struct Token {
     std::string lexeme;
     int line;
 
-    Token(TokenType type, std::string const& lexeme, int line);
+    Token(TokenType type, std::string lexeme, int line);
     std::string to_string();
 };
 

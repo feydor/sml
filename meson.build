@@ -6,7 +6,7 @@ project(
 )
 
 inc = include_directories('inc')
-src = ['src/sml.cpp', 'src/lexer.cpp']
+src = ['src/sml.cpp', 'src/lexer.cpp', 'src/token.cpp']
 exe = executable(
   'sml', 
   src,

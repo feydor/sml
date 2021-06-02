@@ -67,9 +67,7 @@ void SML::eval(std::string const& src)
 {
     std::unique_ptr<Lexer> lexer(new Lexer(src));
     std::vector<Token> tokens = lexer->scan_tokens();
-    /*
     for (auto token : tokens) {
-        std::cout << token << std::endl;
+        std::cout << token.to_string() << std::endl;
     }
-    */
 }

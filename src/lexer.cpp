@@ -15,6 +15,14 @@ std::vector<Token> Lexer::scan_tokens()
         switch(c) {
             case '(': this->add_token(LEFT_PAREN); break;
             case ')': this->add_token(RIGHT_PAREN); break;
+            case '{': this->add_token(LEFT_BRACE); break;
+            case '}': this->add_token(RIGHT_BRACE); break;
+            case ',': this->add_token(COMMA); break;
+            case '.': this->add_token(DOT); break;
+            case '-': this->add_token(MINUS); break;
+            case '+': this->add_token(PLUS); break;
+            case ';': this->add_token(SEMICOLON); break;
+            case '*': this->add_token(STAR); break;
         }
     }
 

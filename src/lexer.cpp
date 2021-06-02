@@ -16,43 +16,43 @@ std::vector<Token> Lexer::scan_tokens()
 {
     // a lexeme is made by the substring of [start, curr-start)
     // where curr is ahead of start depending on the char size of the token
-    while (!this->at_end()) {
+    while (!at_end()) {
         this->start = this->curr; // start is reset to curr
 
         char c = this->advance();
         switch(c) {
-            case '(': this->add_token(LEFT_PAREN); break;
-            case ')': this->add_token(RIGHT_PAREN); break;
-            case '{': this->add_token(LEFT_BRACE); break;
-            case '}': this->add_token(RIGHT_BRACE); break;
-            case ',': this->add_token(COMMA); break;
-            case '.': this->add_token(DOT); break;
-            case '-': this->add_token(MINUS); break;
-            case '+': this->add_token(PLUS); break;
-            case ';': this->add_token(SEMICOLON); break;
-            case '*': this->add_token(STAR); break;
+            case '(': add_token(LEFT_PAREN); break;
+            case ')': add_token(RIGHT_PAREN); break;
+            case '{': add_token(LEFT_BRACE); break;
+            case '}': add_token(RIGHT_BRACE); break;
+            case ',': add_token(COMMA); break;
+            case '.': add_token(DOT); break;
+            case '-': add_token(MINUS); break;
+            case '+': add_token(PLUS); break;
+            case ';': add_token(SEMICOLON); break;
+            case '*': add_token(STAR); break;
             case '!':
-                this->add_token(this->next_is('=') ? BANG_EQUAL : BANG);
+                add_token(next_is('=') ? BANG_EQUAL : BANG);
                 break;
             case '=':
-                this->add_token(this->next_is('=') ? EQUAL_EQUAL : EQUAL);
+                add_token(next_is('=') ? EQUAL_EQUAL : EQUAL);
                 break;
             case '<':
-                this->add_token(this->next_is('=') ? LESS_EQUAL : LESS);
+                add_token(next_is('=') ? LESS_EQUAL : LESS);
                 break;
             case '>':
-                this->add_token(this->next_is('=') 
+                add_token(next_is('=') 
                         ? GREATER_EQUAL : GREATER);
                 break;
             case '/':
-                if (this->next_is('/')) {
+                if (next_is('/')) {
                     // comment goes until end of line; skip it
                     // curr ends up pointing to the comment's
                     // new line character
-                    while (this->peek() != '\n' && !this->at_end())
-                        this->advance();
+                    while (peek() != '\n' && !at_end())
+                        advance();
                 } else {
-                    this->add_token(SLASH);
+                    add_token(SLASH);
                 }
                 break;
             case ' ':
@@ -63,11 +63,16 @@ std::vector<Token> Lexer::scan_tokens()
             case '\n':
                 this->line++;
                 break;
-            // case '"': this->string(); break;
+            case '"': this->str(); break;
             default:
-                // report unexpected characters
-                // TODO: combine these into a vector and report as one err
-                SML::error(line, "Unexpected character."); 
+                if (is_digit(c)) {
+                    this->num();
+                } else {
+                    // report unexpected characters
+                    // TODO: combine these into a vector 
+                    // and report as one err
+                    SML::error(line, "Unexpected character."); 
+                }
                 break;
         }
     }
@@ -84,22 +89,42 @@ char Lexer::advance()
 
 void Lexer::add_token(TokenType type)
 {
-    std::string lexeme(this->src.substr(start, curr - start));
+    std::string lexeme(
+        this->src.substr(this->start, this->curr - this->start)
+    );
     this->tokens.emplace_back(type, lexeme, this->line);
+}
+
+/* with literal */
+void Lexer::add_token(TokenType type, 
+        std::variant<double, std::string> const& literal)
+{
+    std::string lexeme(
+        this->src.substr(this->start, this->curr - this->start)
+    );
+    this->tokens.emplace_back(type, lexeme, this->line, literal);
 }
 
 /* lookahead one character */
 char Lexer::peek()
 {
-    if (this->at_end()) 
+    if (at_end()) 
         return '\0';
     return src.at(this->curr);
+}
+
+/* lookahead two characters */
+char Lexer::peek_next()
+{
+    if (this->curr + 1 >= (int)src.length()) 
+        return '\0';
+    return src.at(this->curr + 1);
 }
 
 /* if the next character matches, consume the current + next character */
 bool Lexer::next_is(char c)
 {
-    if (this->at_end())
+    if (at_end())
         return false;
     if (src.at(this->curr) != c)
         return false;
@@ -108,7 +133,54 @@ bool Lexer::next_is(char c)
     return true;
 }
 
+/* handle string literals */
+void Lexer::str()
+{
+    // consume characters until matching " mark
+    while (peek() != '"' && !at_end()) {
+        if (peek() == '\n') 
+            this->line++;
+        advance();
+    }
+
+    if (at_end()) {
+        SML::error(this->line, "Unterminated string.");
+        return;
+    }
+
+    advance(); // consume the closing " mark
+
+    // trim the quote marks
+    std::variant<double, std::string> literal(
+        this->src.substr(this->start+1, (this->curr - this->start) - 1)
+    );
+    add_token(STRING, literal);
+}
+
+void Lexer::num()
+{
+    // consume consequetive digits
+    while (is_digit(peek()))
+        advance();
+
+    // check for decimal and consume anymore consequetive digits
+    if (peek() == '.' && is_digit(peek_next())) {
+        advance();
+        while (is_digit(peek()))
+            advance();
+    }
+
+    double num = std::stod(this->src.substr(this->start, this->curr - this->start));
+    std::variant<double, std::string> literal(num);
+    add_token(NUMBER, literal);
+}
+
 bool Lexer::at_end()
 {
     return this->curr >= (int)this->src.length(); 
+}
+
+bool Lexer::is_digit(char c)
+{
+    return c >= '0' && c <= '9';
 }

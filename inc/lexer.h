@@ -1,6 +1,7 @@
 #ifndef LEXER_H
 #define LEXER_H
 #include <string>
+#include <variant>
 #include <vector>
 #include "token.h"
 
@@ -18,9 +19,14 @@ class Lexer {
     private:
     char advance();
     void add_token(TokenType type);
+    void add_token(TokenType type, std::variant<double, std::string> const& lit);
     char peek();
+    char peek_next();
     bool next_is(char c);
+    void str();
+    void num();
     bool at_end();
+    static bool is_digit(char c);
 };
 
 #endif

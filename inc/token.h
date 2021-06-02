@@ -1,6 +1,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 #include <string>
+#include <variant>
 
 enum TokenType {
     // single-character tokens
@@ -16,12 +17,16 @@ enum TokenType {
     THIS, TRUE, LET, _WHILE, _EOF,
 };
 
-struct Token {
+class Token {
     TokenType type;
     std::string lexeme;
     int line;
+    std::variant<double, std::string> literal;
 
+    public:
     Token(TokenType type, std::string lexeme, int line);
+    Token(TokenType type, std::string lexeme, int line,
+        std::variant<double, std::string> literal);
     std::string to_string();
 };
 

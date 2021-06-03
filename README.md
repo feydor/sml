@@ -1,2 +1,6 @@
-# SML
-A wip sml interpreter, tree-walking for now.
+# SMOL
+A wip smol interpreter, tree-walking for now.
+
+## Project structure
+- inc
+    - expr.h - intermediate grammer rules between lexer/scanner and parser

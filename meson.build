@@ -14,4 +14,10 @@ exe = executable(
   install : true
 )
 
+gen_ast = executable(
+  'gen_ast',
+  ['util/generate_ast.cpp'],
+  install: false
+)
+
 test('basic', exe)

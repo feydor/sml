@@ -1,7 +1,7 @@
 #include <iostream>
 #include <memory>
 #include "lexer.h"
-#include "sml.h"
+#include "smol.h"
 
 Lexer::Lexer(std::string const& src) 
     : src(src) 
@@ -90,7 +90,7 @@ std::vector<Token> Lexer::scan_tokens()
                     // report unexpected characters
                     // TODO: combine these into a vector 
                     // and report as one err
-                    SML::error(line, "Unexpected character."); 
+                    SMOL::error(line, "Unexpected character."); 
                 }
                 break;
         }
@@ -163,7 +163,7 @@ void Lexer::str()
     }
 
     if (at_end()) {
-        SML::error(this->line, "Unterminated string.");
+        SMOL::error(this->line, "Unterminated string.");
         return;
     }
 

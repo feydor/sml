@@ -1,14 +1,14 @@
 project(
-  'sml', 
+  'smol', 
   'cpp',
   version : '0.1.0',
   default_options : ['warning_level=3', 'cpp_std=c++17']
 )
 
 inc = include_directories('inc')
-src = ['src/sml.cpp', 'src/lexer.cpp', 'src/token.cpp']
+src = ['src/smol.cpp', 'src/lexer.cpp', 'src/token.cpp']
 exe = executable(
-  'sml', 
+  'smol', 
   src,
   include_directories: inc,
   install : true

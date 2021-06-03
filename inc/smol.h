@@ -1,10 +1,10 @@
-#ifndef SML_H
-#define SML_H
+#ifndef SMOL_H
+#define SMOL_H
 
-struct SML {
+struct SMOL {
     static bool had_error;
 
-    SML();
+    SMOL() {};
     static void run_prompt();
     static void run_file(std::string const& fname);
     static void eval(std::string const& src);

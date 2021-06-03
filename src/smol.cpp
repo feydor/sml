@@ -6,43 +6,39 @@
 #include <vector>
 #include "lexer.h"
 #include "token.h"
-#include "sml.h"
+#include "smol.h"
 
-#define PROJECT_NAME "sml"
+#define PROJECT_NAME "smol"
 #define VERSION "v0.1.0"
 
 int main(int argc, char **argv) 
 {
-    // std::unique_ptr<SML> sml(new SML());
     if (argc > 2) {
         std::cout << "Usage: " << PROJECT_NAME << " [source]" << "\n";
         exit(64);
     } else if (argc == 2) {
-        SML::run_file(argv[1]);
+        SMOL::run_file(argv[1]);
     } else {
-        SML::run_prompt();
+        SMOL::run_prompt();
     }
     return 0;
 }
 
-bool SML::had_error = false;
+bool SMOL::had_error = false;
 
-SML::SML() 
-{}
-
-void SML::run_file(std::string const& fname) 
+void SMOL::run_file(std::string const& fname) 
 {
     std::fstream ifs(fname);
     std::stringstream buf;
     buf << ifs.rdbuf();
-    SML::eval(buf.str());
+    SMOL::eval(buf.str());
 
     /* reached after evaluation */
-    if (SML::had_error)
+    if (SMOL::had_error)
         exit(65);
 }
 
-void SML::run_prompt()
+void SMOL::run_prompt()
 {
     std::cout << PROJECT_NAME << " " << VERSION << std::endl;
     std::string line("");
@@ -51,19 +47,19 @@ void SML::run_prompt()
         std::getline(std::cin, line);
         if (line.empty())
             break;
-        SML::eval(line);
-        SML::had_error = false;
+        SMOL::eval(line);
+        SMOL::had_error = false;
     }
 }
 
-void SML::error(int line, std::string const& message)
+void SMOL::error(int line, std::string const& message)
 {
     std::cout << "[line " << line << "] Error " << message << std::endl;
-    SML::had_error = true;
+    SMOL::had_error = true;
 }
 
 /* start interpretation */
-void SML::eval(std::string const& src)
+void SMOL::eval(std::string const& src)
 {
     std::unique_ptr<Lexer> lexer(new Lexer(src));
     std::vector<Token> tokens = lexer->scan_tokens();

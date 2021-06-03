@@ -3,62 +3,83 @@
 #define EXPR_H
 #include "token.h"
 #include <variant>
-class Expr {};
-template <typename T>
+
+class Binary;
+class Grouping;
+class Literal;
+class Unary;
+
 class Visitor {
-    Visitor() {}
-    virtual ~Visitor() {}
-
-    virtual T visitBinaryExpr(Binary &expr) = 0;
-    virtual T visitGroupingExpr(Grouping &expr) = 0;
-    virtual T visitLiteralExpr(Literal &expr) = 0;
-    virtual T visitUnaryExpr(Unary &expr) = 0;
-
-};
-class Binary : Expr {
-    Expr left;
-    Token op;
-    Expr right;
-
 public:
-     Binary(Expr left, Token op, Expr right)
-    : left(left), op(op), right(right) {};
-
+    virtual std::string &visitBinaryExpr(Binary &expr) = 0;
+    virtual std::string &visitGroupingExpr(Grouping &expr) = 0;
+    virtual std::string &visitLiteralExpr(Literal &expr) = 0;
+    virtual std::string &visitUnaryExpr(Unary &expr) = 0;
 };
 
-    virtual T accept(Visitor<T> visitor);
-
-class Grouping : Expr {
-    Expr expr;
-
+class Visitor_impl: public Visitor {
 public:
-     Grouping(Expr expr)
-    : expr(expr) {};
-
+    virtual std::string &visitBinaryExpr(Binary &expr);
+    virtual std::string &visitGroupingExpr(Grouping &expr);
+    virtual std::string &visitLiteralExpr(Literal &expr);
+    virtual std::string &visitUnaryExpr(Unary &expr);
 };
 
-    virtual T accept(Visitor<T> visitor);
-
-class Literal : Expr {
-    Placeholder val;
-
-public:
-     Literal(Placeholder val)
-    : val(val) {};
-
+class Expr {
+    virtual void accept(Visitor &visitor) = 0;
 };
 
-    virtual T accept(Visitor<T> visitor);
+class Binary : public Expr {
+    Expr &left;
+    Token &op;
+    Expr &right;
 
-class Unary : Expr {
-    Token op;
-    Expr right;
+    public:
+    Binary(Expr &left, Token &op, Expr &right)
+        : left(left), op(op), right(right) {};
 
-public:
-     Unary(Token op, Expr right)
-    : op(op), right(right) {};
-
+    virtual void accept(Visitor &v) override {
+        v.visitBinaryExpr(*this);
+    };
 };
 
-    virtual T accept(Visitor<T> visitor);
 
+class Grouping : public Expr {
+    Expr &expr;
+
+    public:
+    Grouping(Expr &expr)
+        : expr(expr) {};
+    virtual void accept(Visitor &v) override {
+        v.visitGroupingExpr(*this);
+    };
+};
+
+class Literal : public Expr {
+    std::variant<double, std::string> val;
+
+    public:
+    Literal(double dbl)
+        : val(dbl) {};
+    Literal(std::string str)
+        : val(str) {};
+    virtual void accept(Visitor &v) override {
+        v.visitLiteralExpr(*this);
+    };
+};
+
+
+class Unary : public Expr {
+    Token &op;
+    Expr &right;
+
+    public:
+    Unary(Token &op, Expr &right)
+        : op(op), right(right) {};
+
+    virtual void accept(Visitor &v) override {
+        v.visitUnaryExpr(*this);
+    };
+};
+
+#endif

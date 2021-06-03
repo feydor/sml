@@ -52,14 +52,25 @@ void SMOL::run_prompt()
     }
 }
 
-void SMOL::error(int line, std::string const& message)
+void SMOL::error(int line, std::string const &message)
 {
     std::cout << "[line " << line << "] Error " << message << std::endl;
     SMOL::had_error = true;
 }
 
+void SMOL::error(Token const &tok, std::string const &message)
+{
+    if (tok->type == _EOF)
+        std::cout << "[line " << tok->line << "] Error " << "at end " <<
+            message << std::endl;
+    else
+        std::cout << "[line " << tok->line << "] Error " << "at '" <<
+            token->lexeme << "' " + message << std::endl;
+    SMOL::had_error = true;
+}
+
 /* start interpretation */
-void SMOL::eval(std::string const& src)
+void SMOL::eval(std::string const &src)
 {
     std::unique_ptr<Lexer> lexer(new Lexer(src));
     std::vector<Token> tokens = lexer->scan_tokens();

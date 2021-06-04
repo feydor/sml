@@ -17,7 +17,7 @@ Parser::equality()
     while (match(BANG_EQUAL, EQUAL_EQUAL)) {
         Token &op = prev(); // get just matched token
         Expr &right = comparison();
-        expr = new Binary e(expr, op, right);
+        // expr = new Binary e(expr, op, right);
     }
     return expr;
 }
@@ -29,7 +29,7 @@ Parser::comparison()
     while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
         Token &op = prev();
         Expr &right = term();
-        expr = new Binary e(expr, op, right);
+        // expr = new Binary e(expr, op, right);
     }
     return expr;
 }
@@ -41,7 +41,7 @@ Parser::term()
     while (match(MINUS, PLUS)) {
         Token &op = prev();
         Expr &right = factor();
-        expr = new Binary e(expr, op, right);
+        // expr = new Binary e(expr, op, right);
     }
     return expr;
 }
@@ -53,7 +53,7 @@ Parser::factor()
     while (match(MINUS, PLUS)) {
         Token &op = prev();
         Expr &right = unary();
-        expr = new Binary e(expr, op, right);
+        // expr = new Binary e(expr, op, right);
     }
     return expr;
 }
@@ -64,7 +64,7 @@ Parser::unary()
     if (match(BANG, MINUS)) {
         Token &op = prev();
         Expr &right = unary();
-        return std::unique_ptr<Unary> ex(new Unary(op, right));
+        // return std::unique_ptr<Unary> ex(new Unary(op, right));
     }
     return primary();
 }

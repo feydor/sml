@@ -6,8 +6,6 @@
 #include "expr.h"
 #include "token.h"
 
-class ParseError;
-
 class Parser {
     std::vector<Token> tokens;
     int curr = 0;
@@ -31,16 +29,8 @@ class Parser {
     Token &advance();
     Token &prev();
     Token &consume();
-    ParseError error();
     bool at_end();
 };
-
-class ParseError : public exception {
-    virtual const char* what() const throw()
-    {
-        return "Parse error happened.";
-    }
-} parse_err;
 
 #endif
 

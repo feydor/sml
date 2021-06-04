@@ -6,6 +6,11 @@
 - unary, '! -', right
 
 ## Grammer, Productions
+- program     -> statement* EOF;
+- statement   -> expr_stmt | say_stmnt;
+- expr_stmt   -> expression"\n";
+- say_stmt    -> "say" expression"\n";
+
 - expression  -> equality;
 - equality    -> comparison (("!=" | "==") comparison)*;
 - comparison  -> term ((">" | ">=" | "<=" | "<") term)*;

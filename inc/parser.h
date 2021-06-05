@@ -7,11 +7,11 @@
 #include "token.h"
 
 class Parser {
-    std::vector<Token> tokens;
+    std::vector<std::unique_ptr<Token>> tokens;
     int curr = 0;
 
     public:
-    Parser(std::vector<Token> tokens)
+    Parser(std::vector<std::unique_ptr<Token>> tokens)
         : tokens(tokens) {};
 
     private:

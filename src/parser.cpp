@@ -2,6 +2,13 @@
 #include <memory>
 #include <tuple>
 
+std::vector<std::unique_ptr<Expr>>
+Parser::scan_exprs(std::vector<Token> &tokens) {
+    while (!at_end()) {
+        Token &tok = advance();
+    }  
+}
+
 Expr &
 Parser::expression() 
 {

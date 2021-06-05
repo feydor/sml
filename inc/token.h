@@ -18,12 +18,12 @@ enum TokenType {
 };
 
 class Token {
+    public:
     TokenType type;
     std::string lexeme;
     int line;
     std::variant<double, std::string> literal;
 
-    public:
     Token(TokenType type, std::string lexeme, int line);
     Token(TokenType type, std::string lexeme, int line,
         std::variant<double, std::string> literal);

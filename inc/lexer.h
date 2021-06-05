@@ -1,5 +1,6 @@
 #ifndef LEXER_H
 #define LEXER_H
+#include <memory>
 #include <string>
 #include <variant>
 #include <vector>
@@ -8,7 +9,7 @@
 
 class Lexer {
     std::string src;
-    std::vector<Token> tokens;
+    std::vector<std::unique_ptr<Token>> tokens;
     std::unordered_map<std::string, TokenType> keywords;
     int start = 0; // first char of current lexeme in src file
     int curr = 0; // curr char of src file before consuming
@@ -16,7 +17,7 @@ class Lexer {
 
     public:
     Lexer(std::string const& src);
-    std::vector<Token> scan_tokens();
+    std::vector<std::unique_ptr<Token>> scan_tokens();
 
     private:
     char advance();

@@ -26,7 +26,7 @@ int main(int argc, char **argv)
 
 bool SMOL::had_error = false;
 
-void SMOL::run_file(std::string const& fname) 
+void SMOL::run_file(std::string const &fname) 
 {
     std::fstream ifs(fname);
     std::stringstream buf;
@@ -60,22 +60,29 @@ void SMOL::error(int line, std::string const &message)
 
 void SMOL::error(Token const &tok, std::string const &message)
 {
-    if (tok->type == _EOF)
-        std::cout << "[line " << tok->line << "] Error " << "at end " <<
+    if (tok.type == _EOF)
+        std::cout << "[line " << tok.line << "] Error " << "at end " <<
             message << std::endl;
     else
-        std::cout << "[line " << tok->line << "] Error " << "at '" <<
-            token->lexeme << "' " + message << std::endl;
+        std::cout << "[line " << tok.line << "] Error " << "at '" <<
+            tok.lexeme << "' " + message << std::endl;
     SMOL::had_error = true;
 }
 
 /* start interpretation */
 void SMOL::eval(std::string const &src)
 {
-    std::unique_ptr<Lexer> lexer(new Lexer(src));
-    std::vector<Token> tokens = lexer->scan_tokens();
-    for (auto token : tokens) {
-        std::cout << token.to_string();
+    
+    std::unique_ptr<Lexer> lexer = std::make_unique<Lexer>(src);
+    std::vector<std::unique_ptr<Token>> tokens = lexer->scan_tokens();
+    for (auto &token : tokens) {
+        std::cout << token->to_string();
     }
+
+    /*
+    std::unique_ptr<Parser> parser = std::make_unique<Parser>(tokens);
+    std::vector<Expr> exprs = parser->scan_exprs();
+    std::vector<Stmt> stmts = parser->scan_stmts();
+    */
     std::cout << "\n";
 }

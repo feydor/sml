@@ -29,7 +29,7 @@ Lexer::Lexer(std::string const& src)
  * this function detects and adds a token to the tokens vector
  * and returns it.
  */
-std::vector<std::unique_ptr<Token>>
+std::vector<Token>
 Lexer::scan_tokens()
 {
     // a lexeme is made by the substring of [start, curr-start)
@@ -37,7 +37,7 @@ Lexer::scan_tokens()
     while (!at_end()) {
         this->start = this->curr; // start is reset to curr
 
-        char c = this->advance();
+        char c = advance();
         switch(c) {
             case '(': add_token(LEFT_PAREN); break;
             case ')': add_token(RIGHT_PAREN); break;
@@ -97,7 +97,7 @@ Lexer::scan_tokens()
         }
     }
 
-    this->tokens.push_back(std::make_unique<Token>(_EOF, "", this->line));
+    this->tokens.emplace_back(_EOF, "", this->line);
     return std::move(this->tokens); // move ownership of smart ptrs
 }
 
@@ -112,9 +112,7 @@ void Lexer::add_token(TokenType type)
     std::string lexeme(
         this->src.substr(this->start, this->curr - this->start)
     );
-    this->tokens.push_back(
-            std::make_unique<Token>(type, lexeme, this->line)
-    );
+    this->tokens.emplace_back(type, lexeme, this->line);
 }
 
 /* with literal */
@@ -124,9 +122,7 @@ void Lexer::add_token(TokenType type,
     std::string lexeme(
         this->src.substr(this->start, this->curr - this->start)
     );
-    this->tokens.push_back(
-            std::make_unique<Token>(type, lexeme, this->line, literal)
-    );
+    this->tokens.emplace_back(type, lexeme, this->line, literal);
 }
 
 /* lookahead one character */
@@ -205,10 +201,8 @@ void Lexer::identifier()
         advance();
 
     std::string lexeme(this->start, this->curr - this->start);
-    auto type = this->keywords.find(lexeme);
-    type == this->keywords.end()
-        ? add_token(IDENTIFIER)
-        : add_token(type->second);
+    auto itr = keywords.find(lexeme);
+    itr != keywords.end() ? add_token(itr->second) : add_token(IDENTIFIER);
 }
 
 bool Lexer::at_end()

@@ -27,7 +27,9 @@ class Token {
     Token(TokenType type, std::string lexeme, int line);
     Token(TokenType type, std::string lexeme, int line,
         std::variant<double, std::string> literal);
+    Token();
     std::string to_string();
+    static std::string type_to_string(TokenType type);
 };
 
 #endif

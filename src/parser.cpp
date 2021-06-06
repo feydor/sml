@@ -1,111 +1,139 @@
 #include "parser.h"
-#include <memory>
+#include "smol.h"
 #include <tuple>
+#include <iostream>
 
-std::vector<std::unique_ptr<Expr>>
-Parser::scan_exprs(std::vector<Token> &tokens) {
+std::vector<Expr *>
+Parser::scan_exprs() 
+{
+    std::cout << "begin scan_exprs" << std::endl;
     while (!at_end()) {
-        Token &tok = advance();
-    }  
+        Expr *expr = expression();
+        this->exprs.push_back(expr);
+    } 
+    std::cout << "end scan_exprs" << std::endl;
+    return this->exprs;
 }
 
-Expr &
+/*
+bool
+Parser::accept(Symbol sym)
+{
+    if (sym == this.tokens.at(this->curr)->type) {
+        advance();
+        return true;
+    }
+    return false;
+}
+
+bool Parser::expect(Symbol sym)
+{
+    return accept(sym) ? true : false;
+}
+*/
+
+/**
+ * begin recursive descent parser
+ * see GRAMMER.md for high-level routine outline
+ */
+Expr *
 Parser::expression() 
 {
     return equality();
 }
 
-Expr &
+Expr *
 Parser::equality()
 {
-    Expr &expr = comparison();
+    Expr *expr = comparison();
 
     // (...)*
     while (match(BANG_EQUAL, EQUAL_EQUAL)) {
-        Token &op = prev(); // get just matched token
-        Expr &right = comparison();
-        // expr = new Binary e(expr, op, right);
+        Token op = prev();
+        Expr *right = comparison();
+        return new Expr(expr, op, right);
     }
     return expr;
 }
 
-Expr &
+Expr *
 Parser::comparison()
 {
-    Expr &expr = term();
+    Expr *expr = term();
     while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
-        Token &op = prev();
-        Expr &right = term();
-        // expr = new Binary e(expr, op, right);
+        Token op = prev();
+        Expr *right = term();
+        return new Expr(expr, op, right);
     }
     return expr;
 }
 
-Expr &
+Expr *
 Parser::term()
 {
-    Expr &expr = factor();
+    Expr *expr = factor();
     while (match(MINUS, PLUS)) {
-        Token &op = prev();
-        Expr &right = factor();
-        // expr = new Binary e(expr, op, right);
+        Token op = prev();
+        Expr *right = factor();
+        return new Expr(expr, op, right);
     }
     return expr;
 }
 
-Expr &
+Expr *
 Parser::factor()
 {
-    Expr &expr = unary();
-    while (match(MINUS, PLUS)) {
-        Token &op = prev();
-        Expr &right = unary();
-        // expr = new Binary e(expr, op, right);
+    Expr *expr = unary();
+    while (match(SLASH, STAR)) {
+        Token op = prev();
+        Expr *right = unary();
+        return new Expr(expr, op, right);
     }
     return expr;
 }
 
-Expr &
+Expr *
 Parser::unary()
 {
     if (match(BANG, MINUS)) {
-        Token &op = prev();
-        Expr &right = unary();
-        // return std::unique_ptr<Unary> ex(new Unary(op, right));
+        Token op = prev();
+        Expr *right = unary();
+        return new Expr(op, right);
     }
     return primary();
 }
 
-Expr &
+Expr *
 Parser::primary()
 {
     if (match(FALSE))
-        return std::unique_ptr<Literal> ex(new Literal(false));
+        return new Expr(false);
     if (match(TRUE))
-        return std::unique_ptr<Literal> ex(new Literal(true));
+        return new Expr(true);
     if (match(NIL))
-        return std::unique_ptr<Literal> ex(new Literal(nullptr));
-
-    if (match(NUMBER, STRING))
-        return std::unique_ptr<Literal> ex(new Literal(prev().literal));
-
+        return new Expr("nullptr");
+    if (match(NUMBER))
+        return new Expr(std::get<double>(prev().literal));
+    if (match(STRING))
+        return new Expr(std::get<std::string>(prev().literal));
     if (match(LEFT_PAREN)) {
-        Expr &expr = expression();
+        Expr *expr = expression();
         consume(RIGHT_PAREN, "Expect ')' after expression.");
-        return std::unique_ptr<Grouping> ex(new Grouping(expr));
+        return new Expr(expr);
     }
+    return nullptr;
 }
 
 /**
  * checks curr token for type matches
  * consumes and returns true on the first valid match
  */
-template <class... Args>
+template <class ...Ts>
 bool 
-Parser::match(Args&&... args)
+Parser::match(Ts... args)
 {
-    auto types = std::make_tuple(std::forward<Args>(args)...);
-
+    std::vector<TokenType> types {args...};
+    // std::cout << Token::type_to_string(types[0]) << std::endl;
     for (auto type : types) {
         if (is_type(type)) {
             advance();
@@ -121,49 +149,43 @@ Parser::is_type(TokenType type)
 {
     if (at_end())
         return false;
-    return peek()->type == type;
+    return peek().type == type;
 }  
 
 /* returns curr token, does not consume it */
-Token &
+Token
 Parser::peek()
 {
     return this->tokens.at(this->curr);
 }
 
 /* consumes curr token, returns it, and advances to the next token */
-Token &
+Token
 Parser::advance()
 {
     if (!at_end())
-        this->cur++;
+        this->curr++;
     return prev();
 }
 
-Token &
+Token
 Parser::prev()
 {
     return this->tokens.at(this->curr - 1);
 }
 
 /* check if next token has type and if so consume, otherwise error */
-Token &
+Token
 Parser::consume(TokenType type, std::string const& message)
 {
     if (is_type(type))
         return advance();
-    throw Parser::error(peek(), message);
+    SMOL::error(peek(), message);
+    return Token(); // TODO: This should be a nullptr
 }
     
-ParseError
-error(Token &tok, std::string const& message)
-{
-    SMOL::error(tok, message);
-    return parse_err;
-}
-
 bool
 Parser::at_end()
 {
-    return peek.type() == _EOF;
+    return peek().type == _EOF;
 }

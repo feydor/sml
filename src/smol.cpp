@@ -6,6 +6,7 @@
 #include <vector>
 #include "lexer.h"
 #include "token.h"
+#include "parser.h"
 #include "smol.h"
 
 #define PROJECT_NAME "smol"
@@ -58,7 +59,7 @@ void SMOL::error(int line, std::string const &message)
     SMOL::had_error = true;
 }
 
-void SMOL::error(Token const &tok, std::string const &message)
+void SMOL::error(Token const& tok, std::string const &message)
 {
     if (tok.type == _EOF)
         std::cout << "[line " << tok.line << "] Error " << "at end " <<
@@ -73,15 +74,26 @@ void SMOL::error(Token const &tok, std::string const &message)
 void SMOL::eval(std::string const &src)
 {
     
-    std::unique_ptr<Lexer> lexer = std::make_unique<Lexer>(src);
-    std::vector<std::unique_ptr<Token>> tokens = lexer->scan_tokens();
-    for (auto &token : tokens) {
-        std::cout << token->to_string();
-    }
-
+    Lexer lexer(src);
+    std::vector<Token> tokens = lexer.scan_tokens();
     /*
-    std::unique_ptr<Parser> parser = std::make_unique<Parser>(tokens);
-    std::vector<Expr> exprs = parser->scan_exprs();
+    for (auto token : tokens) {
+        std::cout << token.to_string();
+    }
+    */
+
+    Parser parser(tokens);
+    std::vector<Expr *> exprs = parser.scan_exprs();
+    /*
+
+    Token min(MINUS, "-", 1);
+    auto num1 = std::make_shared<Expr>(123.0);
+    Token star(STAR, "*", 1);
+    // auto num2 = std::make_shared<Expr>(46.7);
+    auto group = std::make_shared<Expr>(num2);
+    auto e = std::make_shared<Expr>(num1, star, group);
+    */
+    /*
     std::vector<Stmt> stmts = parser->scan_stmts();
     */
     std::cout << "\n";

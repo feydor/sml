@@ -4,59 +4,28 @@
 #include <variant>
 
 enum ExprType {
-    BINARY, GROUPING, LITERAL, UNARY
+    BINARY, GROUPING, LITERAL, UNARY,
+    EXPR_NUMBER, EXPR_STRING, EXPR_BOOL
 };
 
-class Expr {
+struct Expr {
     ExprType type;
-};
+    Expr *left; // used for grouping
+    Token op;
+    Expr *right;
+    std::variant<double, std::string, bool> val;
 
-class Binary : Expr {
-    Expr &left;
-    Token &op;
-    Expr &right;
+    Expr(Expr *left, Token op, Expr *right)
+        : type(BINARY), left(left), op(op), right(right) {};
+    Expr(Token op, Expr *right)
+        : type(UNARY), left(nullptr), op(op), right(right) {};
+    Expr(Expr *expr)
+        : type(GROUPING), left(expr), right(nullptr) {};
+    Expr(double dbl) : type(EXPR_NUMBER), val(dbl) {};
+    Expr(std::string s) : type(EXPR_STRING), val(s) {};
+    Expr(bool b) : type(EXPR_BOOL), val(b) {};
+    Expr() {};
 
-    public:
-    Binary(Expr &left, Token &op, Expr &right)
-        : left(left), op(op), right(right) {
-        this->type = BINARY;    
-    };
-};
-
-class Grouping : Expr {
-    Expr &expr;
-
-    public:
-    Grouping(Expr &expr)
-        : expr(expr) {
-        this->type = GROUPING;
-    };
-};
-
-class Literal : Expr {
-    std::variant<double, std::string> val;
-
-    public:
-    Literal(double dbl)
-        : val(dbl) {
-        this->type = LITERAL;
-    };
-    Literal(std::string str)
-        : val(str) {
-        this->type = LITERAL;
-    };
-};
-
-
-class Unary : Expr {
-    Token &op;
-    Expr &right;
-
-    public:
-    Unary(Token &op, Expr &right)
-        : op(op), right(right) {
-        this->type = UNARY;
-    };
 };
 
 #endif

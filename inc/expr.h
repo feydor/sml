@@ -34,7 +34,8 @@ struct Expr {
     Expr() {};
 
     void to_string();
-    void interpret(Expr *curr, Eval &res);
+    double interpret(Expr *curr, Eval &res);
+    double eval_binary(Expr *curr, Eval &res);
 };
 
 #endif

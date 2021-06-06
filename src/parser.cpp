@@ -6,31 +6,12 @@
 std::vector<Expr *>
 Parser::scan_exprs() 
 {
-    std::cout << "begin scan_exprs" << std::endl;
     while (!at_end()) {
         Expr *expr = expression();
         this->exprs.push_back(expr);
     } 
-    std::cout << "end scan_exprs" << std::endl;
     return this->exprs;
 }
-
-/*
-bool
-Parser::accept(Symbol sym)
-{
-    if (sym == this.tokens.at(this->curr)->type) {
-        advance();
-        return true;
-    }
-    return false;
-}
-
-bool Parser::expect(Symbol sym)
-{
-    return accept(sym) ? true : false;
-}
-*/
 
 /**
  * begin recursive descent parser

@@ -76,25 +76,22 @@ void SMOL::eval(std::string const &src)
     
     Lexer lexer(src);
     std::vector<Token> tokens = lexer.scan_tokens();
-    /*
+    std::cout << "Printing tokens... ";
     for (auto token : tokens) {
         std::cout << token.to_string();
     }
-    */
 
     Parser parser(tokens);
     std::vector<Expr *> exprs = parser.scan_exprs();
-    /*
 
-    Token min(MINUS, "-", 1);
-    auto num1 = std::make_shared<Expr>(123.0);
-    Token star(STAR, "*", 1);
-    // auto num2 = std::make_shared<Expr>(46.7);
-    auto group = std::make_shared<Expr>(num2);
-    auto e = std::make_shared<Expr>(num1, star, group);
-    */
-    /*
-    std::vector<Stmt> stmts = parser->scan_stmts();
-    */
-    std::cout << "\n";
+    std::cout << "\nEvaluating expressions... ";
+    Eval res;
+    for (auto &expr : exprs) {
+        expr->interpret(expr, res);
+        switch (expr->type) {
+            case BINARY:
+                std::cout << res.num << std::endl;
+                break;
+        }
+    }
 }

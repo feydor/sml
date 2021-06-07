@@ -1,6 +1,7 @@
 #ifndef EXPR_H
 #define EXPR_H
 #include "token.h"
+#include <stack>
 #include <variant>
 
 enum ExprType {
@@ -21,7 +22,9 @@ struct Expr {
     Token op;
     Expr *right;
     std::variant<double, std::string, bool> val;
+    std::string name;
 
+    Expr(Token ident);
     Expr(Expr *left, Token op, Expr *right)
         : type(BINARY), left(left), op(op), right(right) {};
     Expr(Token op, Expr *right)
@@ -33,9 +36,7 @@ struct Expr {
     Expr(bool b) : type(EXPR_BOOL), left(nullptr), right(nullptr), val(b) {};
     Expr() {};
 
-    void to_string();
-    double interpret(Expr *curr, Eval &res);
-    double eval_binary(Expr *curr, Eval &res);
+    void eval(Expr *curr, std::stack<double> &stack);
 };
 
 #endif

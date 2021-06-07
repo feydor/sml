@@ -73,29 +73,19 @@ void SMOL::error(Token const& tok, std::string const &message)
 /* start interpretation */
 void SMOL::eval(std::string const &src)
 {
-    
     Lexer lexer(src);
     std::vector<Token> tokens = lexer.scan_tokens();
     std::cout << "Printing tokens... ";
     for (auto token : tokens) {
         std::cout << token.to_string();
     }
+    std::cout << "\n";
 
     Parser parser(tokens);
     std::vector<Expr *> exprs = parser.scan_exprs();
 
     std::cout << "\nEvaluating expressions (expr_size: " 
         << exprs.size() << ")...";
-    Eval res;
-    for (auto &expr : exprs) {
-        expr->interpret(expr, res);
-        switch (expr->type) {
-            case BINARY:
-                std::cout << res.num << std::endl;
-                break;
-            case GROUPING:
-                std::cout << res.num << std::endl;
-                break;
-        }
-    }
+
+    parser.interpret();
 }

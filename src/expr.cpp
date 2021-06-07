@@ -1,56 +1,33 @@
 #include "expr.h"
 #include <iostream>
 
-double
-Expr::interpret(Expr *curr, Eval &res)
+/**
+ * traversal from end-branches to root
+ */
+void
+Expr::eval(Expr *curr, std::stack<double> &stack)
 {
-    if (!curr) return res.num;
-
+    if (curr->left) eval(curr->left, stack);
+    if (curr->right) eval(curr->right, stack);
+    std::cout << curr->op.lexeme << " : " << std::get<double>(curr->val) << std::endl;
+    double n1 = 0, n2 = 0, res = 0;
     switch (curr->type) {
         case EXPR_NUMBER:
-            return std::get<double>(curr->val);
+            stack.push(std::get<double>(curr->val));
+            break;
         case BINARY:
-            return eval_binary(curr, res);
+            // pop two off stack, evaluate, and push res
+            n2 = stack.top();
+            stack.pop();
+            n1 = stack.top();
+            stack.pop();
+            switch (curr->op.type) {
+                case MINUS: res = n1 - n2; break;
+                case PLUS: res = n1 + n2; break;
+                case SLASH: res = n1 / n2; break;
+                case STAR: res = n1 * n2; break;
+            }
+            stack.push(res);
             break;
-        case UNARY: break;
-        case GROUPING:
-            return interpret(curr->left, res);
-            break;
-    } 
-}
-
-double
-Expr::eval_binary(Expr *curr, Eval &res)
-{
-    if (!curr) return 0;
-    double n1 = eval_binary(curr->left, res);
-    double n2 = eval_binary(curr->right, res);
-
-    if (curr->type == EXPR_NUMBER)
-        return std::get<double>(curr->val);
-
-    switch (curr->op.type) {
-        case MINUS:
-            res.num = n1 - n2;
-            return res.num;
-        case PLUS:
-            res.num = n1 + n2;
-            return res.num;
-        case SLASH:
-            res.num = n1 / n2;
-            return res.num;
-        case STAR:
-            res.num = n1 * n2;
-            return res.num;
-    }
-}
-
-void
-Expr::to_string()
-{
-    Expr *curr = this;
-    while (curr != nullptr) {
-        std::cout << Token::type_to_string(curr->op.type) << std::endl;
-        curr = curr->right;
     }
 }

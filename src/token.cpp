@@ -25,12 +25,14 @@ std::string Token::type_to_string(TokenType type) {
         case RIGHT_PAREN: return ")";
         case LEFT_BRACE: return "{";
         case RIGHT_BRACE: return "}";
+        case LEFT_BRACKET: return "[";
+        case RIGHT_BRACKET: return "]";
         case COMMA: return ",";
         case DOT: return ".";
         case MINUS: return "-";
         case PLUS: return "+";
         case SEMICOLON: return ";";
-        case SLASH: return "/";
+        case SLASH: return "/"; 
         case STAR: return "*";
         case BANG: return "!";
         case BANG_EQUAL: return "!=";
@@ -44,7 +46,6 @@ std::string Token::type_to_string(TokenType type) {
         case STRING: return "STRING";
         case NUMBER: return "NUMBER";
         case AND: return "and";
-        case CLASS: return "class";
         case ELSE: return "else";
         case FALSE: return "false";
         case FN: return "fn";
@@ -54,12 +55,11 @@ std::string Token::type_to_string(TokenType type) {
         case OR: return "or";
         case SAY: return "say";
         case RETURN: return "return";
-        case SUPER: return "super";
-        case THIS: return "this";
         case TRUE: return "true";
         case LET: return "let";
         case WHILE: return "while";
         case _EOF: return "EOF";
+        case EOL: return "EOL";
         default: return "Not yet identifed.";
     }
 }

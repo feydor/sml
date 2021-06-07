@@ -5,7 +5,8 @@
 
 enum TokenType {
     // single-character tokens
-    LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, COMMA, DOT,
+    LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, LEFT_BRACKET,
+    RIGHT_BRACKET, COMMA, DOT,
     MINUS, PLUS, SEMICOLON, SLASH, STAR,
     // one or two character tokens
     BANG, BANG_EQUAL, EQUAL, EQUAL_EQUAL, GREATER, GREATER_EQUAL,
@@ -13,8 +14,8 @@ enum TokenType {
     // literals
     IDENTIFIER, STRING, NUMBER,
     // keywords
-    AND, CLASS, ELSE, FALSE, FN, FOR, IF, NIL, OR, SAY, RETURN, SUPER,
-    THIS, TRUE, LET, WHILE, _EOF,
+    AND, ELSE, ELSE_IF, FALSE, FN, FOR, IF, NIL, OR, SAY, RETURN,
+    TRUE, LET, WHILE, _EOF, EOL,
 };
 
 class Token {

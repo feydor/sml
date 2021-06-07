@@ -7,8 +7,8 @@ Lexer::Lexer(std::string const& src)
     : src(src) 
 {
     this->keywords.emplace("and", AND);
-    this->keywords.emplace("class", CLASS);
     this->keywords.emplace("else", ELSE);
+    this->keywords.emplace("elif", ELSE_IF);
     this->keywords.emplace("false", FALSE);
     this->keywords.emplace("for", FOR);
     this->keywords.emplace("fn", FN);
@@ -17,8 +17,6 @@ Lexer::Lexer(std::string const& src)
     this->keywords.emplace("or", OR);
     this->keywords.emplace("say", SAY);
     this->keywords.emplace("return", RETURN);
-    this->keywords.emplace("super", SUPER);
-    this->keywords.emplace("this", THIS);
     this->keywords.emplace("true", TRUE);
     this->keywords.emplace("let", LET);
     this->keywords.emplace("while", WHILE);
@@ -43,12 +41,15 @@ Lexer::scan_tokens()
             case ')': add_token(RIGHT_PAREN); break;
             case '{': add_token(LEFT_BRACE); break;
             case '}': add_token(RIGHT_BRACE); break;
+            case '[': add_token(LEFT_BRACKET); break;
+            case ']': add_token(RIGHT_BRACKET); break;
             case ',': add_token(COMMA); break;
             case '.': add_token(DOT); break;
             case '-': add_token(MINUS); break;
             case '+': add_token(PLUS); break;
             case ';': add_token(SEMICOLON); break;
             case '*': add_token(STAR); break;
+            case '/': add_token(SLASH); break;
             case '!':
                 add_token(next_is('=') ? BANG_EQUAL : BANG);
                 break;
@@ -62,16 +63,10 @@ Lexer::scan_tokens()
                 add_token(next_is('=') 
                         ? GREATER_EQUAL : GREATER);
                 break;
-            case '/':
-                if (next_is('/')) {
-                    // comment goes until end of line; skip it
-                    // curr ends up pointing to the comment's
-                    // new line character
-                    while (peek() != '\n' && !at_end())
-                        advance();
-                } else {
-                    add_token(SLASH);
-                }
+            case '#':
+                // comment goes until end of line; skip it
+                while (peek() != '\n' && !at_end())
+                    advance();
                 break;
             case ' ':
             case '\r':
@@ -79,6 +74,7 @@ Lexer::scan_tokens()
                 // ignore whitespace
                 break;
             case '\n':
+                add_token(EOL);
                 this->line++;
                 break;
             case '"': str(); break;
@@ -125,7 +121,7 @@ void Lexer::add_token(TokenType type,
     this->tokens.emplace_back(type, lexeme, this->line, literal);
 }
 
-/* lookahead one character */
+/* look at current character without consumption */
 char Lexer::peek()
 {
     if (at_end()) 
@@ -195,8 +191,10 @@ void Lexer::num()
     add_token(NUMBER, literal);
 }
 
+/* handle non-string letters */
 void Lexer::identifier()
 {
+    // move curr char ptr to end of identifier token
     while (is_alphanumeric(peek()))
         advance();
 

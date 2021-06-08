@@ -166,9 +166,9 @@ void Lexer::str()
 
     advance(); // consume the closing " mark
 
-    // trim the quote marks
+    // trim the quote marks and last space
     std::variant<double, std::string> literal(
-        this->src.substr(this->start+1, (this->curr - this->start) - 1)
+        this->src.substr(this->start+1, (this->curr - this->start) - 2)
     );
     add_token(STRING, literal);
 }

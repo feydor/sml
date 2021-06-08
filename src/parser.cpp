@@ -25,7 +25,7 @@ Parser::interpret()
     for (auto &root : this->exprs) {
         std::cout << "root->op: " + root->op.lexeme << std::endl;
         root->eval(root, this->stack);
-        std::cout << "result: " << this->stack.top() << std::endl;
+        std::cout << "result: " << this->stack.top().val << std::endl;
     }
 }
 

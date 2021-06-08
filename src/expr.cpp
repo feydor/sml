@@ -40,6 +40,7 @@ Expr::eval(Expr *curr, std::stack<Literal> &stack)
             }
 
             // eval number or string
+            // TODO: binary operator of two bools, ops, nils
             if (a.val_type == VAL_NUMBER)
                 res.val = eval_binary(curr->op, 
                         std::stod(a.val), std::stod(b.val));
@@ -47,6 +48,21 @@ Expr::eval(Expr *curr, std::stack<Literal> &stack)
                 res.val = eval_binary(curr->op, a.val, b.val);
 
             stack.push(res);
+            break;
+        case GROUPING:
+            // do nothing here
+            break;
+        case UNARY:
+            // pop one off stack, modify with unary, push back onto stack
+            a = stack.top();
+            stack.pop();
+            // TODO: what does unary do to strings, groups, bools, ops, nil
+            // use switch statement for valid options, emit error on inval
+            if (a.val_type == VAL_NUMBER)
+                a.val = eval_unary(curr->op, std::stod(a.val));
+            else if (a.val_type == VAL_GROUP)
+                a.val = eval_unary(curr->op, std::stod(a.val));
+            stack.push(a);
             break;
     }
 }
@@ -60,7 +76,7 @@ Expr::eval_binary(Token const &tok, double a, double b)
         case PLUS: res = a + b; break;
         case SLASH: res = a / b; break;
         case STAR: res = a * b; break;
-        default: SMOL::error(tok, "Expr::eval: Unimplemented operator.");
+        default: SMOL::error(tok, "eval_binary: Unimplemented operator.");
     }
     return std::to_string(res);
 }
@@ -71,13 +87,33 @@ Expr::eval_binary(Token const &tok, std::string a, std::string b)
     std::string res("");
     switch (tok.type) {
         case PLUS: res = a + b; break;
-        default: Parser::error(tok, "Expr::eval: Unexpected operator on strings.");
+        default: Parser::error(tok, "eval_binary: Unexpected operator on strings.");
     }
     return res;
 }
 
-std::string to_string(bool b) {
+std::string
+Expr::eval_unary(Token const &tok, double a)
+{
+    double res = 0;
+    switch (tok.type) {
+        case MINUS: res = -a; break;
+        default: SMOL::error(tok, "eval_unary: Unexpected operator on literal.");
+    }
+    return std::to_string(res);
+}
+
+std::string
+to_string(bool b) {
     return b ? "true" : "false";
+}
+
+void
+Expr::print_tree(Expr *curr, std::string &res)
+{
+    if (curr->left) print_tree(curr->left, res);
+    if (curr->right) print_tree(curr->right, res);
+    res += curr->val + ", ";
 }
 
 Expr::Expr(Expr *left, Token op, Expr *right)

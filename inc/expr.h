@@ -33,9 +33,11 @@ struct Expr {
     // Expr() {};
 
     void eval(Expr *curr, std::stack<Literal> &stack);
+    void print_tree(Expr *curr, std::string &res);
     private:
     std::string eval_binary(Token const &tok, double a, double b);
     std::string eval_binary(Token const &tok, std::string a, std::string b);
+    std::string eval_unary(Token const &tok, double a);
 };
 
 #endif

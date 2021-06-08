@@ -22,9 +22,11 @@ void
 Parser::interpret()
 {
     std::cout << "\n begin interpretation...\n";
+    std::string res;
     for (auto &root : this->exprs) {
-        std::cout << "root->op: " + root->op.lexeme << std::endl;
         root->eval(root, this->stack);
+        // root->print_tree(root, res);
+        std::cout << res << std::endl;
         std::cout << "result: " << this->stack.top().val << std::endl;
     }
 }
@@ -42,7 +44,7 @@ Parser::equality()
     while (match(BANG_EQUAL, EQUAL_EQUAL)) {
         Token op = prev();
         Expr *right = comparison();
-        return new Expr(expr, op, right);
+        expr = new Expr(expr, op, right);
     }
     return expr;
 }
@@ -53,7 +55,7 @@ Parser::comparison()
     while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
         Token op = prev();
         Expr *right = term();
-        return new Expr(expr, op, right);
+        expr = new Expr(expr, op, right);
     }
     return expr;
 }
@@ -65,7 +67,7 @@ Parser::term()
     while (match(MINUS, PLUS)) {
         Token op = prev();
         Expr *right = factor();
-        return new Expr(expr, op, right);
+        expr = new Expr(expr, op, right);
     }
     return expr;
 }
@@ -76,7 +78,7 @@ Parser::factor()
     while (match(SLASH, STAR)) {
         Token op = prev();
         Expr *right = unary();
-        return new Expr(expr, op, right);
+        expr =  new Expr(expr, op, right);
     }
     return expr;
 }

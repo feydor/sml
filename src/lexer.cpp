@@ -16,7 +16,7 @@ Lexer::Lexer(std::string const& src)
     this->keywords.emplace("nil", NIL);
     this->keywords.emplace("or", OR);
     this->keywords.emplace("say", SAY);
-    this->keywords.emplace("return", RETURN);
+    this->keywords.emplace("ret", RETURN);
     this->keywords.emplace("true", TRUE);
     this->keywords.emplace("let", LET);
     this->keywords.emplace("while", WHILE);

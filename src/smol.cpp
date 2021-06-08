@@ -10,7 +10,7 @@
 #include "smol.h"
 
 #define PROJECT_NAME "smol"
-#define VERSION "v0.1.0"
+#define VERSION "0.1.0"
 
 int main(int argc, char **argv) 
 {
@@ -46,7 +46,7 @@ void SMOL::run_prompt()
     for (;;) {
         std::cout << "> ";
         std::getline(std::cin, line);
-        if (line.empty())
+        if (line.empty() || line.compare("quit") == 0)
             break;
         SMOL::eval(line);
         SMOL::had_error = false;

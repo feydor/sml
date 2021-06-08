@@ -5,11 +5,13 @@
 - factor, '/ *', left
 - unary, '! -', right
 
-## Grammer, Productions
-- program     -> statement* EOF;
+## Grammer
+- program     -> declaration* EOF;
+- declaration -> var_decl | statement;
 - statement   -> expr_stmt | say_stmnt;
 - expr_stmt   -> expression"\n";
 - say_stmt    -> "say" expression"\n";
+- var_decl    -> "let" IDENTIFIER ("=" expression)? EOL;
 
 - expression  -> equality;
 - equality    -> comparison (("!=" | "==") comparison)*;
@@ -17,5 +19,6 @@
 - term        -> factor (("-") | "+") factor)*;
 - factor      -> unary (("/" | "*") unary)*;
 - unary       -> ("!" | "-") unary | primary;
-- primary     -> NUMBER | STRING | "true" | "false" | "nil" | "("expression")";
+- primary     -> NUMBER | STRING | "true" | "false" 
+                 | "nil" | "("expression")" | IDENTIFIER;
 

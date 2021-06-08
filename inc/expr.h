@@ -7,8 +7,10 @@
 enum ExprType {
     BINARY, GROUPING, LITERAL, UNARY,
 };
-    
-enum val_t { VAL_NUMBER, VAL_STRING, VAL_GROUP, VAL_BOOL, VAL_OP, VAL_NIL };
+
+enum val_t {
+    VAL_NUMBER, VAL_STRING, VAL_GROUP, VAL_BOOL, VAL_OP, VAL_NIL
+};
 
 /* placed on the stack machine for eval */
 struct Literal {

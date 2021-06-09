@@ -4,9 +4,10 @@
 #include <string>
 #include <sstream>
 #include <vector>
+#include "intpr.h"
 #include "lexer.h"
-#include "token.h"
 #include "parser.h"
+#include "token.h"
 #include "smol.h"
 
 #define PROJECT_NAME "smol"
@@ -48,7 +49,7 @@ void SMOL::run_prompt()
         std::getline(std::cin, line);
         if (line.empty() || line.compare("quit") == 0)
             break;
-        SMOL::eval(line);
+        SMOL::eval(line + "\n");
         SMOL::had_error = false;
     }
 }
@@ -82,10 +83,12 @@ void SMOL::eval(std::string const &src)
     std::cout << "\n";
 
     Parser parser(tokens);
-    std::vector<Expr *> exprs = parser.scan_exprs();
+    std::vector<Stmt *> stmts = parser.scan_program();
+    // std::vector<Expr *> exprs = parser.scan_exprs();
 
-    std::cout << "\nEvaluating expressions (expr_size: " 
-        << exprs.size() << ")...";
+    std::cout << "\nEvaluating statements (stmts_size: " 
+        << stmts.size() << ")...";
 
-    parser.interpret();
+    Intpr intpr(stmts);
+    intpr.interpret();
 }

@@ -5,7 +5,7 @@
 #include <variant>
 
 enum ExprType {
-    BINARY, GROUPING, LITERAL, UNARY,
+    BINARY, GROUPING, LITERAL, UNARY, KEYWORD,
 };
 
 enum val_t {
@@ -13,7 +13,7 @@ enum val_t {
 };
 
 /* placed on the stack machine for eval */
-struct Literal {
+struct Eval {
     val_t val_type;
     std::string val;
 };
@@ -26,15 +26,29 @@ struct Expr {
     Token op;
     Expr *right;
 
+    // Binary expr
     Expr(Expr *left, Token op, Expr *right);
-    Expr(Token op, Expr *right);
-    Expr(Expr *expr);
-    Expr(double dbl);
-    Expr(std::string s);
-    Expr(bool b);
-    // Expr() {};
 
-    void eval(Expr *curr, std::stack<Literal> &stack);
+    // Unary expr
+    Expr(Token op, Expr *right);
+
+    // Grouping expr
+    Expr(Expr *expr);
+
+    // Literal expr, number
+    Expr(double num);
+
+    // Literal expr, string
+    // used for user-defined identifers/syms
+    Expr(std::string ident);
+
+    // Literal expr, bool
+    Expr(bool b);
+
+    // Literal expr, keyword
+    Expr(std::string keyword, TokenType type);
+
+    void eval(Expr *curr, std::stack<Eval> &stack);
     void print_tree(Expr *curr, std::string &res);
     private:
     std::string eval_binary(Token const &tok, double a, double b);

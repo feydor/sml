@@ -10,12 +10,12 @@
  * traversal from end-branches to root
  */
 void
-Expr::eval(Expr *curr, std::stack<Literal> &stack)
+Expr::eval(Expr *curr, std::stack<Eval> &stack)
 {
     if (curr->left) eval(curr->left, stack);
     if (curr->right) eval(curr->right, stack);
     std::cout << curr->op.lexeme << " : " << curr->val << std::endl;
-    Literal a, b, res;
+    Eval a, b, res;
     switch (curr->type) {
         case LITERAL:
             res.val_type = curr->val_type;
@@ -125,13 +125,17 @@ Expr::Expr(Token op, Expr *right)
 Expr::Expr(Expr *expr)
     : type(GROUPING), val_type(VAL_GROUP), val("GROUPING")
     , left(expr), right(nullptr) {};
-Expr::Expr(double dbl)
-    : type(LITERAL), val_type(VAL_NUMBER), val(std::to_string(dbl))
+Expr::Expr(double num)
+    : type(LITERAL), val_type(VAL_NUMBER), val(std::to_string(num))
     , left(nullptr), right(nullptr) {};
-Expr::Expr(std::string str)
-    : type(LITERAL), val_type(VAL_STRING), val(str)
+Expr::Expr(std::string sym)
+    : type(LITERAL), val_type(VAL_STRING), val(sym)
     , left(nullptr), right(nullptr) {};
 Expr::Expr(bool b)
     : type(LITERAL), val_type(VAL_BOOL), val(to_string(b))
     , left(nullptr), right(nullptr) {};
+
+Expr::Expr(std::string keyword, TokenType type)
+    : type(KEYWORD), val_type(VAL_STRING), val(keyword)
+      , left(nullptr), right(nullptr) {};
 

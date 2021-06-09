@@ -74,7 +74,7 @@ Lexer::scan_tokens()
                 // ignore whitespace
                 break;
             case '\n':
-                // add_token(EOL);
+                add_token(EOL);
                 this->line++;
                 break;
             case '"': str(); break;

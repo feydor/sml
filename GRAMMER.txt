@@ -6,6 +6,7 @@
 - unary, '! -', right
 
 ## Grammer
+# Type: Stmt
 - program     -> declaration* EOF;
 - declaration -> var_decl | statement;
 - statement   -> expr_stmt | say_stmnt;
@@ -13,6 +14,7 @@
 - say_stmt    -> "say" expression"\n";
 - var_decl    -> "let" IDENTIFIER ("=" expression)? EOL;
 
+# Type: Expr
 - expression  -> equality;
 - equality    -> comparison (("!=" | "==") comparison)*;
 - comparison  -> term ((">" | ">=" | "<=" | "<") term)*;

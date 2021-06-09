@@ -1,3 +1,4 @@
+/* parser.cpp - Recursive descent parser - See GRAMMER.txt for overview */
 #include "parser.h"
 #include "smol.h"
 #include <tuple>
@@ -18,17 +19,65 @@ Parser::scan_exprs()
     return this->exprs;
 }
 
-void
-Parser::interpret()
+std::vector<Stmt *>
+Parser::scan_program()
 {
-    std::cout << "\n begin interpretation...\n";
-    std::string res;
-    for (auto &root : this->exprs) {
-        root->eval(root, this->stack);
-        // root->print_tree(root, res);
-        std::cout << res << std::endl;
-        std::cout << "result: " << this->stack.top().val << std::endl;
+    return program();
+}
+
+// entry point to building AST (abstract syntax tree)
+std::vector<Stmt *>
+Parser::program()
+{
+    while (!at_end()) {
+        Stmt *stmt = decl();
+        this->stmts.push_back(stmt);
     }
+    return this->stmts;
+}
+
+Stmt *
+Parser::decl()
+{
+    if (match(LET))
+        return var_decl();        
+    return statement();
+}
+
+Stmt *
+Parser::statement()
+{
+    if (match(SAY))
+        return say_stmt();
+    return expr_stmt();
+}
+
+Stmt *
+Parser::say_stmt()
+{
+    Expr *say_expr = new Expr(prev().lexeme, prev().type);
+    Expr *expr = expression();
+    consume(EOL, "Expected newline after expression.");
+    return new Stmt(SAY_STMT, say_expr, expr);
+}
+
+Stmt *
+Parser::expr_stmt()
+{
+    Expr *expr = expression();
+    consume(EOL, "Expected newline after expression.");
+    return new Stmt(EXPR_STMT, expr, true); // true is placeholder
+}
+
+Stmt *
+Parser::var_decl() {
+    consume(IDENTIFIER, "Expected identifier after keyword 'let'.");
+    Expr *ident = new Expr(prev().lexeme);
+    if (match(EQUAL)) {
+        Expr *expr = expression();
+        return new Stmt(VAR_DECL, ident, expr);
+    }
+    return new Stmt(VAR_DECL, ident);
 }
 
 Expr *
@@ -107,7 +156,7 @@ Parser::primary()
         return new Expr(std::get<double>(prev().literal));
     if (match(STRING))
         return new Expr(std::get<std::string>(prev().literal));
-    if (match(IDENTIFIER))
+    if (match(IDENTIFIER)) // user-defined identifers
         return new Expr(prev().lexeme);
     if (match(LEFT_PAREN)) {
         Expr *expr = expression();

@@ -1,14 +1,24 @@
 #ifndef STMT_H
 #define STMT_H
 #include "expr.h"
+#include <string>
 
 enum stmt_t { VAR_DECL, SAY_STMT, EXPR_STMT };
 
-// TODO: Split these into three classes
+/* A wrapper around an expr so that they can be called and assigned
+ * to variables and functions
+ * Possible types:
+ * - variable declaration without definition
+ * - variable declaration with definition
+ * - say statement (print)
+ * - expression statement
+ */
 struct Stmt {
     stmt_t type;
     Expr *ident; // can be a keyword, or a user-defined identifier
     Expr *expr;
+
+    static std::string type_to_string(stmt_t type);
     
     // identifier with definition or keyword with expression
     Stmt(stmt_t type, Expr *ident, Expr *expr)

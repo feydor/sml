@@ -14,7 +14,7 @@ Expr::eval(Expr *curr, std::stack<Eval> &stack)
 {
     if (curr->left) eval(curr->left, stack);
     if (curr->right) eval(curr->right, stack);
-    std::cout << curr->op.lexeme << " : " << curr->val << std::endl;
+    // std::cout << curr->op.lexeme << " : " << curr->val << std::endl;
     Eval a, b, res;
     switch (curr->type) {
         case LITERAL:
@@ -63,6 +63,9 @@ Expr::eval(Expr *curr, std::stack<Eval> &stack)
             else if (a.val_type == VAL_GROUP)
                 a.val = eval_unary(curr->op, std::stod(a.val));
             stack.push(a);
+            break;
+        case KEYWORD:
+            // do nothing here
             break;
     }
 }
@@ -137,5 +140,5 @@ Expr::Expr(bool b)
 
 Expr::Expr(std::string keyword, TokenType type)
     : type(KEYWORD), val_type(VAL_STRING), val(keyword)
-      , left(nullptr), right(nullptr) {};
+      , left(nullptr), right(nullptr) { (void) type; };
 

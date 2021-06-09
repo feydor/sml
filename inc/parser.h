@@ -3,7 +3,6 @@
 #define PARSER_H
 #include <exception>
 #include <memory>
-#include <stack>
 #include <vector>
 #include "expr.h"
 #include "token.h"
@@ -13,7 +12,6 @@ class Parser {
     std::vector<Token> tokens;
     std::vector<Expr *> exprs;
     std::vector<Stmt *> stmts;
-    std::stack<Eval> stack;
     int curr = 0;
 
     public:

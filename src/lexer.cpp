@@ -67,6 +67,9 @@ Lexer::scan_tokens()
                 // comment goes until end of line; skip it
                 while (peek() != '\n' && !at_end())
                     advance();
+                // skip newline char in comment
+                advance();
+                this->line++;
                 break;
             case ' ':
             case '\r':
@@ -198,7 +201,9 @@ void Lexer::identifier()
     while (is_alphanumeric(peek()))
         advance();
 
-    std::string lexeme(this->start, this->curr - this->start);
+    std::string lexeme(
+            this->src.substr(this->start, this->curr - this->start)
+    );
     auto itr = keywords.find(lexeme);
     itr != keywords.end() ? add_token(itr->second) : add_token(IDENTIFIER);
 }

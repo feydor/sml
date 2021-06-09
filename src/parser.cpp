@@ -56,10 +56,10 @@ Parser::statement()
 Stmt *
 Parser::say_stmt()
 {
-    Expr *say_expr = new Expr(prev().lexeme, prev().type);
+    Expr *say_keyword = new Expr(prev().lexeme, prev().type);
     Expr *expr = expression();
     consume(EOL, "Expected newline after expression.");
-    return new Stmt(SAY_STMT, say_expr, expr);
+    return new Stmt(SAY_STMT, say_keyword, expr);
 }
 
 Stmt *

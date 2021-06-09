@@ -77,9 +77,8 @@ void SMOL::eval(std::string const &src)
     Lexer lexer(src);
     std::vector<Token> tokens = lexer.scan_tokens();
     std::cout << "Printing tokens... ";
-    for (auto token : tokens) {
-        std::cout << token.to_string() << ",";
-    }
+    for (auto token : tokens)
+        std::cout << Token::type_to_string(token.type) << "_";
     std::cout << "\n";
 
     Parser parser(tokens);
@@ -88,7 +87,12 @@ void SMOL::eval(std::string const &src)
 
     std::cout << "\nEvaluating statements (stmts_size: " 
         << stmts.size() << ")...";
+    
+    for (auto &stmt : stmts)
+        std::cout << Stmt::type_to_string(stmt->type) << "_";
+    std::cout << "\n";
 
+    std::cout << "Begin interpretation...\n";
     Intpr intpr(stmts);
     intpr.interpret();
 }

@@ -31,7 +31,8 @@ Parser::program()
 {
     while (!at_end()) {
         Stmt *stmt = decl();
-        this->stmts.push_back(stmt);
+        if (stmt)
+            this->stmts.push_back(stmt);
     }
     return this->stmts;
 }
@@ -66,7 +67,12 @@ Parser::expr_stmt()
 {
     Expr *expr = expression();
     consume(EOL, "Expected newline after expression.");
-    return new Stmt(EXPR_STMT, expr, true); // true is placeholder
+    // expr can be nullptr, if no match
+    // for example EOL returns nullptr
+    if (expr)
+        return new Stmt(EXPR_STMT, expr, true); // true is placeholder
+    else
+        return nullptr;
 }
 
 Stmt *

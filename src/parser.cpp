@@ -163,7 +163,7 @@ Parser::primary()
     if (match(STRING))
         return new Expr(std::get<std::string>(prev().literal));
     if (match(IDENTIFIER)) // user-defined identifers
-        return new Expr(prev().lexeme);
+        return new Expr(prev().lexeme, LITERAL);
     if (match(LEFT_PAREN)) {
         Expr *expr = expression();
         consume(RIGHT_PAREN, "Expect ')' after expression.");

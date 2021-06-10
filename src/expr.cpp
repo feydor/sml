@@ -53,6 +53,10 @@ Expr::eval(Expr const *curr, std::stack<Eval> &stack, SymTable const &sym_table)
                 swap_with_sym(b, sym_table);
             }
 
+            // std::cout << a.val << " : " << b.val << std::endl;
+            // std::cout << Expr::to_string(a.val_type) << " : " <<
+            //    Expr::to_string(b.val_type) << std::endl;
+
             // at this point, both a and be need to have non-IDENT Val_t
             // and both must be the same
             res.val_type = a.val_type;
@@ -180,8 +184,23 @@ Expr::sym_undefined_exit(Expr const *curr)
 }
 
 std::string
-to_string(bool b) {
+Expr::to_string(bool b)
+{
     return b ? "true" : "false";
+}
+
+std::string
+Expr::to_string(Val_t type)
+{
+    switch(type) {
+        case Val_t::NUM: return "NUM";
+        case Val_t::STR: return "STR";
+        case Val_t::BOOL: return "BOOL";
+        case Val_t::IDENT: return "IDENT";
+        case Val_t::OP: return "OP";
+        case Val_t::NIL: return "NIL";
+        case Val_t::GROUP: return "GROUP";
+    }
 }
 
 void

@@ -56,12 +56,15 @@ struct Expr {
     void eval(Expr const *curr, std::stack<Eval> &stack,
             SymTable const &sym_table);
     void print_tree(Expr *curr, std::string &res);
+    std::string to_string(Val_t type);
+
     private:
     std::string eval_binary(Token const &tok, double a, double b);
     std::string eval_binary(Token const &tok, std::string a, std::string b);
     std::string eval_unary(Token const &tok, double a);
     void swap_with_sym(Eval &curr, SymTable const &sym_table);
     void sym_undefined_exit(Expr const *curr);
+    std::string to_string(bool b);
 };
 
 #endif

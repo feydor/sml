@@ -1,11 +1,11 @@
 #ifndef LEXER_H
 #define LEXER_H
+#include "token.h"
 #include <memory>
 #include <string>
 #include <variant>
 #include <vector>
 #include <unordered_map>
-#include "token.h"
 
 class Lexer {
     std::string src;

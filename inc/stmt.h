@@ -1,7 +1,9 @@
 #ifndef STMT_H
 #define STMT_H
-#include "expr.h"
 #include <string>
+
+// forward declarations
+struct Expr;
 
 enum stmt_t { VAR_DECL, SAY_STMT, EXPR_STMT };
 

@@ -8,7 +8,7 @@ project(
 inc = include_directories('inc')
 src = [
   'src/smol.cpp', 'src/lexer.cpp', 'src/token.cpp', 'src/parser.cpp',
-  'src/expr.cpp', 'src/intpr.cpp', 'src/stmt.cpp'
+  'src/expr.cpp', 'src/intpr.cpp', 'src/stmt.cpp', 'src/sym.cpp',
 ]
 exe = executable(
   'smol', 

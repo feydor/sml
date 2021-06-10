@@ -1,12 +1,12 @@
 /* a recursive descent parser */
 #ifndef PARSER_H
 #define PARSER_H
-#include <exception>
-#include <memory>
-#include <vector>
 #include "expr.h"
 #include "token.h"
 #include "stmt.h"
+#include <exception>
+#include <memory>
+#include <vector>
 
 class Parser {
     std::vector<Token> tokens;

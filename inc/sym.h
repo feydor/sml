@@ -1,20 +1,24 @@
 #ifndef SYM_H
 #define SYM_H
-#include <unordered_map>
+#include "stmt.h"
 #include "expr.h"
+#include <unordered_map>
+#include <vector>
 
 // Symbols are user-defined identifiers with definitions
+enum class Sym_t{ FN, VAR };
 struct Sym {
-    enum sym_t { FN, VAR } type;
+    Sym_t stype;
     std::string sym;
 
-    Sym(sym_t type, std::string sym)
-        : type(type), sym(sym) {};
+    Sym(Sym_t type, std::string sym)
+        : stype(type), sym(sym) {};
 };
 
 // Vars are user-defined identifiers with a value
+enum class Var_t{ NUM, STR, BOOL };
 struct Var : public Sym {
-    enum var_t { NUM, STR, BOOL } type;
+    Var_t vtype;
     union {
         double val_num;
         std::string val_str;
@@ -22,24 +26,24 @@ struct Var : public Sym {
     };
 
     // NUM var
-    Var(sym_t type, std::string sym, double num)
-        : Sym{type, sym}, type(NUM), val_num(num) {};
+    Var(std::string sym, double num)
+        : Sym(Sym_t::VAR, sym), vtype(Var_t::NUM), val_num(num) {};
 
     // STR var
-    Var(sym_t type, std::string sym, std::string str)
-        : Sym{type, sym}, type(STR), val_str(str) {};
+    Var(std::string sym, std::string str)
+        : Sym(Sym_t::VAR, sym), vtype(Var_t::STR), val_str(str) {};
 
     // BOOL var
-    Var(sym_t type, std::string sym, bool b)
-        : Sym{type, sym}, type(BOOL), val_bool(b) {};
+    Var(std::string sym, bool b)
+        : Sym(Sym_t::VAR, sym), vtype(Var_t::BOOL), val_bool(b) {};
 };
 
 // Functions are user-defined identifiers with a list of statements
 struct Fn : public Sym {
     std::vector<Stmt *> stmts;
 
-    Fn(sym_t type, std::string sym, std::vector<Stmt *> stmts)
-        : Sym{type, sym}, stmts(stmts) {};
+    Fn(std::string sym, std::vector<Stmt *> stmts)
+        : Sym(Sym_t::FN, sym), stmts(stmts) {};
 };
 
 // a table that holds all of the current syms
@@ -48,11 +52,10 @@ class SymTable {
     std::unordered_map<std::string, Sym *> table;
 
     public:
-    // TODO: Define operations on SymTable
-    // int insert(Sym *sym);
-    // Sym *lookup(std::string ident);
+    void insert(Var *var);
+    bool in_table(std::string sym_name) const;
+    Sym *get(std::string sym_name) const;
 };
-
 
 #endif
 

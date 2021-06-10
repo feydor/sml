@@ -23,10 +23,17 @@ Expr::eval(Expr const *curr, std::stack<Eval> &stack, SymTable const &sym_table)
         case LITERAL:
             // possible val_types are:
             // IDENT, NUMBER, STRING, BOOL
-            // (all copied into res on stack in the form of a string)
-            // look at res.val_type to differentiate
             res.val_type = curr->val_type;
             res.val = curr->val;
+
+            // look up user-defined identifiers in sym_table
+            // must be defined by this point
+            // converts to either NUMBER, STRING, or BOOL
+            if (res.val_type == Val_t::IDENT) {
+                if (!sym_table.in_table(res.val))
+                    sym_undefined_exit(curr);
+                swap_with_sym(res, sym_table);
+            }
             stack.push(res);
             break;
         case BINARY:
@@ -35,23 +42,6 @@ Expr::eval(Expr const *curr, std::stack<Eval> &stack, SymTable const &sym_table)
             stack.pop();
             a = stack.top();
             stack.pop();
-
-            // Identifiers must be in the Interpreter's sym_table
-            // otherwise exit
-            if (a.val_type == Val_t::IDENT) {
-                if (!sym_table.in_table(a.val))
-                    sym_undefined_exit(curr);
-                // swap sym's val and type with a's val and type
-                // TODO: what happens if a sym is in the table
-                // but is undefined, like in "let x; say x"
-                swap_with_sym(a, sym_table);
-            }
-
-            if (b.val_type == Val_t::IDENT) {
-                if (!sym_table.in_table(b.val))
-                    sym_undefined_exit(curr);
-                swap_with_sym(b, sym_table);
-            }
 
             // std::cout << a.val << " : " << b.val << std::endl;
             // std::cout << Expr::to_string(a.val_type) << " : " <<

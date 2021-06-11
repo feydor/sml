@@ -5,11 +5,17 @@ project(
   default_options : ['warning_level=3', 'cpp_std=c++17']
 )
 
-inc = include_directories('inc')
-src = [
-  'src/smol.cpp', 'src/lexer.cpp', 'src/token.cpp', 'src/parser.cpp',
-  'src/expr.cpp', 'src/intpr.cpp', 'src/stmt.cpp', 'src/sym.cpp',
-]
+# gather subsystem sources and headers into vars
+subdir('src')
+
+# gather main source and header
+smol_src = ['src/smol.cpp']
+smol_inc = include_directories('src')
+
+# combine main with subsystems
+src = [smol_src, ast_src, intpr_src, parser_src, lexer_src]
+inc = [smol_inc, ast_inc, intpr_inc, parser_inc, lexer_inc]
+
 exe = executable(
   'smol', 
   src,

@@ -1,5 +1,6 @@
 #include <iostream>
 #include "intpr.h"
+#include "value.h"
 
 // eval statements
 // resolve variable typing
@@ -11,7 +12,7 @@ Intpr::interpret()
         // TODO: Move this into stmt.cpp,
         // called as stmt->eval(this->stack)
         // which internally calls eval on it's expr
-        if (stmt->type == VAR_DECL) {
+        if (stmt->type == Stmt_t::VAR_DECL) {
             if (!stmt->expr)
                 // var_decl without definition, add to symtable?
                 // TODO: add to sym_table with value of NIL
@@ -24,31 +25,14 @@ Intpr::interpret()
              */
             stmt->expr->eval(stmt->expr, this->stack, this->sym_table);
             res = this->stack.top();
-            switch (res.val_type) {
-                case Val_t::NUM:
-                    {
-                        auto vdef = new Var(stmt->ident->val,
-                                std::stod(res.val));
-                        sym_table.insert(vdef);
-                    }
-                    break;
-                case Val_t::STR:
-                    {
-                        auto vdef = new Var(stmt->ident->val, res.val);
-                        sym_table.insert(vdef);
-                    }
-                    break;
-                case Val_t::BOOL:
-                    {
-                        auto vdef = new Var(stmt->ident->val,
-                                Intpr::stob(res.val));
-                        sym_table.insert(vdef);
-                    }
-                    break;
-                default:
-                    Intpr::error(stmt->ident,
-                            "Variable definition is not string, number, or bool.");
-                    break;
+            if (res.is_num() || res.is_str() || res.is_bool()) {
+                auto vdef = new Var(stmt->ident()->sym(), res);
+                sym_table.insert(vdef);
+            } else {
+                Intpr::error(stmt->ident(),
+                        "Variable definition is not string, number, or bool.");
+                break;
+
             }
         } else {
             // do eval on stmt->expr, do not cout the result
@@ -56,7 +40,7 @@ Intpr::interpret()
             stmt->expr->eval(stmt->expr, this->stack, this->sym_table);
 
             // cout the result
-            if (stmt->type == SAY_STMT)
+            if (stmt->type == Stmt_t::SAY)
                 std::cout << "result: " << this->stack.top().val << std::endl;
         }       
         // root->print_tree(root, res);
@@ -64,7 +48,7 @@ Intpr::interpret()
 }
 
 void
-Intpr::error(Expr const *curr, std::string const &msg)
+Intpr::error(Ast::Expr const *curr, std::string const &msg)
 {
     std::cout << "Intpr::error [line " << curr->op.line << "] Error " <<
         "at expression '" << curr->val << "' " + msg << std::endl;

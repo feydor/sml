@@ -1,70 +1,99 @@
 #ifndef EXPR_H
 #define EXPR_H
 #include "token.h"
+#include "value.h"
 #include <stack>
 
 // forward declarations
 class SymTable;
 
-enum ExprType {
-    BINARY, GROUPING, LITERAL, UNARY, KEYWORD
+enum class Expr_t {
+    BINARY, GROUPING, LITERAL, UNARY, IDENT,
 };
 
-enum class Val_t {
-    NUM, STR, GROUP, BOOL, OP, NIL, IDENT
-};
+namespace Ast {
+    class Expr {
+        Expr_t type;
+        Expr *left = nullptr;
+        Expr *right = nullptr;
 
-/* placed on the stack machine for eval */
-struct Eval {
-    Val_t val_type;
-    std::string val;
-};
+        public:
+            Expr(Expr_t type, Expr *left, Expr *right)
+                : type(type), left(left), right(right) {};
+            Expr *left();
+            Expr *right();
+            Val::Val eval() = 0;
+            void eval_ast(Expr const *curr, std::stack<Val::Val> &stack,
+                    SymTable const &sym_table);
+            void swap_with_sym(Val::Val &curr, SymTable const &sym_table);
+            void sym_undefined_exit(Expr const *curr);
+            std::string to_string(bool b);
+            bool is_binary();
+            bool is_unary();
+            bool is_grouping();
+            bool is_ident();
+            bool is_literal();
+            bool is_op();
+            bool is_keyword();
+    };
 
-struct Expr {
-    ExprType type;
-    Val_t val_type;
-    std::string val;
-    Expr *left;
-    Token op; // TODO: Is Token op instantiated in every constructor?
-    Expr *right;
+    class Binary : public Expr {
+        Token op;
 
-    // Binary expr
-    Expr(Expr *left, Token op, Expr *right);
+        public:
+            Binary(Expr *left, Token op, Expr *right)
+                : Expr(Expr_t::BINARY, left, right)
+                , op(op) {};
+            Token op();
 
-    // Unary expr
-    Expr(Token op, Expr *right);
+            // does op on left and right
+            Val::Val eval() override;
+    };
+    
+    class Unary : public Expr {
+        Token op;
 
-    // Grouping expr
-    Expr(Expr *expr);
+        public:
+            Unary(Token op, Expr *right)
+                : Expr(Expr_t::UNARY, nullptr, right)
+                , op(op) {};
+            Token op();
 
-    // Literal expr, number
-    Expr(double num);
+            // does op on right
+            Val::Val eval() override;
+    };
 
-    // Literal expr, string
-    // used for user-defined identifers/syms
-    Expr(std::string ident);
+    class Grouping : public Expr {
+        public:
+            Grouping(Expr *expr)
+                : Expr(Expr_t::GROUPING, expr, nullptr) {};
 
-    // Literal expr, bool
-    Expr(bool b);
+            // calls eval of left
+            Val::Val eval() override;
+    };
 
-    // Literal expr, keyword
-    Expr(std::string keyword, TokenType type);
+    class Ident : public Expr {
+        Sym sym;
 
-    // Literal expr, ident
-    Expr(std::string sym, ExprType type);
+        public: 
+           Ident(Sym sym)
+               : Expr(Expr_t::IDENT, nullptr, nullptr)
+               , sym(sym) {};
+            
+           // returns nil val
+           Val::Val eval() override;
+    };
 
-    void eval(Expr const *curr, std::stack<Eval> &stack,
-            SymTable const &sym_table);
-    void print_tree(Expr *curr, std::string &res);
-    std::string to_string(Val_t type);
+    class Literal : public Expr {
+        Val::Val val;
 
-    private:
-    std::string eval_binary(Token const &tok, double a, double b);
-    std::string eval_binary(Token const &tok, std::string a, std::string b);
-    std::string eval_unary(Token const &tok, double a);
-    void swap_with_sym(Eval &curr, SymTable const &sym_table);
-    void sym_undefined_exit(Expr const *curr);
-    std::string to_string(bool b);
-};
-
+        public:
+            Literal(Val::Val val)
+                : Expr(Expr_t::LITERAL, nullptr, nullptr)
+                , val(val) {};
+           
+            // returns val
+            Val::Val eval() override;
+    };
+}
 #endif

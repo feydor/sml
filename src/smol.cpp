@@ -82,14 +82,14 @@ void SMOL::eval(std::string const &src)
     std::cout << "\n";
 
     Parser parser(tokens);
-    std::vector<Stmt *> stmts = parser.scan_program();
-    // std::vector<Expr *> exprs = parser.scan_exprs();
+    std::vector<Ast::Stmt *> stmts = parser.scan_program();
+    // std::vector<Ast::Expr *> exprs = parser.scan_exprs();
 
     std::cout << "\nEvaluating statements (stmts_size: " 
         << stmts.size() << ")...";
     
     for (auto &stmt : stmts)
-        std::cout << Stmt::type_to_string(stmt->type) << "_";
+        std::cout << Ast::Stmt::type_to_string(stmt->type) << "_";
     std::cout << "\n";
 
     std::cout << "Begin interpretation...\n";

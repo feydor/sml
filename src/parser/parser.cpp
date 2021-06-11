@@ -9,35 +9,35 @@
  * for each statement, go through its tokens and combine into
  * expressions and then a statement
  */
-std::vector<Expr *>
+std::vector<Ast::Expr *>
 Parser::scan_exprs() 
 {
     while (!at_end()) {
-        Expr *e = expression();
+        Ast::Expr *e = expression();
         this->exprs.push_back(e);
     } 
     return this->exprs;
 }
 
-std::vector<Stmt *>
+std::vector<Ast::Stmt *>
 Parser::scan_program()
 {
     return program();
 }
 
 // entry point to building AST (abstract syntax tree)
-std::vector<Stmt *>
+std::vector<Ast::Stmt *>
 Parser::program()
 {
     while (!at_end()) {
-        Stmt *stmt = decl();
+        Ast::Stmt *stmt = decl();
         if (stmt)
             this->stmts.push_back(stmt);
     }
     return this->stmts;
 }
 
-Stmt *
+Ast::Stmt *
 Parser::decl()
 {
     if (match(LET))
@@ -45,7 +45,7 @@ Parser::decl()
     return statement();
 }
 
-Stmt *
+Ast::Stmt *
 Parser::statement()
 {
     if (match(SAY))
@@ -53,121 +53,121 @@ Parser::statement()
     return expr_stmt();
 }
 
-Stmt *
+Ast::Stmt *
 Parser::say_stmt()
 {
-    Expr *say_keyword = new Expr(prev().lexeme, prev().type);
-    Expr *expr = expression();
+    Ast::Expr *say_keyword = new Ast::Expr(prev().lexeme, prev().type);
+    Ast::Expr *expr = expression();
     consume(EOL, "Expected newline after expression.");
-    return new Stmt(SAY_STMT, say_keyword, expr);
+    return new Ast::Stmt(Stmt_t::SAY, say_keyword, expr);
 }
 
-Stmt *
+Ast::Stmt *
 Parser::expr_stmt()
 {
-    Expr *expr = expression();
+    Ast::Expr *expr = expression();
     consume(EOL, "Expected newline after expression.");
     // expr can be nullptr, if no match
     // for example EOL returns nullptr
     if (expr)
-        return new Stmt(EXPR_STMT, expr, true); // true is placeholder
+        return new Ast::Stmt(Stmt_t::EXPR, expr, true); // true is placeholder
     else
         return nullptr;
 }
 
-Stmt *
+Ast::Stmt *
 Parser::var_decl() {
     consume(IDENTIFIER, "Expected identifier after keyword 'let'.");
-    Expr *ident = new Expr(prev().lexeme);
+    Ast::Expr *ident = new Ast::Expr(prev().lexeme);
     if (match(EQUAL)) {
-        Expr *expr = expression();
-        return new Stmt(VAR_DECL, ident, expr);
+        Ast::Expr *expr = expression();
+        return new Ast::Stmt(Stmt_t::VAR_DECL, ident, expr);
     }
-    return new Stmt(VAR_DECL, ident);
+    return new Ast::Stmt(Stmt_t::VAR_DECL, ident);
 }
 
-Expr *
+Ast::Expr *
 Parser::expression()
 {
     return equality(); 
 }
 
-Expr *
+Ast::Expr *
 Parser::equality()
 {
-    Expr *expr = comparison();
+    Ast::Expr *expr = comparison();
     while (match(BANG_EQUAL, EQUAL_EQUAL)) {
         Token op = prev();
-        Expr *right = comparison();
-        expr = new Expr(expr, op, right);
+        Ast::Expr *right = comparison();
+        expr = new Ast::Expr(expr, op, right);
     }
     return expr;
 }
-Expr *
+Ast::Expr *
 Parser::comparison()
 {
-    Expr *expr = term();
+    Ast::Expr *expr = term();
     while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
         Token op = prev();
-        Expr *right = term();
-        expr = new Expr(expr, op, right);
+        Ast::Expr *right = term();
+        expr = new Ast::Expr(expr, op, right);
     }
     return expr;
 }
 
-Expr *
+Ast::Expr *
 Parser::term()
 {
-    Expr *expr = factor();
+    Ast::Expr *expr = factor();
     while (match(MINUS, PLUS)) {
         Token op = prev();
-        Expr *right = factor();
-        expr = new Expr(expr, op, right);
+        Ast::Expr *right = factor();
+        expr = new Ast::Expr(expr, op, right);
     }
     return expr;
 }
-Expr *
+Ast::Expr *
 Parser::factor()
 {
-    Expr *expr = unary();
+    Ast::Expr *expr = unary();
     while (match(SLASH, STAR)) {
         Token op = prev();
-        Expr *right = unary();
-        expr =  new Expr(expr, op, right);
+        Ast::Expr *right = unary();
+        expr =  new Ast::Expr(expr, op, right);
     }
     return expr;
 }
 
-Expr *
+Ast::Expr *
 Parser::unary()
 {
     if (match(BANG, MINUS)) {
         Token op = prev();
-        Expr *right = unary();
-        return new Expr(op, right);
+        Ast::Expr *right = unary();
+        return new Ast::Expr(op, right);
     }
     return primary();
 }
 
-Expr *
+Ast::Expr *
 Parser::primary()
 {
     if (match(FALSE))
-        return new Expr(false);
+        return new Ast::Expr(false);
     if (match(TRUE))
-        return new Expr(true);
+        return new Ast::Expr(true);
     if (match(NIL))
-        return new Expr("nullptr");
+        return new Ast::Expr("nullptr");
     if (match(NUMBER))
-        return new Expr(std::get<double>(prev().literal));
+        return new Ast::Expr(std::get<double>(prev().literal));
     if (match(STRING))
-        return new Expr(std::get<std::string>(prev().literal));
+        return new Ast::Expr(std::get<std::string>(prev().literal));
     if (match(IDENTIFIER)) // user-defined identifers
-        return new Expr(prev().lexeme, LITERAL);
+        return new Ast::Expr(prev().lexeme, Expr_t::LITERAL);
     if (match(LEFT_PAREN)) {
-        Expr *expr = expression();
+        Ast::Expr *expr = expression();
         consume(RIGHT_PAREN, "Expect ')' after expression.");
-        return new Expr(expr);
+        return new Ast::Expr(expr);
     }
     return nullptr;
 }

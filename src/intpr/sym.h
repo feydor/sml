@@ -8,41 +8,39 @@
 // Symbols are user-defined identifiers with definitions
 enum class Sym_t{ FN, VAR };
 struct Sym {
-    Sym_t stype;
+    Sym_t type;
     std::string sym;
 
     Sym(Sym_t type, std::string sym)
-        : stype(type), sym(sym) {};
+        : type(type), sym(sym) {};
 };
 
 // Vars are user-defined identifiers with a value
-enum class Var_t{ NUM, STR, BOOL };
 struct Var : public Sym {
-    Var_t vtype;
-    union {
-        double val_num;
-        std::string val_str;
-        bool val_bool;
-    };
+    Val::Val val;
+    
+    // transfer ownership constructor
+    Var(Sym sym, Val::Val val)
+        : Sym(sym), val(val) {};
 
     // NUM var
     Var(std::string sym, double num)
-        : Sym(Sym_t::VAR, sym), vtype(Var_t::NUM), val_num(num) {};
+        : Sym(Sym_t::VAR, sym), val(Val::Val(num)) {};
 
     // STR var
     Var(std::string sym, std::string str)
-        : Sym(Sym_t::VAR, sym), vtype(Var_t::STR), val_str(str) {};
+        : Sym(Sym_t::VAR, sym), val(Val::Val(str)) {};
 
     // BOOL var
     Var(std::string sym, bool b)
-        : Sym(Sym_t::VAR, sym), vtype(Var_t::BOOL), val_bool(b) {};
+        : Sym(Sym_t::VAR, sym), val(Val::Val(b)) {};
 };
 
 // Functions are user-defined identifiers with a list of statements
 struct Fn : public Sym {
-    std::vector<Stmt *> stmts;
+    std::vector<Ast::Stmt *> stmts;
 
-    Fn(std::string sym, std::vector<Stmt *> stmts)
+    Fn(std::string sym, std::vector<Ast::Stmt *> stmts)
         : Sym(Sym_t::FN, sym), stmts(stmts) {};
 };
 

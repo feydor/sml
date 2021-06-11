@@ -10,31 +10,31 @@
 
 class Parser {
     std::vector<Token> tokens;
-    std::vector<Expr *> exprs;
-    std::vector<Stmt *> stmts;
+    std::vector<Ast::Expr *> exprs;
+    std::vector<Ast::Stmt *> stmts;
     int curr = 0;
 
     public:
     Parser(std::vector<Token> tokens)
         : tokens(tokens) {};
-    std::vector<Expr *> scan_exprs();
-    std::vector<Stmt *> scan_program();
+    std::vector<Ast::Expr *> scan_exprs();
+    std::vector<Ast::Stmt *> scan_program();
     static void error(Token const &tok, std::string const &msg);
 
     private:
-    std::vector<Stmt *> program();
-    Stmt * decl();
-    Stmt * statement();
-    Stmt * say_stmt();
-    Stmt * expr_stmt();
-    Stmt * var_decl();
-    Expr *expression();
-    Expr *equality();
-    Expr *comparison();
-    Expr *term();
-    Expr *factor();
-    Expr *unary();
-    Expr *primary();
+    std::vector<Ast::Stmt *> program();
+    Ast::Stmt * decl();
+    Ast::Stmt * statement();
+    Ast::Stmt * say_stmt();
+    Ast::Stmt * expr_stmt();
+    Ast::Stmt * var_decl();
+    Ast::Expr *expression();
+    Ast::Expr *equality();
+    Ast::Expr *comparison();
+    Ast::Expr *term();
+    Ast::Expr *factor();
+    Ast::Expr *unary();
+    Ast::Expr *primary();
     
     template <class ...Ts> bool match(Ts... args);
     bool peek_type(TokenType type);

@@ -16,7 +16,7 @@ std::vector<Ast::Stmt *>
 parser::program()
 {
     while (!at_end()) {
-        Ast::Stmt *stmt = decl();
+        Ast::Stmt *stmt = declaration();
         if (stmt)
             this->stmts.push_back(stmt);
     }
@@ -24,10 +24,12 @@ parser::program()
 }
 
 Ast::Stmt *
-parser::decl()
+parser::declaration()
 {
     if (match(LET))
         return var_decl();        
+    else if (peek_next_type(EQUAL))
+        return var_redef();
     return statement();
 }
 
@@ -66,9 +68,20 @@ parser::var_decl() {
     auto *ident = new Ast::Ident(Sym(Sym_t::VAR, prev().get_lexeme()));
     if (match(EQUAL)) {
         Ast::Expr *expr = expression();
-        return new Ast::IdentStmt(ident, expr);
+        return new Ast::IdentStmt(ident, expr); // var_def
     }
-    return new Ast::IdentStmt(ident);
+    return new Ast::IdentStmt(ident); // var_decl
+}
+
+Ast::Stmt *
+parser::var_redef()
+{
+    consume(IDENTIFIER, "Expected identifier before token '='.");
+    auto *ident = new Ast::Ident(Sym(Sym_t::VAR, prev().get_lexeme()));
+    consume(EQUAL,
+            "Expected '=' after identifier '" + prev().get_lexeme() + "'");
+    Ast::Expr *expr = expression();
+    return new Ast::IdentStmt(ident, expr, true); // var_redef
 }
 
 Ast::Expr *
@@ -174,6 +187,16 @@ parser::match(Ts... args)
         }
     }
     return false;
+}
+
+/* checks next token for type match
+ * if match, returns true and does not consume */
+bool
+parser::peek_next_type(Token_t type)
+{
+    if (at_end())
+        return false;
+    return peek_next().get_type() == type;
 }
 
 /* checks curr token for given type, does not consume it */

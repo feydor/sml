@@ -22,11 +22,12 @@ class parser {
 
     private:
     std::vector<Ast::Stmt *> program();
-    Ast::Stmt * decl();
+    Ast::Stmt * declaration();
     Ast::Stmt * statement();
     Ast::Stmt * say_stmt();
     Ast::Stmt * expr_stmt();
     Ast::Stmt * var_decl();
+    Ast::Stmt * var_redef();
     Ast::Expr *expression();
     Ast::Expr *equality();
     Ast::Expr *comparison();
@@ -37,6 +38,7 @@ class parser {
     
     template <class ...Ts> bool match(Ts... args);
     bool peek_type(Token_t type);
+    bool peek_next_type(Token_t type);
     Token peek();
     Token peek_next();
     Token advance();

@@ -8,11 +8,12 @@
 ## Grammer
 # Type: Stmt
 - program     -> declaration* EOF;
-- declaration -> var_decl | statement;
+- declaration -> var_decl | var_redef | statement;
 - statement   -> expr_stmt | say_stmnt;
-- expr_stmt   -> expression"\n";
-- say_stmt    -> "say" expression"\n";
+- expr_stmt   -> expression EOL;
+- say_stmt    -> "say" expression EOL;
 - var_decl    -> "let" IDENTIFIER ("=" expression)? EOL;
+- var_redef     -> IDENTIFIER "=" expression EOL;
 
 # Type: Expr
 - expression  -> equality;
@@ -22,5 +23,5 @@
 - factor      -> unary (("/" | "*") unary)*;
 - unary       -> ("!" | "-") unary | primary;
 - primary     -> NUMBER | STRING | "true" | "false" 
-                 | "nil" | "("expression")" | IDENTIFIER;
+                 | "nil" | "("expression")" | IDENTIFIER | EOL;
 

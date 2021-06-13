@@ -89,7 +89,7 @@ void SMOL::eval(std::string const &src)
         << stmts.size() << ")...";
     
     for (auto &stmt : stmts)
-        std::cout << Ast::Stmt::type_to_string(stmt) << "_";
+        std::cout << Ast::Stmt::type_to_string(stmt) << "::";
     std::cout << "\n";
 
     std::cout << "Begin interpretation...\n";

@@ -2,9 +2,15 @@
 
 /* only inserts unique vars */
 void
-SymTable::insert(Var *v)
+SymTable::insert_var(Var *v)
 {
     this->table.insert({v->sym(), v});
+}
+
+void
+SymTable::replace_var(Var *var)
+{
+    this->table.insert_or_assign(var->sym(), var); 
 }
 
 bool

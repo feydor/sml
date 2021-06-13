@@ -1,0 +1,5 @@
+# variable re-definition and scope test
+# say 55, say 100
+let x = 7 * 5
+x = 55
+say x

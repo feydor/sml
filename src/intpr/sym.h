@@ -24,6 +24,10 @@ class Var : public Sym {
     Val::Val val_;
     
     public:
+    // default
+    Var(Sym sym, Val::Val val)
+        : Sym(sym.type(), sym.sym()), val_(val) {};
+
     // NUM var
     Var(std::string sym, double num)
         : Sym(Sym_t::VAR, sym), val_(Val::Val(num)) {};
@@ -55,7 +59,8 @@ class SymTable {
     std::unordered_map<std::string, Sym *> table;
 
     public:
-    void insert(Var *var);
+    void insert_var(Var *var);
+    void replace_var(Var *var);
     bool in_table(Sym const &sym) const;
     Sym *get(Sym const &sym) const;
 };

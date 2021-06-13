@@ -19,29 +19,25 @@ intpr::interpret()
             eval_ast(stmt->expr());
             res = this->stack.top();
 
-            if (res.is_num()) {
-                auto vdef = new Var(stmt->ident()->sym().sym(),
-                        res.get_num());
-                this->sym_table.insert(vdef);
-            } else if (res.is_str()) {
-                auto vdef = new Var(stmt->ident()->sym().sym(),
-                        res.get_str());
-                this->sym_table.insert(vdef);
-            } else if (res.is_bool()) {
-                auto vdef = new Var(stmt->ident()->sym().sym(),
-                        res.get_bool());
-                this->sym_table.insert(vdef);
-            } else {
-                intpr::error(stmt->ident(),
-                        "Variable definition is not string, number, or bool.");
-                break;
-            }
+            auto def = new Var(stmt->ident()->sym(), res);
+            this->sym_table.insert_var(def);
         } else if (_stmt->is_decl_stmt()) {
             auto stmt = (Ast::IdentStmt *)_stmt;
             // var_decl without definition, add to symtable?
             // TODO: add to sym_table with value of NIL
             std::cout << "VAR_DECL without definition is not"
                 << "implemented yet." << std::endl;
+        } else if (_stmt->is_redef_stmt()) {
+            auto stmt = (Ast::IdentStmt *)_stmt; 
+            if (!sym_table.in_table(stmt->ident()->sym())) {
+                intpr::error(stmt->expr(), "Redefinition of un-declared variable.");
+            } else {
+                eval_ast(stmt->expr());
+                res = this->stack.top();
+
+                auto redef = new Var(stmt->ident()->sym(), res);
+                this->sym_table.replace_var(redef);
+            }
         } else {
             auto stmt = (Ast::ExprStmt *)_stmt;
             // do eval on stmt->expr, do not cout the result

@@ -4,7 +4,7 @@
 
 // forward declarations
 
-enum class Stmt_t { VAR_DECL, VAR_DEF, SAY, EXPR };
+enum class Stmt_t { VAR_DECL, VAR_DEF, VAR_REDEF, SAY, EXPR };
 
 namespace Ast {
     class Expr;
@@ -30,6 +30,7 @@ namespace Ast {
         bool is_expr_stmt();
         bool is_decl_stmt();
         bool is_def_stmt();
+        bool is_redef_stmt();
         static std::string type_to_string(Stmt const *stmt);
     };
 
@@ -55,6 +56,11 @@ namespace Ast {
         // identifier without definition (declaration)
         IdentStmt(Ast::Ident *ident)
             : Stmt(Stmt_t::VAR_DECL, nullptr), ident_(ident) {};
+        
+        // identifier with redefinition
+        // must be declared at runtime else runtime error
+        IdentStmt(Ast::Ident *ident, Ast::Expr *def, bool redef)
+            : Stmt(Stmt_t::VAR_REDEF, def), ident_(ident) { (void)redef; };
         
         Ident * ident();
     };

@@ -9,7 +9,7 @@ Intpr::interpret()
 {
     Val::Val res;
     for (auto &_stmt : this->stmts) {
-        if (_stmt->is_decl_stmt()) {
+        if (_stmt->is_def_stmt()) {
             auto stmt = (Ast::IdentStmt *)_stmt;
             // var_decl with definition, add to symtable
             /* assuming expr does not have other vars/identifiers
@@ -35,7 +35,7 @@ Intpr::interpret()
                         "Variable definition is not string, number, or bool.");
                 break;
             }
-        } else if (_stmt->is_def_stmt()) { 
+        } else if (_stmt->is_decl_stmt()) {
             auto stmt = (Ast::IdentStmt *)_stmt;
             // var_decl without definition, add to symtable?
             // TODO: add to sym_table with value of NIL
@@ -104,6 +104,8 @@ Intpr::eval_ast(Ast::Expr const *curr)
 
         stack.push(Ast::Unary::eval(unary->op(), a));
 
+    } else if (curr->is_grouping()) {
+        // do nothing; continue eval
     } else {
         Intpr::error(curr, "Current expr type is not implemented in eval_ast.");
     }

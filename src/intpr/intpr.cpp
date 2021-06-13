@@ -11,22 +11,22 @@ intpr::interpret()
     Val::Val res;
     for (auto &_stmt : this->stmts) {
         if (_stmt->is_def_stmt()) {
-            auto stmt = (Ast::IdentStmt *)_stmt;
             // var_decl with definition, add to symtable
             /* assuming expr does not have other vars/identifiers
              * TODO: in expr->eval, deal with undefined vars/idents
              */
+            auto stmt = (Ast::IdentStmt *)_stmt;
             eval_ast(stmt->expr());
             res = this->stack.top();
 
             auto def = new Var(stmt->ident()->sym(), res);
             this->sym_table.insert_var(def);
         } else if (_stmt->is_decl_stmt()) {
-            auto stmt = (Ast::IdentStmt *)_stmt;
             // var_decl without definition, add to symtable?
             // TODO: add to sym_table with value of NIL
-            std::cout << "VAR_DECL without definition is not"
-                << "implemented yet." << std::endl;
+            auto stmt = (Ast::IdentStmt *)_stmt;
+            auto decl = new Var(stmt->ident()->sym());
+            this->sym_table.insert_var(decl);
         } else if (_stmt->is_redef_stmt()) {
             auto stmt = (Ast::IdentStmt *)_stmt; 
             if (!sym_table.in_table(stmt->ident()->sym())) {

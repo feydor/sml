@@ -28,6 +28,10 @@ class Var : public Sym {
     Var(Sym sym, Val::Val val)
         : Sym(sym.type(), sym.sym()), val_(val) {};
 
+    // NIL var
+    Var(Sym sym)
+        : Sym(sym.type(), sym.sym()), val_(Val::Val()) {};
+
     // NUM var
     Var(std::string sym, double num)
         : Sym(Sym_t::VAR, sym), val_(Val::Val(num)) {};

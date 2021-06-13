@@ -4,15 +4,16 @@
 #include <tuple>
 #include <iostream>
 
+namespace Parser {
 std::vector<Ast::Stmt *>
-Parser::scan_program()
+parser::scan_program()
 {
     return program();
 }
 
 // entry point to building AST (abstract syntax tree)
 std::vector<Ast::Stmt *>
-Parser::program()
+parser::program()
 {
     while (!at_end()) {
         Ast::Stmt *stmt = decl();
@@ -23,7 +24,7 @@ Parser::program()
 }
 
 Ast::Stmt *
-Parser::decl()
+parser::decl()
 {
     if (match(LET))
         return var_decl();        
@@ -31,7 +32,7 @@ Parser::decl()
 }
 
 Ast::Stmt *
-Parser::statement()
+parser::statement()
 {
     if (match(SAY))
         return say_stmt();
@@ -39,7 +40,7 @@ Parser::statement()
 }
 
 Ast::Stmt *
-Parser::say_stmt()
+parser::say_stmt()
 {
     Ast::Expr *expr = expression();
     consume(EOL, "Expected newline after expression.");
@@ -47,7 +48,7 @@ Parser::say_stmt()
 }
 
 Ast::Stmt *
-Parser::expr_stmt()
+parser::expr_stmt()
 {
     Ast::Expr *expr = expression();
     consume(EOL, "Expected newline after expression.");
@@ -60,9 +61,9 @@ Parser::expr_stmt()
 }
 
 Ast::Stmt *
-Parser::var_decl() {
+parser::var_decl() {
     consume(IDENTIFIER, "Expected identifier after keyword 'let'.");
-    auto *ident = new Ast::Ident(Sym(Sym_t::VAR, prev().lexeme));
+    auto *ident = new Ast::Ident(Sym(Sym_t::VAR, prev().get_lexeme()));
     if (match(EQUAL)) {
         Ast::Expr *expr = expression();
         return new Ast::IdentStmt(ident, expr);
@@ -71,13 +72,13 @@ Parser::var_decl() {
 }
 
 Ast::Expr *
-Parser::expression()
+parser::expression()
 {
     return equality(); 
 }
 
 Ast::Expr *
-Parser::equality()
+parser::equality()
 {
     Ast::Expr *expr = comparison();
     while (match(BANG_EQUAL, EQUAL_EQUAL)) {
@@ -88,7 +89,7 @@ Parser::equality()
     return expr;
 }
 Ast::Expr *
-Parser::comparison()
+parser::comparison()
 {
     Ast::Expr *expr = term();
     while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
@@ -100,7 +101,7 @@ Parser::comparison()
 }
 
 Ast::Expr *
-Parser::term()
+parser::term()
 {
     Ast::Expr *expr = factor();
     while (match(MINUS, PLUS)) {
@@ -111,7 +112,7 @@ Parser::term()
     return expr;
 }
 Ast::Expr *
-Parser::factor()
+parser::factor()
 {
     Ast::Expr *expr = unary();
     while (match(SLASH, STAR)) {
@@ -123,7 +124,7 @@ Parser::factor()
 }
 
 Ast::Expr *
-Parser::unary()
+parser::unary()
 {
     if (match(BANG, MINUS)) {
         Token op = prev();
@@ -134,7 +135,7 @@ Parser::unary()
 }
 
 Ast::Expr *
-Parser::primary()
+parser::primary()
 {
     if (match(FALSE))
         return new Ast::Literal(Val::Val(false));
@@ -143,12 +144,12 @@ Parser::primary()
     if (match(NIL))
         return new Ast::Literal(Val::Val());
     if (match(NUMBER))
-        return new Ast::Literal(Val::Val(std::get<double>(prev().literal)));
+        return new Ast::Literal(Val::Val(prev().get_literal_num()));
     if (match(STRING))
-        return new Ast::Literal(Val::Val(std::get<std::string>(prev().literal)));
+        return new Ast::Literal(Val::Val(prev().get_literal_str()));
     if (match(IDENTIFIER)) // user-defined identifers
         // TODO: handle function idents
-        return new Ast::Ident(Sym(Sym_t::VAR, prev().lexeme));
+        return new Ast::Ident(Sym(Sym_t::VAR, prev().get_lexeme()));
     if (match(LEFT_PAREN)) {
         Ast::Expr *expr = expression();
         consume(RIGHT_PAREN, "Expect ')' after expression.");
@@ -163,9 +164,9 @@ Parser::primary()
  */
 template <class ...Ts>
 bool 
-Parser::match(Ts... args)
+parser::match(Ts... args)
 {
-    std::vector<TokenType> types {args...};
+    std::vector<Token_t> types {args...};
     for (auto type : types) {
         if (peek_type(type)) {
             advance();
@@ -177,30 +178,30 @@ Parser::match(Ts... args)
 
 /* checks curr token for given type, does not consume it */
 bool 
-Parser::peek_type(TokenType type)
+parser::peek_type(Token_t type)
 {
     if (at_end())
         return false;
-    return peek().type == type;
+    return peek().get_type() == type;
 }  
 
 /* returns curr token, does not consume it */
 Token
-Parser::peek()
+parser::peek()
 {
     return this->tokens.at(this->curr);
 }
 
 /* returns next token, does not consume it */
 Token
-Parser::peek_next()
+parser::peek_next()
 {
     return this->tokens.at(this->curr + 1);
 }
 
 /* consumes curr token, returns it, and advances to the next token */
 Token
-Parser::advance()
+parser::advance()
 {
     if (!at_end())
         this->curr++;
@@ -208,34 +209,35 @@ Parser::advance()
 }
 
 Token
-Parser::prev()
+parser::prev()
 {
     return this->tokens.at(this->curr - 1);
 }
 
 /* check if next token has type and if so consume, otherwise error */
 Token
-Parser::consume(TokenType type, std::string const& message)
+parser::consume(Token_t type, std::string const& message)
 {
     if (peek_type(type))
         return advance();
-    Parser::error(peek(), message);
+    parser::error(peek(), message);
     return Token(); // TODO: This should be a nullptr
 }
     
 bool
-Parser::at_end()
+parser::at_end()
 {
-    return peek().type == _EOF;
+    return peek().get_type() == _EOF;
 }
 
 void
-Parser::error(Token const &tok, std::string const &msg)
+parser::error(Token const &tok, std::string const &msg)
 {
-    if (tok.type == _EOF)
-        std::cout << "[line " << tok.line << "] Error " << "at end " <<
-            msg << std::endl;
+    if (tok.get_type() == _EOF)
+        std::cout << "[line " << tok.get_line() << "] Error "
+            << "at end " << msg << std::endl;
     else
-        std::cout << "[line " << tok.line << "] Error " << "at '" <<
-            tok.lexeme << "' " + msg << std::endl;
+        std::cout << "[line " << tok.get_line() << "] Error " << "at '" <<
+            tok.get_lexeme() << "' " + msg << std::endl;
+}
 }

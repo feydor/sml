@@ -2,10 +2,11 @@
 #include "intpr.h"
 #include "value.h"
 
+namespace Intpr {
 // eval statements
 // resolve variable typing
 void
-Intpr::interpret()
+intpr::interpret()
 {
     Val::Val res;
     for (auto &_stmt : this->stmts) {
@@ -19,19 +20,19 @@ Intpr::interpret()
             res = this->stack.top();
 
             if (res.is_num()) {
-                auto vdef = new Var(stmt->ident()->sym().sym,
+                auto vdef = new Var(stmt->ident()->sym().sym(),
                         res.get_num());
                 this->sym_table.insert(vdef);
             } else if (res.is_str()) {
-                auto vdef = new Var(stmt->ident()->sym().sym,
+                auto vdef = new Var(stmt->ident()->sym().sym(),
                         res.get_str());
                 this->sym_table.insert(vdef);
             } else if (res.is_bool()) {
-                auto vdef = new Var(stmt->ident()->sym().sym,
+                auto vdef = new Var(stmt->ident()->sym().sym(),
                         res.get_bool());
                 this->sym_table.insert(vdef);
             } else {
-                Intpr::error(stmt->ident(),
+                intpr::error(stmt->ident(),
                         "Variable definition is not string, number, or bool.");
                 break;
             }
@@ -60,7 +61,7 @@ Intpr::interpret()
  * resolve user-defined identifiers
  */
 void
-Intpr::eval_ast(Ast::Expr const *curr)
+intpr::eval_ast(Ast::Expr const *curr)
 {
     if (curr->left()) eval_ast(curr->left());
     if (curr->right()) eval_ast(curr->right());
@@ -71,7 +72,7 @@ Intpr::eval_ast(Ast::Expr const *curr)
         // look up in sym_table and resolve
         if (!sym_table.in_table(ident->sym()))
             sym_undefined_exit(ident);
-        res = ((Var *)sym_table.get(ident->sym()))->val;
+        res = ((Var *)sym_table.get(ident->sym()))->val();
         this->stack.push(res);
 
     } else if (curr->is_literal()) {
@@ -88,7 +89,7 @@ Intpr::eval_ast(Ast::Expr const *curr)
         this->stack.pop();
 
         if (!a.same_type(b)) {
-            Intpr::error(curr, "Literal val types do not match.");
+            intpr::error(curr, "Literal val types do not match.");
             Val::Val nil = Val::Val();
             stack.push(nil);
             return;
@@ -107,40 +108,40 @@ Intpr::eval_ast(Ast::Expr const *curr)
     } else if (curr->is_grouping()) {
         // do nothing; continue eval
     } else {
-        Intpr::error(curr, "Current expr type is not implemented in eval_ast.");
+        intpr::error(curr, "Current expr type is not implemented in eval_ast.");
     }
 }
 
 // populates curr with val and type from sym in sym_table
-// Assumes curr.val_str is a key to a symbol in Intpr::sym_table
+// Assumes curr.val_str is a key to a symbol in intpr::sym_table
 // Assumes the symbol exists in the table and is valid
 void
-Intpr::swap_with_sym(Val::Val &curr, Sym &sym)
+intpr::swap_with_sym(Val::Val &curr, Sym &sym)
 {
     // TODO: Assuming no Fn, only Var
     Var *var = (Var *) &sym;
-    curr = var->val;
-    if (var->val.is_nil())
+    curr = var->val();
+    if (var->val().is_nil())
         std::cout << "Expr::swap_with_sym: Val is nil.\n";        
 }
 
 void
-Intpr::sym_undefined_exit(Ast::Expr const *curr)
+intpr::sym_undefined_exit(Ast::Expr const *curr)
 {
-    Intpr::error(curr, "Symbol not defined at eval-time.");
+    intpr::error(curr, "Symbol not defined at eval-time.");
     exit(-1);
 }
 
 void
-Intpr::error(Ast::Expr const *_curr, std::string const &msg)
+intpr::error(Ast::Expr const *_curr, std::string const &msg)
 {
     if (_curr->is_binary()) {
         auto curr = (Ast::Binary *) _curr;
-        std::cout << "Intpr::error [line" << curr->op().line <<
+        std::cout << "intpr::error [line" << curr->op().get_line() <<
             "} Error at expression '" <<  "' " + msg + "]\n";
     } else { 
         auto curr = (Ast::Literal *) _curr;
-        std::cout << "Intpr::error  Error " <<
+        std::cout << "intpr::error  Error " <<
             "at expression '" << curr->val().to_string() << "' " + msg << std::endl;
     }
 }
@@ -148,7 +149,8 @@ Intpr::error(Ast::Expr const *_curr, std::string const &msg)
 // string to bool
 // input should be lowercase "true" or "false"
 bool
-Intpr::stob(std::string s)
+intpr::stob(std::string s)
 {
     return s.compare("true") == 0 ? true : false;
+}
 }

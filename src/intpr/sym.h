@@ -7,41 +7,44 @@
 
 // Symbols are user-defined identifiers with definitions
 enum class Sym_t{ FN, VAR };
-struct Sym {
-    Sym_t type;
-    std::string sym;
+class Sym {
+    Sym_t type_;
+    std::string sym_;
 
+    public:
     Sym(Sym_t type, std::string sym)
-        : type(type), sym(sym) {};
+        : type_(type), sym_(sym) {};
+
+    Sym_t type() const;
+    std::string sym() const;
 };
 
 // Vars are user-defined identifiers with a value
-struct Var : public Sym {
-    Val::Val val;
+class Var : public Sym {
+    Val::Val val_;
     
-    // transfer ownership constructor
-    /*
-    Var(Sym sym, Val::Val val)
-        : Sym(sym), val(val) {};
-        */
-
+    public:
     // NUM var
     Var(std::string sym, double num)
-        : Sym(Sym_t::VAR, sym), val(Val::Val(num)) {};
+        : Sym(Sym_t::VAR, sym), val_(Val::Val(num)) {};
 
     // STR var
     Var(std::string sym, std::string str)
-        : Sym(Sym_t::VAR, sym), val(Val::Val(str)) {};
+        : Sym(Sym_t::VAR, sym), val_(Val::Val(str)) {};
 
     // BOOL var
     Var(std::string sym, bool b)
-        : Sym(Sym_t::VAR, sym), val(Val::Val(b)) {};
+        : Sym(Sym_t::VAR, sym), val_(Val::Val(b)) {};
+
+    Val::Val val() const;
 };
 
 // Functions are user-defined identifiers with a list of statements
-struct Fn : public Sym {
+class Fn : public Sym {
+    // TODO: Change to Block type
     std::vector<Ast::Stmt *> stmts;
 
+    public:
     Fn(std::string sym, std::vector<Ast::Stmt *> stmts)
         : Sym(Sym_t::FN, sym), stmts(stmts) {};
 };

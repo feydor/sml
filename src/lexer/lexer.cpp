@@ -3,7 +3,8 @@
 #include "lexer.h"
 #include "smol.h"
 
-Lexer::Lexer(std::string const& src) 
+namespace Lexer {
+lexer::lexer(std::string const& src) 
     : src(src) 
 {
     this->keywords.emplace("and", AND);
@@ -28,7 +29,7 @@ Lexer::Lexer(std::string const& src)
  * and returns it.
  */
 std::vector<Token>
-Lexer::scan_tokens()
+lexer::scan_tokens()
 {
     // a lexeme is made by the substring of [start, curr-start)
     // where curr is ahead of start depending on the char size of the token
@@ -101,12 +102,12 @@ Lexer::scan_tokens()
 }
 
 /* consume the current character */
-char Lexer::advance()
+char lexer::advance()
 {
     return this->src.at(this->curr++);
 }
 
-void Lexer::add_token(TokenType type)
+void lexer::add_token(Token_t type)
 {
     std::string lexeme(
         this->src.substr(this->start, this->curr - this->start)
@@ -115,7 +116,7 @@ void Lexer::add_token(TokenType type)
 }
 
 /* with literal */
-void Lexer::add_token(TokenType type, 
+void lexer::add_token(Token_t type, 
         std::variant<double, std::string> const& literal)
 {
     std::string lexeme(
@@ -125,7 +126,7 @@ void Lexer::add_token(TokenType type,
 }
 
 /* look at current character without consumption */
-char Lexer::peek()
+char lexer::peek()
 {
     if (at_end()) 
         return '\0';
@@ -133,7 +134,7 @@ char Lexer::peek()
 }
 
 /* lookahead two characters */
-char Lexer::peek_next()
+char lexer::peek_next()
 {
     if (this->curr + 1 >= (int)src.length()) 
         return '\0';
@@ -141,7 +142,7 @@ char Lexer::peek_next()
 }
 
 /* if the next character matches, consume the current + next character */
-bool Lexer::next_is(char c)
+bool lexer::next_is(char c)
 {
     if (at_end())
         return false;
@@ -153,7 +154,7 @@ bool Lexer::next_is(char c)
 }
 
 /* handle string literals */
-void Lexer::str()
+void lexer::str()
 {
     // consume characters until matching " mark
     while (peek() != '"' && !at_end()) {
@@ -176,7 +177,7 @@ void Lexer::str()
     add_token(STRING, literal);
 }
 
-void Lexer::num()
+void lexer::num()
 {
     // consume consecutive digits
     while (is_digit(peek()))
@@ -195,7 +196,7 @@ void Lexer::num()
 }
 
 /* handle non-string letters */
-void Lexer::identifier()
+void lexer::identifier()
 {
     // move curr char ptr to end of identifier token
     while (is_alphanumeric(peek()))
@@ -208,23 +209,24 @@ void Lexer::identifier()
     itr != keywords.end() ? add_token(itr->second) : add_token(IDENTIFIER);
 }
 
-bool Lexer::at_end()
+bool lexer::at_end()
 {
     return this->curr >= (int)this->src.length(); 
 }
 
-bool Lexer::is_digit(char c)
+bool lexer::is_digit(char c)
 {
     return c >= '0' && c <= '9';
 }
 
-bool Lexer::is_alpha(char c) {
+bool lexer::is_alpha(char c) {
     return (c >= 'a' && c <= 'z') ||
            (c >= 'A' && c <= 'Z') ||
            c == '_';
 }
 
-bool Lexer::is_alphanumeric(char c)
+bool lexer::is_alphanumeric(char c)
 {
     return is_alpha(c) || is_digit(c);
+}
 }

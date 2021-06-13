@@ -19,11 +19,11 @@ namespace Ast {
      */
     class Stmt {
         Stmt_t type;
-        Ast::Expr *_expr;
+        Ast::Expr *expr_;
 
         public:
         Stmt(Stmt_t type, Ast::Expr *expr)
-            : type(type), _expr(expr) {};
+            : type(type), expr_(expr) {};
 
         Expr * expr();
         bool is_say_stmt();
@@ -46,15 +46,15 @@ namespace Ast {
     };
 
     class IdentStmt : public Stmt {
-        Ident *_ident;
+        Ident *ident_;
         public:
         // identifier with definition
         IdentStmt(Ast::Ident *ident, Ast::Expr *def)
-            : Stmt(Stmt_t::VAR_DEF, def), _ident(ident) {};
+            : Stmt(Stmt_t::VAR_DEF, def), ident_(ident) {};
 
         // identifier without definition (declaration)
         IdentStmt(Ast::Ident *ident)
-            : Stmt(Stmt_t::VAR_DECL, nullptr), _ident(ident) {};
+            : Stmt(Stmt_t::VAR_DECL, nullptr), ident_(ident) {};
         
         Ident * ident();
     };

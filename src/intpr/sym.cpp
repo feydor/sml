@@ -1,21 +1,20 @@
 #include "sym.h"
 
-void
-SymTable::insert(Var *v)
+Sym_t
+Sym::type() const
 {
-    this->table.insert({v->sym, v});
+    return this->type_;
 }
 
-bool
-SymTable::in_table(Sym const &sym) const
+std::string
+Sym::sym() const
 {
-    return this->table.find(sym.sym) != table.end()
-        ? true : false;
+    return this->sym_;
 }
-    
-/* assumes sym_name is a valid key in table */
-Sym *
-SymTable::get(Sym const &sym) const
+
+Val::Val
+Var::val() const
 {
-    return this->table.find(sym.sym)->second;
+    return this->val_;
 }
+

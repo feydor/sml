@@ -7,14 +7,14 @@
 #include <stack>
 #include <vector>
 
-// Interpreter
-class Intpr {
+namespace Intpr {
+class intpr {
     std::vector<Ast::Stmt *> stmts;
     std::stack<Val::Val> stack;
     SymTable sym_table;
     
     public:
-    Intpr(std::vector<Ast::Stmt *> stmts)
+    intpr(std::vector<Ast::Stmt *> stmts)
         : stmts(stmts) {};
 
     void interpret();
@@ -24,6 +24,7 @@ class Intpr {
     void sym_undefined_exit(Ast::Expr const *curr);
     static bool stob(std::string s);
 };
+}
 
 #endif
 

@@ -1,8 +1,7 @@
 # gather subsystem sources and headers into vars
-ast_src = files(['ast/expr.cpp', 'ast/literal.cpp', 'ast/ident.cpp', 'ast/binary.cpp', 'ast/unary.cpp', 'ast/stmt.cpp'])
-ast_inc = include_directories('ast')
+subdir('ast')
 
-intpr_src = files(['intpr/intpr.cpp', 'intpr/sym.cpp'])
+intpr_src = files(['intpr/intpr.cpp', 'intpr/sym.cpp', 'intpr/sym_table.cpp'])
 intpr_inc = include_directories('intpr')
 
 parser_src = files(['parser/parser.cpp'])

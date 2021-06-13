@@ -3,7 +3,7 @@
 #include <string>
 #include <variant>
 
-enum TokenType {
+enum Token_t {
     // single-character tokens
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, LEFT_BRACKET,
     RIGHT_BRACKET, COMMA, DOT,
@@ -19,18 +19,24 @@ enum TokenType {
 };
 
 class Token {
-    public:
-    TokenType type;
+    Token_t type;
     std::string lexeme;
     int line;
     std::variant<double, std::string> literal;
 
-    Token(TokenType type, std::string lexeme, int line);
-    Token(TokenType type, std::string lexeme, int line,
+    public:
+    Token(Token_t type, std::string lexeme, int line);
+    Token(Token_t type, std::string lexeme, int line,
         std::variant<double, std::string> literal);
     Token();
-    std::string to_string();
-    static std::string type_to_string(TokenType type);
+
+    Token_t get_type() const;
+    std::string get_lexeme() const;
+    int get_line() const;
+    double get_literal_num() const;
+    std::string get_literal_str() const;
+    std::string to_string() const;
+    static std::string type_to_string(Token_t type);
 };
 
 #endif

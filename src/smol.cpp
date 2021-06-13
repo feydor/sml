@@ -62,30 +62,30 @@ void SMOL::error(int line, std::string const &message)
 
 void SMOL::error(Token const& tok, std::string const &message)
 {
-    if (tok.type == _EOF)
-        std::cout << "[line " << tok.line << "] Error " << "at end " <<
-            message << std::endl;
+    if (tok.get_type() == _EOF)
+        std::cout << "[line " << tok.get_line() << "] Error " <<
+            "at end " << message << std::endl;
     else
-        std::cout << "[line " << tok.line << "] Error " << "at '" <<
-            tok.lexeme << "' " + message << std::endl;
+        std::cout << "[line " << tok.get_line() << "] Error " << "at '" <<
+            tok.get_lexeme() << "' " + message << std::endl;
     SMOL::had_error = true;
 }
 
 /* start interpretation */
 void SMOL::eval(std::string const &src)
 {
-    Lexer lexer(src);
+    Lexer::lexer lexer(src);
     std::vector<Token> tokens = lexer.scan_tokens();
     std::cout << "Printing tokens... ";
     for (auto token : tokens)
-        std::cout << Token::type_to_string(token.type) << "_";
+        std::cout << Token::type_to_string(token.get_type()) << "_";
     std::cout << "\n";
 
-    Parser parser(tokens);
+    Parser::parser parser(tokens);
     std::vector<Ast::Stmt *> stmts = parser.scan_program();
     // std::vector<Ast::Expr *> exprs = parser.scan_exprs();
 
-    std::cout << "\nEvaluating statements (stmts_size: " 
+    std::cout << "Evaluating statements (stmts_size: " 
         << stmts.size() << ")...";
     
     for (auto &stmt : stmts)
@@ -93,6 +93,6 @@ void SMOL::eval(std::string const &src)
     std::cout << "\n";
 
     std::cout << "Begin interpretation...\n";
-    Intpr intpr(stmts);
+    Intpr::intpr intpr(stmts);
     intpr.interpret();
 }

@@ -1,12 +1,12 @@
 #include "token.h"
 
-Token::Token(TokenType type, std::string lexeme, int line)
+Token::Token(Token_t type, std::string lexeme, int line)
     : type(type), lexeme(std::move(lexeme)), line(line)
 {
     this->literal = 0.0;
 }
 
-Token::Token(TokenType type, std::string lexeme, int line,
+Token::Token(Token_t type, std::string lexeme, int line,
     std::variant<double, std::string> literal)
     : type(type), lexeme(std::move(lexeme)), line(line), 
     literal(std::move(literal))
@@ -14,14 +14,44 @@ Token::Token(TokenType type, std::string lexeme, int line,
 
 Token::Token() {}
 
+Token_t
+Token::get_type() const
+{
+    return this->type;
+}
+
 std::string
-Token::to_string() 
+Token::get_lexeme() const
+{
+    return this->lexeme;
+}
+
+int
+Token::get_line() const
+{
+    return this->line;
+}
+
+double
+Token::get_literal_num() const
+{
+    return std::get<double>(this->literal);
+}
+
+std::string
+Token::get_literal_str() const
+{
+    return std::get<std::string>(this->literal);
+}
+
+std::string
+Token::to_string() const
 {
     return this->lexeme;
 }
 
 std::string
-Token::type_to_string(TokenType type)
+Token::type_to_string(Token_t type)
 {
     switch (type) {
         case LEFT_PAREN: return "(";

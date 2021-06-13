@@ -8,13 +8,14 @@
 #include <memory>
 #include <vector>
 
-class Parser {
+namespace Parser {
+class parser {
     std::vector<Token> tokens;
     std::vector<Ast::Stmt *> stmts;
     int curr = 0;
 
     public:
-    Parser(std::vector<Token> tokens)
+    parser(std::vector<Token> tokens)
         : tokens(tokens) {};
     std::vector<Ast::Stmt *> scan_program();
     static void error(Token const &tok, std::string const &msg);
@@ -35,14 +36,15 @@ class Parser {
     Ast::Expr *primary();
     
     template <class ...Ts> bool match(Ts... args);
-    bool peek_type(TokenType type);
+    bool peek_type(Token_t type);
     Token peek();
     Token peek_next();
     Token advance();
     Token prev();
-    Token consume(TokenType type, std::string const &msg);
+    Token consume(Token_t type, std::string const &msg);
     bool at_end();
 };
+}
 
 #endif
 

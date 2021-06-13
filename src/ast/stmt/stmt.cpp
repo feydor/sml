@@ -4,13 +4,13 @@ using namespace Ast;
 Ident *
 IdentStmt::ident()
 {
-    return this->_ident;
+    return this->ident_;
 }
         
 Expr *
 Stmt::expr()
 {
-    return this->_expr;
+    return this->expr_;
 }
 
 bool

@@ -12,7 +12,7 @@ Binary::op()
 Val::Val
 Binary::eval(Val::Val const &a, Token const &op, Val::Val const &b)
 {
-    switch (op.type) {
+    switch (op.get_type()) {
         case MINUS:
             if (a.is_num())
                 return Val::Val(a.get_num() - b.get_num());

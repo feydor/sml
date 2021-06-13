@@ -7,22 +7,23 @@
 #include <vector>
 #include <unordered_map>
 
-class Lexer {
+namespace Lexer {
+class lexer {
     std::string src;
     std::vector<Token> tokens;
-    std::unordered_map<std::string, TokenType> keywords;
+    std::unordered_map<std::string, Token_t> keywords;
     int start = 0; // first char of current lexeme in src file
     int curr = 0; // curr char of src file before consuming
     int line = 1; // curr line of src file
 
     public:
-    Lexer(std::string const& src);
+    lexer(std::string const& src);
     std::vector<Token> scan_tokens();
 
     private:
     char advance();
-    void add_token(TokenType type);
-    void add_token(TokenType type, std::variant<double, std::string> const& lit);
+    void add_token(Token_t type);
+    void add_token(Token_t type, std::variant<double, std::string> const& lit);
     char peek();
     char peek_next();
     bool next_is(char c);
@@ -34,6 +35,7 @@ class Lexer {
     static bool is_alpha(char c);
     static bool is_alphanumeric(char c);
 };
+}
 
 #endif
 

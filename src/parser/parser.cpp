@@ -4,21 +4,6 @@
 #include <tuple>
 #include <iostream>
 
-/**
- * a statement is a series of tokens ending with the NEWLINE token
- * for each statement, go through its tokens and combine into
- * expressions and then a statement
- */
-std::vector<Ast::Expr *>
-Parser::scan_exprs() 
-{
-    while (!at_end()) {
-        Ast::Expr *e = expression();
-        this->exprs.push_back(e);
-    } 
-    return this->exprs;
-}
-
 std::vector<Ast::Stmt *>
 Parser::scan_program()
 {
@@ -56,10 +41,9 @@ Parser::statement()
 Ast::Stmt *
 Parser::say_stmt()
 {
-    Ast::Expr *say_keyword = new Ast::Expr(prev().lexeme, prev().type);
     Ast::Expr *expr = expression();
     consume(EOL, "Expected newline after expression.");
-    return new Ast::Stmt(Stmt_t::SAY, say_keyword, expr);
+    return new Ast::SayStmt(expr);
 }
 
 Ast::Stmt *
@@ -70,7 +54,7 @@ Parser::expr_stmt()
     // expr can be nullptr, if no match
     // for example EOL returns nullptr
     if (expr)
-        return new Ast::Stmt(Stmt_t::EXPR, expr, true); // true is placeholder
+        return new Ast::ExprStmt(expr);
     else
         return nullptr;
 }
@@ -78,12 +62,12 @@ Parser::expr_stmt()
 Ast::Stmt *
 Parser::var_decl() {
     consume(IDENTIFIER, "Expected identifier after keyword 'let'.");
-    Ast::Expr *ident = new Ast::Expr(prev().lexeme);
+    auto *ident = new Ast::Ident(Sym(Sym_t::VAR, prev().lexeme));
     if (match(EQUAL)) {
         Ast::Expr *expr = expression();
-        return new Ast::Stmt(Stmt_t::VAR_DECL, ident, expr);
+        return new Ast::IdentStmt(ident, expr);
     }
-    return new Ast::Stmt(Stmt_t::VAR_DECL, ident);
+    return new Ast::IdentStmt(ident);
 }
 
 Ast::Expr *
@@ -99,7 +83,7 @@ Parser::equality()
     while (match(BANG_EQUAL, EQUAL_EQUAL)) {
         Token op = prev();
         Ast::Expr *right = comparison();
-        expr = new Ast::Expr(expr, op, right);
+        expr = new Ast::Binary(expr, op, right);
     }
     return expr;
 }
@@ -110,7 +94,7 @@ Parser::comparison()
     while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
         Token op = prev();
         Ast::Expr *right = term();
-        expr = new Ast::Expr(expr, op, right);
+        expr = new Ast::Binary(expr, op, right);
     }
     return expr;
 }
@@ -122,7 +106,7 @@ Parser::term()
     while (match(MINUS, PLUS)) {
         Token op = prev();
         Ast::Expr *right = factor();
-        expr = new Ast::Expr(expr, op, right);
+        expr = new Ast::Binary(expr, op, right);
     }
     return expr;
 }
@@ -133,7 +117,7 @@ Parser::factor()
     while (match(SLASH, STAR)) {
         Token op = prev();
         Ast::Expr *right = unary();
-        expr =  new Ast::Expr(expr, op, right);
+        expr =  new Ast::Binary(expr, op, right);
     }
     return expr;
 }
@@ -144,7 +128,7 @@ Parser::unary()
     if (match(BANG, MINUS)) {
         Token op = prev();
         Ast::Expr *right = unary();
-        return new Ast::Expr(op, right);
+        return new Ast::Unary(op, right);
     }
     return primary();
 }
@@ -153,21 +137,22 @@ Ast::Expr *
 Parser::primary()
 {
     if (match(FALSE))
-        return new Ast::Expr(false);
+        return new Ast::Literal(Val::Val(false));
     if (match(TRUE))
-        return new Ast::Expr(true);
+        return new Ast::Literal(Val::Val(true));
     if (match(NIL))
-        return new Ast::Expr("nullptr");
+        return new Ast::Literal(Val::Val());
     if (match(NUMBER))
-        return new Ast::Expr(std::get<double>(prev().literal));
+        return new Ast::Literal(Val::Val(std::get<double>(prev().literal)));
     if (match(STRING))
-        return new Ast::Expr(std::get<std::string>(prev().literal));
+        return new Ast::Literal(Val::Val(std::get<std::string>(prev().literal)));
     if (match(IDENTIFIER)) // user-defined identifers
-        return new Ast::Expr(prev().lexeme, Expr_t::LITERAL);
+        // TODO: handle function idents
+        return new Ast::Ident(Sym(Sym_t::VAR, prev().lexeme));
     if (match(LEFT_PAREN)) {
         Ast::Expr *expr = expression();
         consume(RIGHT_PAREN, "Expect ')' after expression.");
-        return new Ast::Expr(expr);
+        return new Ast::Grouping(expr);
     }
     return nullptr;
 }

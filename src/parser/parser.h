@@ -10,14 +10,12 @@
 
 class Parser {
     std::vector<Token> tokens;
-    std::vector<Ast::Expr *> exprs;
     std::vector<Ast::Stmt *> stmts;
     int curr = 0;
 
     public:
     Parser(std::vector<Token> tokens)
         : tokens(tokens) {};
-    std::vector<Ast::Expr *> scan_exprs();
     std::vector<Ast::Stmt *> scan_program();
     static void error(Token const &tok, std::string const &msg);
 

@@ -7,15 +7,15 @@ SymTable::insert(Var *v)
 }
 
 bool
-SymTable::in_table(std::string sym_name) const
+SymTable::in_table(Sym const &sym) const
 {
-    return this->table.find(sym_name) != table.end()
+    return this->table.find(sym.sym) != table.end()
         ? true : false;
 }
     
 /* assumes sym_name is a valid key in table */
 Sym *
-SymTable::get(std::string sym_name) const
+SymTable::get(Sym const &sym) const
 {
-    return this->table.find(sym_name)->second;
+    return this->table.find(sym.sym)->second;
 }

@@ -2,10 +2,13 @@
 #define STMT_H
 #include <string>
 
-enum class Stmt_t { VAR_DECL, SAY, EXPR };
+// forward declarations
+
+enum class Stmt_t { VAR_DECL, VAR_DEF, SAY, EXPR };
 
 namespace Ast {
-    struct Expr;
+    class Expr;
+    class Ident;
     /* A wrapper around an expr so that they can be called and assigned
      * to variables and functions
      * Possible types:
@@ -14,24 +17,46 @@ namespace Ast {
      * - say statement (print)
      * - expression statement
      */
-    struct Stmt {
+    class Stmt {
         Stmt_t type;
-        Ast::Ident *ident; // can be a keyword, or a user-defined identifier
-        Ast::Expr *expr;
+        Ast::Expr *_expr;
 
-        static std::string type_to_string(Stmt_t type);
+        public:
+        Stmt(Stmt_t type, Ast::Expr *expr)
+            : type(type), _expr(expr) {};
 
-        // identifier with definition or keyword with expression
-        Stmt(Stmt_t type, Ast::Expr *ident, Ast::Expr *expr)
-            : type(type), ident(ident), expr(expr) {};
+        Expr * expr();
+        bool is_say_stmt();
+        bool is_expr_stmt();
+        bool is_decl_stmt();
+        bool is_def_stmt();
+        static std::string type_to_string(Stmt const *stmt);
+    };
 
-        // identifier without definition
-        Stmt(Stmt_t type, Ast::Expr *ident)
-            : type(type), ident(ident), expr(nullptr) {};
+    class ExprStmt : public Stmt {
+        public:
+        ExprStmt(Ast::Expr *expr)
+            : Stmt(Stmt_t::EXPR, expr) {};
+    };
 
-        // EXPR_STMT, expression without identifier
-        Stmt(Stmt_t type, Ast::Expr *expr, bool unused)
-            : type(type), ident(nullptr), expr(expr) { (void)unused; };
+    class SayStmt : public Stmt {
+        public:
+        SayStmt(Ast::Expr *expr)
+            : Stmt(Stmt_t::SAY, expr) {};
+    };
+
+    class IdentStmt : public Stmt {
+        Ident *_ident;
+        public:
+        // identifier with definition
+        IdentStmt(Ast::Ident *ident, Ast::Expr *def)
+            : Stmt(Stmt_t::VAR_DEF, def), _ident(ident) {};
+
+        // identifier without definition (declaration)
+        IdentStmt(Ast::Ident *ident)
+            : Stmt(Stmt_t::VAR_DECL, nullptr), _ident(ident) {};
+        
+        Ident * ident();
     };
 }
 

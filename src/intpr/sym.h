@@ -1,7 +1,7 @@
 #ifndef SYM_H
 #define SYM_H
 #include "stmt.h"
-#include "expr.h"
+#include "value.h"
 #include <unordered_map>
 #include <vector>
 
@@ -20,8 +20,10 @@ struct Var : public Sym {
     Val::Val val;
     
     // transfer ownership constructor
+    /*
     Var(Sym sym, Val::Val val)
         : Sym(sym), val(val) {};
+        */
 
     // NUM var
     Var(std::string sym, double num)
@@ -51,8 +53,8 @@ class SymTable {
 
     public:
     void insert(Var *var);
-    bool in_table(std::string sym_name) const;
-    Sym *get(std::string sym_name) const;
+    bool in_table(Sym const &sym) const;
+    Sym *get(Sym const &sym) const;
 };
 
 #endif

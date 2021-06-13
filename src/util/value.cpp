@@ -1,60 +1,84 @@
 #include "value.h"
-using namespace Val;
 
-double Val::get_num()
+namespace Val {
+double
+Val::get_num() const
 {
     return val_num;
 }
 
-std::string Val::get_str()
+std::string
+Val::get_str() const
 {
     return val_str;
 }
 
-bool Val::get_bool()
+bool
+Val::get_bool() const
 {
     return val_bool;
 }
 
-bool Val::is_num()
+bool
+Val::is_num() const
 {
-    return this->type == Val::NUM;
+    return this->type == NUM;
 }
 
-bool Val::is_str()
+bool
+Val::is_str() const
 {
-    return this->type == Val::STR;
+    return this->type == STR;
 }
 
-bool Val::is_bool()
+bool
+Val::is_bool() const
 {
-    return this->type == Val::BOOL;
+    return this->type == BOOL;
 }
 
-bool Val::is_nil()
+bool
+Val::is_nil() const
 {
-    return this->type == Val::NIL;
+    return this->type == NIL;
+}
+        
+bool
+Val::same_type(Val const &val) const
+{
+    return this->type == val.type;
 }
 
-std::string Val::type_to_string()
+std::string
+Val::type_to_string() const
 {
     switch(this->type) {
-        case Val::NUM: return "NUM";
-        case Val::STR: return "STR";
-        case Val::BOOL: return "BOOL";
-        case Val::NIL: return "NIL";
-        case Val::ARRAY: return "ARRAY";
-        case Val::IDENT: return "IDENT";
-        case Val::OP: return "OP";
-        case Val::GROUP: return "GROUP";
+        case NUM: return "NUM";
+        case STR: return "STR";
+        case BOOL: return "BOOL";
+        case NIL: return "NIL";
+        case IDENT: return "IDENT";
     }
 }
 
+std::string
+Val::to_string() const
+{
+    switch (this->type) {
+        case NUM: return std::to_string(get_num());
+        case STR: return get_str();
+        case BOOL: return get_bool() ? "true" : "false";
+        case NIL: return "nil";
+        case IDENT: return "ERROR: Ident on stack after eval.";
+    }
+}
 Val::Val(double val)
-    : type(Val::NUM), val_num(val) {};
+    : type(NUM), val_num(val) {};
 Val::Val(std::string val)
-    : type(Val::STR), val_num(val) {};
+    : type(STR), val_str(val) {};
 Val::Val(bool val)
-    : type(Val::BOOL), val_bool(val) {};
+    : type(BOOL), val_bool(val) {};
 Val::Val()
-    : type(Val::NIL), val_num(0.0) {};
+    : type(NIL), val_num(0.0) {};
+}
+

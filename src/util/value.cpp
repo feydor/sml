@@ -1,6 +1,31 @@
 #include "value.h"
 
 namespace Val {
+
+Val
+Val::operator+ (Val const &other) const
+{
+    Val temp;
+    if (this->is_num()) {
+        if (other.is_num()) {
+            temp.val_num = this->get_num() + other.get_num();
+            temp.type = NUM;
+        } else if (other.is_str()) {
+            temp.val_str = std::to_string(this->get_num()) + other.get_str();
+            temp.type = STR;
+        }
+    } else if (this->is_str()) {
+        if (other.is_num()) {
+            temp.val_str = this->get_str() + std::to_string(other.get_num());
+            temp.type = STR;
+        } else if (other.is_str()) {
+            temp.val_str = this->get_str() + other.get_str();
+            temp.type = STR;
+        }
+    }
+    return temp;
+}
+
 double
 Val::get_num() const
 {

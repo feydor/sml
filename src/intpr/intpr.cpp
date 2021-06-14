@@ -12,9 +12,8 @@ intpr::interpret()
     for (auto &_stmt : this->stmts) {
         if (_stmt->is_def_stmt()) {
             // var_decl with definition, add to symtable
-            /* assuming expr does not have other vars/identifiers
-             * TODO: in expr->eval, deal with undefined vars/idents
-             */
+            // if definition holds other undeclared vars/idents
+            // error in eval
             auto stmt = (Ast::IdentStmt *)_stmt;
             eval_ast(stmt->expr());
             res = this->stack.top();
@@ -22,8 +21,7 @@ intpr::interpret()
             auto def = new Var(stmt->ident()->sym(), res);
             this->sym_table.insert_var(def);
         } else if (_stmt->is_decl_stmt()) {
-            // var_decl without definition, add to symtable?
-            // TODO: add to sym_table with value of NIL
+            // var_decl without definition, add to symtable as NIL value
             auto stmt = (Ast::IdentStmt *)_stmt;
             auto decl = new Var(stmt->ident()->sym());
             this->sym_table.insert_var(decl);
@@ -39,9 +37,9 @@ intpr::interpret()
                 this->sym_table.replace_var(redef);
             }
         } else {
-            auto stmt = (Ast::ExprStmt *)_stmt;
             // do eval on stmt->expr, do not cout the result
             // can error if an identifier is not in symtable
+            auto stmt = (Ast::ExprStmt *)_stmt;
             eval_ast(stmt->expr());
 
             // cout the result
@@ -84,12 +82,15 @@ intpr::eval_ast(Ast::Expr const *curr)
         a = this->stack.top();
         this->stack.pop();
 
+        // TODO: Allow string concats with nums
+        /*
         if (!a.same_type(b)) {
             intpr::error(curr, "Literal val types do not match.");
             Val::Val nil = Val::Val();
             stack.push(nil);
             return;
         }
+        */
         
         stack.push(Ast::Binary::eval(a, binary->op(), b)); 
 

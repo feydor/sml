@@ -24,25 +24,25 @@ class Var : public Sym {
     Val::Val val_;
     
     public:
-    // default
+    // default, copy val
     Var(Sym sym, Val::Val val)
-        : Sym(sym.type(), sym.sym()), val_(val) {};
+        : Sym(Sym_t::VAR, sym.sym()), val_(val) {};
 
     // NIL var
     Var(Sym sym)
-        : Sym(sym.type(), sym.sym()), val_(Val::Val()) {};
+        : Sym(Sym_t::VAR, sym.sym()), val_(Val::Val()) {};
 
     // NUM var
-    Var(std::string sym, double num)
-        : Sym(Sym_t::VAR, sym), val_(Val::Val(num)) {};
+    Var(Sym sym, double num)
+        : Sym(Sym_t::VAR, sym.sym()), val_(Val::Val(num)) {};
 
     // STR var
-    Var(std::string sym, std::string str)
-        : Sym(Sym_t::VAR, sym), val_(Val::Val(str)) {};
+    Var(Sym sym, std::string str)
+        : Sym(Sym_t::VAR, sym.sym()), val_(Val::Val(str)) {};
 
     // BOOL var
-    Var(std::string sym, bool b)
-        : Sym(Sym_t::VAR, sym), val_(Val::Val(b)) {};
+    Var(Sym sym, bool b)
+        : Sym(Sym_t::VAR, sym.sym()), val_(Val::Val(b)) {};
 
     Val::Val val() const;
 };

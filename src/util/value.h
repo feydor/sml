@@ -20,6 +20,8 @@ namespace Val {
         Val(bool val);
         Val(); // NIL, implemented as num_val = 0
 
+        Val operator+ (Val const &other) const;
+
         double get_num() const;
         std::string get_str() const;
         bool get_bool() const;

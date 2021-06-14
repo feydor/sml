@@ -18,11 +18,7 @@ Binary::eval(Val::Val const &a, Token const &op, Val::Val const &b)
                 return Val::Val(a.get_num() - b.get_num());
             break;
         case PLUS:
-            if (a.is_num())
-                return Val::Val(a.get_num() + b.get_num());
-            else if (a.is_str())
-                return Val::Val(a.get_str() + b.get_str());
-            break;
+            return a + b;
         case SLASH:
             if (a.is_num())
                 return Val::Val(a.get_num() / b.get_num());

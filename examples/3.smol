@@ -10,3 +10,6 @@ say x
 say y
 y = "y is now a string"
 say y
+
+let z = 9
+say "Seven ate " + z

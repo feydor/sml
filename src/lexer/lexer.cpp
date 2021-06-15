@@ -68,9 +68,7 @@ lexer::scan_tokens()
                 // comment goes until end of line; skip it
                 while (peek() != '\n' && !at_end())
                     advance();
-                // skip newline char in comment
-                advance();
-                this->line++;
+                // curr char is newline; add it on next iteration
                 break;
             case ' ':
             case '\r':

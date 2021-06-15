@@ -46,7 +46,6 @@ parser::statement()
 Ast::Stmt *
 parser::say_stmt()
 {
-    std::cout << "In say stmt\n";
     Ast::Expr *expr = expression();
     consume(EOL, "Expected newline after expression.");
     return new Ast::SayStmt(expr);
@@ -55,7 +54,6 @@ parser::say_stmt()
 Ast::Stmt *
 parser::expr_stmt()
 {
-    std::cout << "In expr stmt\n";
     Ast::Expr *expr = expression();
     consume(EOL, "Expected newline after expression.");
     // expr can be nullptr, if no match
@@ -71,15 +69,13 @@ parser::block()
 {
     // create a new Env and store in it a list of stmts, like in program()
     // TODO: Mitigate danger of inf loop here when missing closing brace
+    advance(); // skip EOL after opening brace
     Ast::BlockStmt *block = new Ast::BlockStmt();
-    while (!peek_type(RIGHT_BRACE)) {
-        std::cout << "Before initial stmt of blockstmt\n";
+    while (!match(RIGHT_BRACE)) {
         Ast::Stmt *stmt = declaration();
         if (stmt)
             block->add_stmt(stmt);
     }
-    advance(); // skip the closing brace
-    std::cout << "After block stmt\n";
     return block;
 }
 
@@ -189,7 +185,7 @@ parser::primary()
         consume(RIGHT_PAREN, "Expect ')' after expression.");
         return new Ast::Grouping(expr);
     }
-    return nullptr;
+    return nullptr; // curr token: EOL
 }
 
 /**

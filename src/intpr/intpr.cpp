@@ -26,7 +26,6 @@ intpr::interpret(std::vector<Ast::Stmt *> stmts)
             auto stmt = (Ast::IdentStmt *)_stmt;
             auto decl = new Var(stmt->ident()->sym());
 
-            // put into curr_env (ie envs.back())
             envs.back().insert_var(decl);
 
         } else if (_stmt->is_redef_stmt()) {
@@ -87,21 +86,7 @@ intpr::eval_ast(Ast::Expr const *curr)
         auto ident = (Ast::Ident *)curr;
 
         // look up in envs and resolve
-        for (auto ritr = envs.rbegin(); ritr != envs.rend(); ++ritr) {
-            if ((*ritr).in_env(ident->sym())) {
-                auto curr_env = *ritr;
-                res = (((Var *)curr_env.get(ident->sym()))->val());
-                break;
-            }
-        }
-        this->stack.push(res);
-
-        /*
-        if (!curr_env.in_env(ident->sym()))
-            sym_undefined_exit(ident);
-        res = ((Var *)syms_table.get(ident->sym()))->val();
-        this->stack.push(res);
-        */
+        this->stack.push(resolve_sym(ident->sym()));
 
     } else if (curr->is_literal()) {
         auto literal = (Ast::Literal *) curr;
@@ -115,16 +100,6 @@ intpr::eval_ast(Ast::Expr const *curr)
         this->stack.pop();
         a = this->stack.top();
         this->stack.pop();
-
-        // TODO: Allow string concats with nums
-        /*
-        if (!a.same_type(b)) {
-            intpr::error(curr, "Literal val types do not match.");
-            Val::Val nil = Val::Val();
-            stack.push(nil);
-            return;
-        }
-        */
         
         stack.push(Ast::Binary::eval(a, binary->op(), b)); 
 
@@ -161,6 +136,21 @@ intpr::swap_with_sym(Val::Val &curr, Sym &sym)
     curr = var->val();
     if (var->val().is_nil())
         std::cout << "Expr::swap_with_sym: Val is nil.\n";        
+}
+
+Val::Val
+intpr::resolve_sym(Sym const &sym)
+{
+    // TODO: Assuming only Var
+    Val::Val res;
+    for (auto ritr = envs.rbegin(); ritr != envs.rend(); ++ritr) {
+        if ((*ritr).in_env(sym)) {
+            auto curr_env = *ritr;
+            res = (((Var *)curr_env.get(sym))->val());
+            break;
+        }
+    }
+    return res;
 }
 
 void

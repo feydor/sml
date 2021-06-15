@@ -26,6 +26,7 @@ class intpr {
     void interpret(std::vector<Ast::Stmt *> stmts);
     void eval_ast(Ast::Expr const *curr);
     void swap_with_sym(Val::Val &curr, Sym &sym);
+    Val::Val resolve_sym(Sym const &sym);
     static void error(Ast::Expr const *curr, std::string const &msg);
     void sym_undefined_exit(Ast::Expr const *curr);
     static bool stob(std::string s);

@@ -22,12 +22,13 @@ class parser {
 
     private:
     std::vector<Ast::Stmt *> program();
-    Ast::Stmt * declaration();
-    Ast::Stmt * statement();
-    Ast::Stmt * say_stmt();
-    Ast::Stmt * expr_stmt();
-    Ast::Stmt * var_decl();
-    Ast::Stmt * var_redef();
+    Ast::Stmt *declaration();
+    Ast::Stmt *statement();
+    Ast::Stmt *say_stmt();
+    Ast::Stmt *expr_stmt();
+    Ast::Stmt *block();
+    Ast::Stmt *var_decl();
+    Ast::Stmt *var_redef();
     Ast::Expr *expression();
     Ast::Expr *equality();
     Ast::Expr *comparison();

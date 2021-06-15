@@ -2,28 +2,53 @@
 
 namespace Val {
 
+/* invalid data types returns NIL value */
 Val
 Val::operator+ (Val const &other) const
 {
-    Val temp;
     if (this->is_num()) {
-        if (other.is_num()) {
-            temp.val_num = this->get_num() + other.get_num();
-            temp.type = NUM;
-        } else if (other.is_str()) {
-            temp.val_str = std::to_string(this->get_num()) + other.get_str();
-            temp.type = STR;
-        }
+        if (other.is_num())
+            return Val(this->get_num() + other.get_num());
+        else if (other.is_str())
+            return Val(std::to_string(this->get_num()) + other.get_str());
     } else if (this->is_str()) {
-        if (other.is_num()) {
-            temp.val_str = this->get_str() + std::to_string(other.get_num());
-            temp.type = STR;
-        } else if (other.is_str()) {
-            temp.val_str = this->get_str() + other.get_str();
-            temp.type = STR;
-        }
+        if (other.is_num())
+            return Val(this->get_str() + std::to_string(other.get_num()));
+        else if (other.is_str())
+            return Val(this->get_str() + other.get_str());
     }
-    return temp;
+
+    // TODO: Show some sort of runtime/intpr error here
+    return Val();
+}
+
+/* invalid data types returns NIL value */
+Val
+Val::operator- (Val const &other) const
+{
+   if (this->is_num())
+       return Val(this->get_num() - other.get_num());
+
+    // TODO: Show some sort of runtime/intpr error here
+   return Val();
+}
+
+Val
+Val::operator/ (Val const &other) const
+{
+   if (this->is_num())
+       return Val(this->get_num() / other.get_num());
+
+   return Val();
+}
+
+Val
+Val::operator* (Val const &other) const
+{
+   if (this->is_num())
+       return Val(this->get_num() * other.get_num());
+
+   return Val();
 }
 
 double

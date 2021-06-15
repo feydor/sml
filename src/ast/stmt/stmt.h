@@ -1,10 +1,11 @@
 #ifndef STMT_H
 #define STMT_H
 #include <string>
+#include <vector>
 
 // forward declarations
 
-enum class Stmt_t { VAR_DECL, VAR_DEF, VAR_REDEF, SAY, EXPR };
+enum class Stmt_t { VAR_DECL, VAR_DEF, VAR_REDEF, BLOCK, SAY, EXPR };
 
 namespace Ast {
     class Expr;
@@ -31,6 +32,7 @@ namespace Ast {
         bool is_decl_stmt();
         bool is_def_stmt();
         bool is_redef_stmt();
+        bool is_block_stmt();
         static std::string type_to_string(Stmt const *stmt);
     };
 
@@ -63,6 +65,17 @@ namespace Ast {
             : Stmt(Stmt_t::VAR_REDEF, def), ident_(ident) { (void)redef; };
         
         Ident * ident();
+    };
+
+    class BlockStmt : public Stmt {
+        std::vector<Stmt *> stmts;
+
+        public:
+        BlockStmt()
+            :Stmt(Stmt_t::BLOCK, nullptr) {};
+
+        void add_stmt(Stmt *stmt);
+        std::vector<Stmt *> get_stmts();
     };
 }
 

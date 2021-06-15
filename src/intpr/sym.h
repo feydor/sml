@@ -57,17 +57,5 @@ class Fn : public Sym {
         : Sym(Sym_t::FN, sym), stmts(stmts) {};
 };
 
-// a table that holds all of the current syms
-// and their definitions, if defined
-class SymTable {
-    std::unordered_map<std::string, Sym *> table;
-
-    public:
-    void insert_var(Var *var);
-    void replace_var(Var *var);
-    bool in_table(Sym const &sym) const;
-    Sym *get(Sym const &sym) const;
-};
-
 #endif
 

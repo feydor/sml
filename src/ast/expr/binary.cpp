@@ -13,20 +13,10 @@ Val::Val
 Binary::eval(Val::Val const &a, Token const &op, Val::Val const &b)
 {
     switch (op.get_type()) {
-        case MINUS:
-            if (a.is_num())
-                return Val::Val(a.get_num() - b.get_num());
-            break;
-        case PLUS:
-            return a + b;
-        case SLASH:
-            if (a.is_num())
-                return Val::Val(a.get_num() / b.get_num());
-            break;
-        case STAR:
-            if (a.is_num())
-                return Val::Val(a.get_num() * b.get_num());
-            break;
+        case MINUS: return a - b;
+        case PLUS: return a + b;
+        case SLASH: return a / b;
+        case STAR: return a * b;
         default: 
             // SMOL::error(op, "BINARY::eval: Unimplemented operator.");
             std::cout << "BINARY:eval: Unimplemented operator.\n";

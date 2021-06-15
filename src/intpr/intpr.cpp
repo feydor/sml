@@ -6,10 +6,10 @@ namespace Intpr {
 // eval statements
 // resolve variable typing
 void
-intpr::interpret()
+intpr::interpret(std::vector<Ast::Stmt *> stmts)
 {
     Val::Val res;
-    for (auto &_stmt : this->stmts) {
+    for (auto &_stmt : stmts) {
         if (_stmt->is_def_stmt()) {
             // var_decl with definition, add to symtable
             // if definition holds other undeclared vars/idents
@@ -19,23 +19,45 @@ intpr::interpret()
             res = this->stack.top();
 
             auto def = new Var(stmt->ident()->sym(), res);
-            this->sym_table.insert_var(def);
+            envs.back().insert_var(def);
+
         } else if (_stmt->is_decl_stmt()) {
             // var_decl without definition, add to symtable as NIL value
             auto stmt = (Ast::IdentStmt *)_stmt;
             auto decl = new Var(stmt->ident()->sym());
-            this->sym_table.insert_var(decl);
+
+            // put into curr_env (ie envs.back())
+            envs.back().insert_var(decl);
+
         } else if (_stmt->is_redef_stmt()) {
             auto stmt = (Ast::IdentStmt *)_stmt; 
-            if (!sym_table.in_table(stmt->ident()->sym())) {
-                intpr::error(stmt->expr(), "Redefinition of un-declared variable.");
-            } else {
-                eval_ast(stmt->expr());
-                res = this->stack.top();
 
-                auto redef = new Var(stmt->ident()->sym(), res);
-                this->sym_table.replace_var(redef);
+            // search for var in envs; redefine once and break
+            auto itr = envs.rbegin();
+            for (; itr != envs.rend(); ++itr) {
+                if ((*itr).in_env(stmt->ident()->sym())) {
+                    eval_ast(stmt->expr());
+                    res = this->stack.top();
+
+                    auto redef = new Var(stmt->ident()->sym(), res);
+                    (*itr).replace_var(redef);
+                    break;
+                }
             }
+
+            if (itr == envs.rend()) {
+                /* reached if var is undeclared  */
+                intpr::error(stmt->expr(),
+                        "Redefinition of un-declared variable.");
+            }
+
+        } else if (_stmt->is_block_stmt()) {
+            // create new Env, add vars to it, interpret the block's stmts
+            auto block = (Ast::BlockStmt *)_stmt;
+            this->envs.emplace_back();
+            interpret(block->get_stmts());
+            this->envs.pop_back();
+
         } else {
             // do eval on stmt->expr, do not cout the result
             // can error if an identifier is not in symtable
@@ -63,11 +85,23 @@ intpr::eval_ast(Ast::Expr const *curr)
 
     if (curr->is_ident()) {
         auto ident = (Ast::Ident *)curr;
-        // look up in sym_table and resolve
-        if (!sym_table.in_table(ident->sym()))
-            sym_undefined_exit(ident);
-        res = ((Var *)sym_table.get(ident->sym()))->val();
+
+        // look up in envs and resolve
+        for (auto ritr = envs.rbegin(); ritr != envs.rend(); ++ritr) {
+            if ((*ritr).in_env(ident->sym())) {
+                auto curr_env = *ritr;
+                res = (((Var *)curr_env.get(ident->sym()))->val());
+                break;
+            }
+        }
         this->stack.push(res);
+
+        /*
+        if (!curr_env.in_env(ident->sym()))
+            sym_undefined_exit(ident);
+        res = ((Var *)syms_table.get(ident->sym()))->val();
+        this->stack.push(res);
+        */
 
     } else if (curr->is_literal()) {
         auto literal = (Ast::Literal *) curr;
@@ -107,6 +141,13 @@ intpr::eval_ast(Ast::Expr const *curr)
     } else {
         intpr::error(curr, "Current expr type is not implemented in eval_ast.");
     }
+}
+
+// public interface to private interpret
+void
+intpr::interpret()
+{
+    interpret(this->stmts);
 }
 
 // populates curr with val and type from sym in sym_table

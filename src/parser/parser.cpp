@@ -38,12 +38,15 @@ parser::statement()
 {
     if (match(SAY))
         return say_stmt();
+    else if (match(LEFT_BRACE))
+        return block();
     return expr_stmt();
 }
 
 Ast::Stmt *
 parser::say_stmt()
 {
+    std::cout << "In say stmt\n";
     Ast::Expr *expr = expression();
     consume(EOL, "Expected newline after expression.");
     return new Ast::SayStmt(expr);
@@ -52,6 +55,7 @@ parser::say_stmt()
 Ast::Stmt *
 parser::expr_stmt()
 {
+    std::cout << "In expr stmt\n";
     Ast::Expr *expr = expression();
     consume(EOL, "Expected newline after expression.");
     // expr can be nullptr, if no match
@@ -60,6 +64,23 @@ parser::expr_stmt()
         return new Ast::ExprStmt(expr);
     else
         return nullptr;
+}
+
+Ast::Stmt *
+parser::block()
+{
+    // create a new Env and store in it a list of stmts, like in program()
+    // TODO: Mitigate danger of inf loop here when missing closing brace
+    Ast::BlockStmt *block = new Ast::BlockStmt();
+    while (!peek_type(RIGHT_BRACE)) {
+        std::cout << "Before initial stmt of blockstmt\n";
+        Ast::Stmt *stmt = declaration();
+        if (stmt)
+            block->add_stmt(stmt);
+    }
+    advance(); // skip the closing brace
+    std::cout << "After block stmt\n";
+    return block;
 }
 
 Ast::Stmt *

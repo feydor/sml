@@ -1,7 +1,7 @@
 ## Precedence (from lowest to highest)
 - equality, '== !=', left
 - comparison, '> >= <= <', left
-- term, '= +', left
+- term, '- +', left
 - factor, '/ *', left
 - unary, '! -', right
 
@@ -9,7 +9,8 @@
 # Type: Stmt
 - program     -> declaration* EOF;
 - declaration -> var_decl | var_redef | statement;
-- statement   -> expr_stmt | say_stmnt;
+- statement   -> expr_stmt | say_stmnt | block;
+- block       -> "{" declaration* "}";
 - expr_stmt   -> expression EOL;
 - say_stmt    -> "say" expression EOL;
 - var_decl    -> "let" IDENTIFIER ("=" expression)? EOL;

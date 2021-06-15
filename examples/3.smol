@@ -1,15 +1,26 @@
-# variable re-definition and scope test
-# say 55, say 100
-let y
+# variable re-definition, implicit string/num concats and scope test
+say "Testing variable re-definition"
+let y   # y is nil
 let x = 7 * 5
-say x
+say "x = " + x
 
-x = "x is now a string"
+x = "x is now a string" # redefine x as a string
 say x
 
 say y
-y = "y is now a string"
+y = "y is now a string" # redefine y as a string
 say y
 
-let z = 9
-say "Seven ate " + z
+say "Testing implicit string/num concat"
+let z = 10 - 1
+say "Seven ate " + z  # "Seven ate 9.000"
+
+say "Testing local/global scope and shadowing"
+let x1 = 5
+{
+    say "x1 = " + x1 # x1 = 5
+    let x1 = 6
+    say "x1 = " + x1 # x1 = 6
+    x1 = x1 + 1      # x1 = 7
+}
+say "x1 = " + x1     # x1 = 5

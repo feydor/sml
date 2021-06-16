@@ -16,7 +16,12 @@ The below code fragment is an example written in smol and demonstrates what is s
 # some math demonstrating working operator precedence,
 # symbol resolution, dynamic typing, etc
 let x = (-23 - (8 + (-12) * 2 - 1 - 12)) / (-21 - (-20)) # x = -6
-let y = 3
-let z = y
-say x + y + z # prints 0
-'''
+let y = x + 1
+{
+    let z = x + y
+    let x = z
+    x = x + 1
+    say x # prints -10
+}
+say x + y # prints -11
+```

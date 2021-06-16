@@ -40,6 +40,8 @@ parser::statement()
         return say_stmt();
     else if (match(LEFT_BRACE))
         return block();
+    else if (match(IF))
+        return ifstmt();
     return expr_stmt();
 }
 
@@ -66,7 +68,7 @@ parser::block()
 {
     // create a new Env and store in it a list of stmts, like in program()
     // TODO: Mitigate danger of inf loop here when missing closing brace
-    advance(); // skip EOL after opening brace
+    match(EOL); // optional linebreak
     Ast::BlockStmt *block = new Ast::BlockStmt();
     while (!match(RIGHT_BRACE)) {
         Ast::Stmt *stmt = declaration();
@@ -74,6 +76,45 @@ parser::block()
             block->add_stmt(stmt);
     }
     return block;
+}
+
+Ast::Stmt *
+parser::ifstmt()
+{
+    Ast::Expr *cond = expression();
+    match(EOL); // optional linebreak
+    Ast::IfStmt *ifstmt = new Ast::IfStmt(cond, declaration());
+
+    if (peek_type(ELSE_IF)) {
+        while (match(ELSE_IF)) {
+            ifstmt->add_elif((Ast::ElifStmt *)elif_stmt());
+        }
+    } else if (match(ELSE)) {
+        ifstmt->set_else((Ast::ElseStmt *)else_stmt());
+    }
+    return ifstmt;
+}
+
+Ast::Stmt *
+parser::elif_stmt()
+{
+    Ast::Expr *cond = expression();
+    match(EOL); // optional linebreak
+    Ast::ElifStmt *elif = new Ast::ElifStmt(cond, declaration());
+
+    if (match(ELSE)) {
+        elif->set_else((Ast::ElseStmt *)else_stmt());
+    }
+
+    return elif;
+}
+
+Ast::Stmt *
+parser::else_stmt()
+{
+    match(EOL); // optional linebreak
+    Ast::ElseStmt *else_stmt = new Ast::ElseStmt(declaration());
+    return else_stmt;
 }
 
 Ast::Stmt *

@@ -23,7 +23,8 @@ class intpr {
     void interpret();
 
     private:
-    void interpret(std::vector<Ast::Stmt *> stmts);
+    void interpret_stmts(std::vector<Ast::Stmt *> stmts);
+    void interpret_one(Ast::Stmt *_stmt);
     void eval_ast(Ast::Expr const *curr);
     void swap_with_sym(Val::Val &curr, Sym &sym);
     Val::Val resolve_sym(Sym const &sym);

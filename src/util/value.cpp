@@ -99,6 +99,20 @@ Val::same_type(Val const &val) const
     return this->type == val.type;
 }
 
+bool
+Val::is_truthy() const
+{
+    switch(this->type) {
+
+        // 0 evaluates to false, all other numbers are true
+        case NUM: return this->get_num() != 0;
+        case STR: return false; // error
+        case BOOL: return this->get_bool();
+        case NIL: return false;
+        case IDENT: return false; // error
+    }
+}
+
 std::string
 Val::type_to_string() const
 {

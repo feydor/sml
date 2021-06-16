@@ -34,6 +34,7 @@ namespace Val {
         bool is_bool() const;
         bool is_nil() const;
         bool same_type(Val const &val) const;
+        bool is_truthy() const;
         
         std::string type_to_string() const;
         std::string to_string() const;

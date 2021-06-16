@@ -5,7 +5,8 @@
 
 // forward declarations
 
-enum class Stmt_t { VAR_DECL, VAR_DEF, VAR_REDEF, BLOCK, SAY, EXPR };
+enum class Stmt_t { VAR_DECL, VAR_DEF, VAR_REDEF,
+    BLOCK, COND, SAY, EXPR };
 
 namespace Ast {
     class Expr;
@@ -33,6 +34,7 @@ namespace Ast {
         bool is_def_stmt();
         bool is_redef_stmt();
         bool is_block_stmt();
+        bool is_cond_stmt();
         static std::string type_to_string(Stmt const *stmt);
     };
 
@@ -76,6 +78,48 @@ namespace Ast {
 
         void add_stmt(Stmt *stmt);
         std::vector<Stmt *> get_stmts();
+    };
+
+    class ElseStmt : public Stmt {
+        Stmt *body_;
+
+        public:
+        ElseStmt(Stmt *body)
+            : Stmt(Stmt_t::COND, nullptr), body_(body) {};
+        Stmt *body() const;
+    };
+
+    class ElifStmt : public Stmt {
+        Expr *cond_;
+        Stmt *body_;
+        ElseStmt *else_;
+
+        public:
+        ElifStmt(Expr *cond, Stmt *body)
+            : Stmt(Stmt_t::COND, cond)
+            , cond_(cond), body_(body) {};
+        void set_else(ElseStmt *els);
+    };
+
+    class IfStmt : public Stmt {
+        Expr *cond_;
+        Stmt *body_;
+        
+        std::vector<Stmt *> elifs_;
+        ElseStmt *else_ = nullptr;
+
+        public:
+        IfStmt(Expr *cond, Stmt *body)
+            : Stmt(Stmt_t::COND, cond)
+            ,cond_(cond), body_(body) {};
+
+        int else_or_elifs() const;
+        void add_elif(ElifStmt *elif);
+        void set_else(ElseStmt *els);
+        Expr *cond() const;
+        Stmt *body() const;
+        ElseStmt *else_stmt() const;
+        std::vector<Stmt *> elifs() const;
     };
 }
 

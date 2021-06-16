@@ -15,12 +15,13 @@
 - say_stmt    -> "say" expression EOL;
 - expr_stmt   -> expression EOL;
 
-- block       -> "{" declaration* "}";
-- if_stmt     -> "if" expression EOL (declaration | block)
-                 (elif_statement)*;
-- elif_stmt   -> "elif" expression EOL (declaration | block)
+- block       -> "{" (EOL)? declaration* "}";
+- if_stmt     -> "if" expression (EOL)? declaration
+                 ((elif_statement)* | (else_stmt)?);
+- if_stmt_body -> (declaration | block);
+- elif_stmt   -> "elif" expression (EOL)? declaration
                  (else_statement)?;
-- else_stmt   -> "else" expression EOL (declaration | block);
+- else_stmt   -> "else" (EOL)? declaration;
 - for_stmt    -> "for" "(" (var_decl)? ";" (comparison)? ";" (expression)?
                  ")" (declaration | block);
 - while_stmt  -> "while" expression (EOL)? (declaration | block);

@@ -6,69 +6,106 @@ namespace Intpr {
 // eval statements
 // resolve variable typing
 void
-intpr::interpret(std::vector<Ast::Stmt *> stmts)
+intpr::interpret_stmts(std::vector<Ast::Stmt *> stmts)
+{
+    for (auto& _stmt : stmts) {
+        interpret_one(_stmt);
+    }
+}
+
+void
+intpr::interpret_one(Ast::Stmt *_stmt)
 {
     Val::Val res;
-    for (auto &_stmt : stmts) {
-        if (_stmt->is_def_stmt()) {
-            // var_decl with definition, add to symtable
-            // if definition holds other undeclared vars/idents
-            // error in eval
-            auto stmt = (Ast::IdentStmt *)_stmt;
-            eval_ast(stmt->expr());
-            res = this->stack.top();
+    if (_stmt->is_def_stmt()) {
+        // var_decl with definition, add to symtable
+        // if definition holds other undeclared vars/idents
+        // error in eval
+        auto stmt = (Ast::IdentStmt *)_stmt;
+        eval_ast(stmt->expr());
+        res = this->stack.top();
 
-            auto def = new Var(stmt->ident()->sym(), res);
-            envs.back().insert_var(def);
+        auto def = new Var(stmt->ident()->sym(), res);
+        envs.back().insert_var(def);
 
-        } else if (_stmt->is_decl_stmt()) {
-            // var_decl without definition, add to symtable as NIL value
-            auto stmt = (Ast::IdentStmt *)_stmt;
-            auto decl = new Var(stmt->ident()->sym());
+    } else if (_stmt->is_decl_stmt()) {
+        // var_decl without definition, add to symtable as NIL value
+        auto stmt = (Ast::IdentStmt *)_stmt;
+        auto decl = new Var(stmt->ident()->sym());
 
-            envs.back().insert_var(decl);
+        envs.back().insert_var(decl);
 
-        } else if (_stmt->is_redef_stmt()) {
-            auto stmt = (Ast::IdentStmt *)_stmt; 
+    } else if (_stmt->is_redef_stmt()) {
+        auto stmt = (Ast::IdentStmt *)_stmt; 
 
-            // search for var in envs; redefine once and break
-            auto itr = envs.rbegin();
-            for (; itr != envs.rend(); ++itr) {
-                if ((*itr).in_env(stmt->ident()->sym())) {
-                    eval_ast(stmt->expr());
-                    res = this->stack.top();
+        // search for var in envs; redefine once and break
+        auto itr = envs.rbegin();
+        for (; itr != envs.rend(); ++itr) {
+            if ((*itr).in_env(stmt->ident()->sym())) {
+                eval_ast(stmt->expr());
+                res = this->stack.top();
 
-                    auto redef = new Var(stmt->ident()->sym(), res);
-                    (*itr).replace_var(redef);
+                auto redef = new Var(stmt->ident()->sym(), res);
+                (*itr).replace_var(redef);
+                break;
+            }
+        }
+
+        if (itr == envs.rend()) {
+            /* reached if var is undeclared  */
+            intpr::error(stmt->expr(),
+                    "Redefinition of un-declared variable.");
+        }
+
+    } else if (_stmt->is_block_stmt()) {
+        // create new Env, add vars to it, interpret the block's stmts
+        auto block = (Ast::BlockStmt *)_stmt;
+        this->envs.emplace_back();
+        interpret_stmts(block->get_stmts());
+        this->envs.pop_back();
+
+    } else if (_stmt->is_cond_stmt()) {
+        // eval IfStmt's condition, if true interpret body
+        // otherwise continue on to either else or elifs
+        auto ifstmt = (Ast::IfStmt *)_stmt;
+        eval_ast(ifstmt->cond());
+        res = this->stack.top();
+
+        // error: str cannot bet evaluated to bool
+        if (res.is_str()) {
+            intpr::error(ifstmt->cond(),
+                "Conditional type does not eval to bool.");
+        }
+
+        if (res.is_truthy())
+            interpret_one(ifstmt->body());
+        else {
+            switch (ifstmt->else_or_elifs()) {
+                case 0:
+                    // interpret else
+                    interpret_one(ifstmt->else_stmt());
                     break;
-                }
+                case 1:
+                    // interpret 1 or more elifs
+                    interpret_stmts(ifstmt->elifs());
+                    break;
+                case -1:
+                    // neither; do nothing
+                    break;
             }
+        }
 
-            if (itr == envs.rend()) {
-                /* reached if var is undeclared  */
-                intpr::error(stmt->expr(),
-                        "Redefinition of un-declared variable.");
-            }
+    } else {
+        // do eval on stmt->expr, do not cout the result
+        // can error if an identifier is not in symtable
+        auto stmt = (Ast::ExprStmt *)_stmt;
+        eval_ast(stmt->expr());
 
-        } else if (_stmt->is_block_stmt()) {
-            // create new Env, add vars to it, interpret the block's stmts
-            auto block = (Ast::BlockStmt *)_stmt;
-            this->envs.emplace_back();
-            interpret(block->get_stmts());
-            this->envs.pop_back();
-
-        } else {
-            // do eval on stmt->expr, do not cout the result
-            // can error if an identifier is not in symtable
-            auto stmt = (Ast::ExprStmt *)_stmt;
-            eval_ast(stmt->expr());
-
-            // cout the result
-            if (stmt->is_say_stmt())
-                std::cout << "result: " <<
-                    this->stack.top().to_string() << std::endl;
-        }       
-    }
+        // cout the result
+        if (stmt->is_say_stmt())
+            std::cout << "result: " <<
+                this->stack.top().to_string() << std::endl;
+    }  
 }
 
 /**
@@ -122,7 +159,7 @@ intpr::eval_ast(Ast::Expr const *curr)
 void
 intpr::interpret()
 {
-    interpret(this->stmts);
+    interpret_stmts(this->stmts);
 }
 
 // populates curr with val and type from sym in sym_table

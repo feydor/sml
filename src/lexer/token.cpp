@@ -80,6 +80,7 @@ Token::type_to_string(Token_t type)
         case NUMBER: return "NUMBER";
         case AND: return "AND";
         case ELSE: return "ELSE";
+        case ELSE_IF: return "ELSE_IF";
         case FALSE: return "FALSE";
         case FN: return "FN";
         case FOR: return "FOR";

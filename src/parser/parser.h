@@ -27,6 +27,9 @@ class parser {
     Ast::Stmt *say_stmt();
     Ast::Stmt *expr_stmt();
     Ast::Stmt *block();
+    Ast::Stmt *ifstmt();
+    Ast::Stmt *elif_stmt();
+    Ast::Stmt *else_stmt();
     Ast::Stmt *var_decl();
     Ast::Stmt *var_redef();
     Ast::Expr *expression();

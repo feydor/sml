@@ -5,5 +5,5 @@ ast_expr_src = files(
 )
 ast_expr_inc = include_directories('expr')
 
-ast_stmt_src = files(['stmt/stmt.cpp'])
+ast_stmt_src = files(['stmt/stmt.cpp', 'stmt/cond_stmt.cpp'])
 ast_stmt_inc = include_directories('stmt')

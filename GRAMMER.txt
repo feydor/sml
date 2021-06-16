@@ -1,4 +1,5 @@
 ## Precedence (from lowest to highest)
+- logical_and/logical_or, 'and or', left
 - equality, '== !=', left
 - comparison, '> >= <= <', left
 - term, '- +', left
@@ -9,15 +10,27 @@
 # Type: Stmt
 - program     -> declaration* EOF;
 - declaration -> var_decl | var_redef | statement;
-- statement   -> expr_stmt | say_stmnt | block;
-- block       -> "{" declaration* "}";
-- expr_stmt   -> expression EOL;
+- statement   -> expr_stmt | say_stmnt | block |
+                 if_stmt | while_stmt | for_stmt;
 - say_stmt    -> "say" expression EOL;
+- expr_stmt   -> expression EOL;
+
+- block       -> "{" declaration* "}";
+- if_stmt     -> "if" expression EOL (declaration | block)
+                 (elif_statement)*;
+- elif_stmt   -> "elif" expression EOL (declaration | block)
+                 (else_statement)?;
+- else_stmt   -> "else" expression EOL (declaration | block);
+- for_stmt    -> "for" "(" (var_decl)? ";" (comparison)? ";" (expression)?
+                 ")" (declaration | block);
+- while_stmt  -> "while" expression (EOL)? (declaration | block);
+
 - var_decl    -> "let" IDENTIFIER ("=" expression)? EOL;
-- var_redef     -> IDENTIFIER "=" expression EOL;
+- var_redef   -> IDENTIFIER "=" expression EOL;
 
 # Type: Expr
-- expression  -> equality;
+- expression  -> logical;
+- logical     -> equality (("or" | "and") equality)*;
 - equality    -> comparison (("!=" | "==") comparison)*;
 - comparison  -> term ((">" | ">=" | "<=" | "<") term)*;
 - term        -> factor (("-") | "+") factor)*;

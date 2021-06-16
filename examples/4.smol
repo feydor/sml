@@ -1,0 +1,6 @@
+# logical/comparison operators, branching, looping
+let x = (54 > 53) and (1 <= 100)
+say x # true
+
+let y = (54 < 53) or (1 == 0)
+say y # false

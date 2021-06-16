@@ -30,6 +30,7 @@ class parser {
     Ast::Stmt *var_decl();
     Ast::Stmt *var_redef();
     Ast::Expr *expression();
+    Ast::Expr *logical();
     Ast::Expr *equality();
     Ast::Expr *comparison();
     Ast::Expr *term();

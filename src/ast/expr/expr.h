@@ -43,6 +43,10 @@ namespace Ast {
             Token op();
             static Val::Val eval(Val::Val const &a,
                     Token const &op, Val::Val const &b);
+        private:
+            template<typename Op>
+            static Val::Val eval_logical(Val::Val const &a,
+                    Val::Val const &b, Op fn);
     };
     
     class Unary : public Expr {

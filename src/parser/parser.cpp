@@ -58,10 +58,7 @@ parser::expr_stmt()
     consume(EOL, "Expected newline after expression.");
     // expr can be nullptr, if no match
     // for example EOL returns nullptr
-    if (expr)
-        return new Ast::ExprStmt(expr);
-    else
-        return nullptr;
+    return expr ? new Ast::ExprStmt(expr) : nullptr;
 }
 
 Ast::Stmt *
@@ -104,7 +101,19 @@ parser::var_redef()
 Ast::Expr *
 parser::expression()
 {
-    return equality(); 
+    return logical();
+}
+
+Ast::Expr *
+parser::logical()
+{
+    Ast::Expr *expr = equality();
+    while (match(OR, AND)) {
+        Token op = prev();
+        Ast::Expr *right = equality();
+        expr = new Ast::Binary(expr, op, right);
+    }
+    return expr;
 }
 
 Ast::Expr *

@@ -3,15 +3,15 @@
 
 /* only inserts unique vars */
 void
-Env::insert_var(Var *v)
+Env::insert_var(std::shared_ptr<Var> var)
 {
-    this->sym_table.insert({v->sym(), v});
+    this->sym_table.insert({var->sym(), var});
 }
 
 void
-Env::replace_var(Var *var)
+Env::replace_var(std::shared_ptr<Var> var)
 {
-    this->sym_table.insert_or_assign(var->sym(), var); 
+    this->sym_table.insert_or_assign(var->sym(), var);
 }
 
 bool
@@ -22,7 +22,7 @@ Env::in_env(Sym const &sym) const
 }
     
 /* assumes sym is a valid key in table */
-Sym *
+std::shared_ptr<Var>
 Env::get(Sym const &sym) const
 {
     return this->sym_table.find(sym.sym())->second;

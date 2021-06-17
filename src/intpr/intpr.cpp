@@ -1,6 +1,6 @@
-#include <iostream>
 #include "intpr.h"
-#include "value.h"
+#include <iostream>
+#include <memory>
 
 namespace Intpr {
 // eval statements
@@ -25,13 +25,13 @@ intpr::interpret_one(Ast::Stmt *_stmt)
         eval_ast(stmt->expr());
         res = this->stack.top();
 
-        auto def = new Var(stmt->ident()->sym(), res);
+        auto def = std::make_shared<Var>(stmt->ident()->sym(), res);
         envs.back().insert_var(def);
 
     } else if (_stmt->is_decl_stmt()) {
         // var_decl without definition, add to symtable as NIL value
         auto stmt = (Ast::IdentStmt *)_stmt;
-        auto decl = new Var(stmt->ident()->sym());
+        auto decl = std::make_shared<Var>(stmt->ident()->sym(), res);
 
         envs.back().insert_var(decl);
 
@@ -45,7 +45,7 @@ intpr::interpret_one(Ast::Stmt *_stmt)
                 eval_ast(stmt->expr());
                 res = this->stack.top();
 
-                auto redef = new Var(stmt->ident()->sym(), res);
+                auto redef = std::make_shared<Var>(stmt->ident()->sym(), res);
                 (*itr).replace_var(redef);
                 break;
             }
@@ -183,7 +183,7 @@ intpr::resolve_sym(Sym const &sym)
     for (auto ritr = envs.rbegin(); ritr != envs.rend(); ++ritr) {
         if ((*ritr).in_env(sym)) {
             auto curr_env = *ritr;
-            res = (((Var *)curr_env.get(sym))->val());
+            res = curr_env.get(sym)->val();
             break;
         }
     }
@@ -218,4 +218,5 @@ intpr::stob(std::string s)
 {
     return s.compare("true") == 0 ? true : false;
 }
+
 }

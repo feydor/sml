@@ -3,14 +3,14 @@
 #include <string>
 #include <vector>
 
-// forward declarations
-
 enum class Stmt_t { VAR_DECL, VAR_DEF, VAR_REDEF,
     BLOCK, COND, SAY, EXPR };
 
 namespace Ast {
+    // forward declarations
     class Expr;
     class Ident;
+
     /* A wrapper around an expr so that they can be called and assigned
      * to variables and functions
      * Possible types:
@@ -66,7 +66,7 @@ namespace Ast {
         IdentStmt(Ast::Ident *ident, Ast::Expr *def, bool redef)
             : Stmt(Stmt_t::VAR_REDEF, def), ident_(ident) { (void)redef; };
         
-        Ident * ident();
+        Ident *ident();
     };
 
     class BlockStmt : public Stmt {

@@ -18,7 +18,7 @@ class intpr {
         : stmts(stmts) {
         // start with globals environment
         envs.emplace_back();
-    };
+    }
 
     void interpret();
 

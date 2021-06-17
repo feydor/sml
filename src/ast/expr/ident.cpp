@@ -2,7 +2,13 @@
 using namespace Ast;
            
 Sym
-Ident::sym()
+Ident::sym() const
 {
-    return this->_sym;
+    return _sym;
+}
+
+std::string
+Ident::to_str() const
+{
+    return sym().to_str();
 }

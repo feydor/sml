@@ -37,7 +37,7 @@ namespace Val {
         bool is_truthy() const;
         
         std::string type_to_string() const;
-        std::string to_string() const;
+        std::string to_str() const;
     };
 }
 

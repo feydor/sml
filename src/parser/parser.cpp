@@ -1,6 +1,7 @@
 /* parser.cpp - Recursive descent parser - See GRAMMER.txt for overview */
 #include "parser.h"
 #include "smol.h"
+#include "ansi.h"
 #include <tuple>
 #include <iostream>
 
@@ -49,7 +50,7 @@ Ast::Stmt *
 parser::say_stmt()
 {
     Ast::Expr *expr = expression();
-    consume(EOL, "Expected newline after expression.");
+    consume(EOL, expr, "say_stmt: Expected newline after expression.");
     return new Ast::SayStmt(expr);
 }
 
@@ -57,7 +58,7 @@ Ast::Stmt *
 parser::expr_stmt()
 {
     Ast::Expr *expr = expression();
-    consume(EOL, "Expected newline after expression.");
+    consume(EOL, expr, "expr_stmt: Expected newline after expression.");
     // expr can be nullptr, if no match
     // for example EOL returns nullptr
     return expr ? new Ast::ExprStmt(expr) : nullptr;
@@ -119,8 +120,8 @@ parser::else_stmt()
 
 Ast::Stmt *
 parser::var_decl() {
-    consume(IDENTIFIER, "Expected identifier after keyword 'let'.");
-    auto *ident = new Ast::Ident(Sym(Sym_t::VAR, prev().get_lexeme()));
+    consume(IDENTIFIER, nullptr, "Expected identifier after keyword 'let'.");
+    auto *ident = new Ast::Ident(Sym(Sym_t::VAR, prev().lexeme()));
     if (match(EQUAL)) {
         Ast::Expr *expr = expression();
         return new Ast::IdentStmt(ident, expr); // var_def
@@ -131,10 +132,10 @@ parser::var_decl() {
 Ast::Stmt *
 parser::var_redef()
 {
-    consume(IDENTIFIER, "Expected identifier before token '='.");
-    auto *ident = new Ast::Ident(Sym(Sym_t::VAR, prev().get_lexeme()));
-    consume(EQUAL,
-            "Expected '=' after identifier '" + prev().get_lexeme() + "'");
+    consume(IDENTIFIER, nullptr, "Expected identifier before token '='.");
+    auto *ident = new Ast::Ident(Sym(Sym_t::VAR, prev().lexeme()));
+    consume(EQUAL, ident,
+            "Expected '=' after identifier '" + prev().lexeme() + "'");
     Ast::Expr *expr = expression();
     return new Ast::IdentStmt(ident, expr, true); // var_redef
 }
@@ -229,12 +230,28 @@ parser::primary()
         return new Ast::Literal(Val::Val(prev().get_literal_str()));
     if (match(IDENTIFIER)) // user-defined identifers
         // TODO: handle function idents
-        return new Ast::Ident(Sym(Sym_t::VAR, prev().get_lexeme()));
+        return new Ast::Ident(Sym(Sym_t::VAR, prev().lexeme()));
     if (match(LEFT_PAREN)) {
         Ast::Expr *expr = expression();
-        consume(RIGHT_PAREN, "Expect ')' after expression.");
+        consume(RIGHT_PAREN, expr, "Expect ')' after expression.");
         return new Ast::Grouping(expr);
     }
+
+    // TODO: fix hacky way of getting around assignment ops
+    // evaluates to old lvalue, ignoring the assignment
+    if (peek_type(EQUAL)) {
+        auto ident = new Ast::Ident(Sym(Sym_t::VAR, prev().lexeme()));
+        advance();
+        advance();
+        return ident;
+    }
+    /*
+    if (peek_type(EOL))
+        std::cout << "match EOL\n";
+    else 
+        std::cout << "match nothing " << prev().to_str() <<
+        " " << peek().to_str() << " " << peek_next().to_str() << "\n";
+    */
     return nullptr; // curr token: EOL
 }
 
@@ -263,7 +280,7 @@ parser::peek_next_type(Token_t type)
 {
     if (at_end())
         return false;
-    return peek_next().get_type() == type;
+    return peek_next().type() == type;
 }
 
 /* checks curr token for given type, does not consume it */
@@ -272,7 +289,7 @@ parser::peek_type(Token_t type)
 {
     if (at_end())
         return false;
-    return peek().get_type() == type;
+    return peek().type() == type;
 }  
 
 /* returns curr token, does not consume it */
@@ -306,28 +323,59 @@ parser::prev()
 
 /* check if next token has type and if so consume, otherwise error */
 Token
-parser::consume(Token_t type, std::string const& message)
+parser::consume(Token_t type, Ast::Expr const *curr,
+    std::string const& msg)
 {
     if (peek_type(type))
         return advance();
-    parser::error(peek(), message);
-    return Token(); // TODO: This should be a nullptr
+    parser::error(peek(), curr, msg);
+
+    // unreached
+    return Token();
 }
     
 bool
 parser::at_end()
 {
-    return peek().get_type() == _EOF;
+    return peek().type() == _EOF;
 }
 
 void
-parser::error(Token const &tok, std::string const &msg)
+parser::error(Token const &tok, Ast::Expr const *curr,
+    std::string const &msg)
 {
-    if (tok.get_type() == _EOF)
-        std::cout << "[line " << tok.get_line() << "] Error "
-            << "at end " << msg << std::endl;
-    else
-        std::cout << "[line " << tok.get_line() << "] Error " << "at '" <<
-            tok.get_lexeme() << "' " + msg << std::endl;
+    ANSI::Modifier err(Color::FG_RED);
+    ANSI::Modifier secondary(Color::FG_BLUE);
+    ANSI::Modifier bold(Format::BOLD);
+    ANSI::Modifier def(Color::FG_DEFAULT);
+
+    std::string fileloc("");
+    std::string expr_str("");
+
+    if (!SMOL::is_repl) // add tok.offset()
+        fileloc += SMOL::fname + ":" + std::to_string(tok.line());
+
+    if (!curr) {
+        std::cout << err << "error" << def << ": " << bold <<
+            msg << "\n " << secondary << "--> " << def << fileloc
+            << std::endl;
+        exit(-1);
+    }
+
+    if (curr->is_ident())
+        expr_str = ((Ast::Ident *)curr)->to_str();
+    else if (curr->is_literal())
+        expr_str = ((Ast::Literal *)curr)->to_str();
+    else if (curr->is_binary())
+        expr_str = ((Ast::Binary *)curr)->to_str();
+    else if (curr->is_unary())
+        expr_str = ((Ast::Unary *)curr)->to_str();
+
+    std::cout << err << "error" << def << ": " << bold <<
+        msg << "\n " << secondary << "--> " << def << fileloc
+        << secondary << "\n  |    " << def << expr_str
+        << std::endl;
+    exit(-1);
 }
+
 }

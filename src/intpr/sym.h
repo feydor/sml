@@ -17,6 +17,7 @@ class Sym {
 
     Sym_t type() const;
     std::string sym() const;
+    std::string to_str() const;
 };
 
 // Vars are user-defined identifiers with a value

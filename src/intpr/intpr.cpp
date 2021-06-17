@@ -104,7 +104,7 @@ intpr::interpret_one(Ast::Stmt *_stmt)
         // cout the result
         if (stmt->is_say_stmt())
             std::cout << "result: " <<
-                this->stack.top().to_string() << std::endl;
+                this->stack.top().to_str() << std::endl;
     }  
 }
 
@@ -202,12 +202,12 @@ intpr::error(Ast::Expr const *_curr, std::string const &msg)
 {
     if (_curr->is_binary()) {
         auto curr = (Ast::Binary *) _curr;
-        std::cout << "intpr::error [line" << curr->op().get_line() <<
+        std::cout << "intpr::error [line" << curr->op().line() <<
             "} Error at expression '" <<  "' " + msg + "]\n";
     } else { 
         auto curr = (Ast::Literal *) _curr;
         std::cout << "intpr::error  Error " <<
-            "at expression '" << curr->val().to_string() << "' " + msg << std::endl;
+            "at expression '" << curr->val().to_str() << "' " + msg << std::endl;
     }
 }
 

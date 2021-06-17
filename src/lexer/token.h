@@ -19,10 +19,10 @@ enum Token_t {
 };
 
 class Token {
-    Token_t type;
-    std::string lexeme;
-    int line;
-    std::variant<double, std::string> literal;
+    Token_t type_;
+    std::string lexeme_;
+    int line_;
+    std::variant<double, std::string> literal_;
 
     public:
     Token(Token_t type, std::string lexeme, int line);
@@ -30,12 +30,12 @@ class Token {
         std::variant<double, std::string> literal);
     Token();
 
-    Token_t get_type() const;
-    std::string get_lexeme() const;
-    int get_line() const;
+    Token_t type() const;
+    std::string lexeme() const;
+    int line() const;
     double get_literal_num() const;
     std::string get_literal_str() const;
-    std::string to_string() const;
+    std::string to_str() const;
     static std::string type_to_string(Token_t type);
 };
 

@@ -1,53 +1,53 @@
 #include "token.h"
 
 Token::Token(Token_t type, std::string lexeme, int line)
-    : type(type), lexeme(std::move(lexeme)), line(line)
+    : type_(type), lexeme_(std::move(lexeme)), line_(line)
 {
-    this->literal = 0.0;
+    literal_ = 0.0;
 }
 
 Token::Token(Token_t type, std::string lexeme, int line,
     std::variant<double, std::string> literal)
-    : type(type), lexeme(std::move(lexeme)), line(line), 
-    literal(std::move(literal))
+    : type_(type), lexeme_(std::move(lexeme)), line_(line), 
+    literal_(std::move(literal))
 {}
 
 Token::Token() {}
 
 Token_t
-Token::get_type() const
+Token::type() const
 {
-    return this->type;
+    return type_;
 }
 
 std::string
-Token::get_lexeme() const
+Token::lexeme() const
 {
-    return this->lexeme;
+    return lexeme_;
 }
 
 int
-Token::get_line() const
+Token::line() const
 {
-    return this->line;
+    return line_;
 }
 
 double
 Token::get_literal_num() const
 {
-    return std::get<double>(this->literal);
+    return std::get<double>(literal_);
 }
 
 std::string
 Token::get_literal_str() const
 {
-    return std::get<std::string>(this->literal);
+    return std::get<std::string>(literal_);
 }
 
 std::string
-Token::to_string() const
+Token::to_str() const
 {
-    return this->lexeme;
+    return lexeme_;
 }
 
 std::string

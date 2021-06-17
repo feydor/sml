@@ -3,7 +3,7 @@
 using namespace Ast;
 
 Token
-Unary::op()
+Unary::op() const
 {
     return this->_op;
 }
@@ -11,7 +11,7 @@ Unary::op()
 Val::Val
 Unary::eval(Token const &op, Val::Val const &a)
 {
-    switch (op.get_type()) {
+    switch (op.type()) {
         case MINUS:
             if (a.is_num())
                 return Val::Val(-(a.get_num()));
@@ -21,10 +21,16 @@ Unary::eval(Token const &op, Val::Val const &a)
                 return Val::Val(!(a.get_bool()));
             break;
         default: 
-            std::cout << "Unary:eval: Unexpected operator. " + op.get_lexeme();
+            std::cout << "Unary:eval: Unexpected operator. " + op.lexeme();
             return Val::Val();
             break;
     }
     /* not reached */
     return Val::Val();
+}
+
+std::string
+Unary::to_str() const
+{
+    return op().to_str() + right()->to_str();
 }

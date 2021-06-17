@@ -126,7 +126,7 @@ Val::type_to_string() const
 }
 
 std::string
-Val::to_string() const
+Val::to_str() const
 {
     switch (this->type) {
         case NUM: return std::to_string(get_num());
@@ -136,6 +136,7 @@ Val::to_string() const
         case IDENT: return "ERROR: Ident on stack after eval.";
     }
 }
+
 Val::Val(double val)
     : type(NUM), val_num(val) {};
 Val::Val(std::string val)

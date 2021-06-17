@@ -4,9 +4,15 @@
 using namespace Ast;
 
 Token
-Binary::op()
+Binary::op() const
 {
     return this->_op;
+}
+
+std::string
+Binary::to_str() const
+{
+    return left()->to_str() + " " + op().to_str() + " " + right()->to_str();
 }
 
 // logical operators are only effective on num and bool types
@@ -33,7 +39,7 @@ Binary::eval_logical(Val::Val const &a, Val::Val const &b, Op fn) {
 Val::Val
 Binary::eval(Val::Val const &a, Token const &op, Val::Val const &b)
 {
-    switch (op.get_type()) {
+    switch (op.type()) {
         case MINUS: return a - b;
         case PLUS: return a + b;
         case SLASH: return a / b;

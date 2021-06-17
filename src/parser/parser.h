@@ -18,7 +18,8 @@ class parser {
     parser(std::vector<Token> tokens)
         : tokens(tokens) {};
     std::vector<Ast::Stmt *> scan_program();
-    static void error(Token const &tok, std::string const &msg);
+    static void error(Token const &tok, Ast::Expr const *curr,
+        std::string const &msg);
 
     private:
     std::vector<Ast::Stmt *> program();
@@ -48,7 +49,8 @@ class parser {
     Token peek_next();
     Token advance();
     Token prev();
-    Token consume(Token_t type, std::string const &msg);
+    Token consume(Token_t type, Ast::Expr const *curr,
+        std::string const& msg);
     bool at_end();
 };
 }

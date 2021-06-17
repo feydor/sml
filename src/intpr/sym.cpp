@@ -3,18 +3,24 @@
 Sym_t
 Sym::type() const
 {
-    return this->type_;
+    return type_;
 }
 
 std::string
 Sym::sym() const
 {
-    return this->sym_;
+    return sym_;
+}
+
+std::string
+Sym::to_str() const
+{
+    return sym_;
 }
 
 Val::Val
 Var::val() const
 {
-    return this->val_;
+    return val_;
 }
 

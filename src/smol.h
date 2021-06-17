@@ -1,10 +1,14 @@
 #ifndef SMOL_H
 #define SMOL_H
-#include "token.h"
 #include <memory>
+#include <string>
+
+class Token;
 
 struct SMOL {
     static bool had_error;
+    static bool is_repl;
+    static std::string fname;
 
     SMOL() {};
     static void run_prompt();

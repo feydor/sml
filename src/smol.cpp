@@ -8,10 +8,15 @@
 #include "lexer.h"
 #include "parser.h"
 #include "token.h"
+#include "ansi.h"
 #include "smol.h"
 
 #define PROJECT_NAME "smol"
 #define VERSION "0.1.0"
+
+bool SMOL::had_error = false;
+bool SMOL::is_repl = false;
+std::string SMOL::fname("");
 
 int main(int argc, char **argv) 
 {
@@ -26,10 +31,11 @@ int main(int argc, char **argv)
     return 0;
 }
 
-bool SMOL::had_error = false;
-
 void SMOL::run_file(std::string const &fname) 
 {
+    SMOL::fname = fname;
+    SMOL::is_repl = false;
+
     std::fstream ifs(fname);
     std::stringstream buf;
     buf << ifs.rdbuf();
@@ -44,6 +50,7 @@ void SMOL::run_prompt()
 {
     std::cout << PROJECT_NAME << " " << VERSION << std::endl;
     std::string line("");
+    SMOL::is_repl = true;
     for (;;) {
         std::cout << "> ";
         std::getline(std::cin, line);
@@ -54,20 +61,21 @@ void SMOL::run_prompt()
     }
 }
 
-void SMOL::error(int line, std::string const &message)
+void SMOL::error(int line, std::string const &msg)
 {
-    std::cout << "[line " << line << "] Error " << message << std::endl;
-    SMOL::had_error = true;
-}
+    ANSI::Modifier err(Color::FG_RED);
+    ANSI::Modifier secondary(Color::FG_BLUE);
+    ANSI::Modifier bold(Format::BOLD);
+    ANSI::Modifier def(Color::FG_DEFAULT);
+    std::string fileloc("");
 
-void SMOL::error(Token const& tok, std::string const &message)
-{
-    if (tok.get_type() == _EOF)
-        std::cout << "[line " << tok.get_line() << "] Error " <<
-            "at end " << message << std::endl;
-    else
-        std::cout << "[line " << tok.get_line() << "] Error " << "at '" <<
-            tok.get_lexeme() << "' " + message << std::endl;
+    if (!SMOL::is_repl)
+        fileloc = SMOL::fname + ":" + std::to_string(line);
+
+    std::cout << err << "error" << def << ": " << bold <<
+        msg << "\n " << secondary << "--> " << def << fileloc
+        << std::endl;
+
     SMOL::had_error = true;
 }
 
@@ -76,10 +84,12 @@ void SMOL::eval(std::string const &src)
 {
     Lexer::lexer lexer(src);
     std::vector<Token> tokens = lexer.scan_tokens();
+    /*
     std::cout << "Printing tokens... ";
     for (auto token : tokens)
-        std::cout << Token::type_to_string(token.get_type()) << "_";
+        std::cout << Token::type_to_string(token.type()) << "_";
     std::cout << "\n";
+    */
 
     Parser::parser parser(tokens);
     std::vector<Ast::Stmt *> stmts = parser.scan_program();

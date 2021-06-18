@@ -50,6 +50,7 @@ lexer::scan_tokens()
             case '+': add_token(PLUS); break;
             case ';': add_token(SEMICOLON); break;
             case '*': add_token(STAR); break;
+            case '%': add_token(PERCENT); break;
             case '/': add_token(SLASH); break;
             case '!':
                 add_token(next_is('=') ? BANG_EQUAL : BANG);

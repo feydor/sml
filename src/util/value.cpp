@@ -1,7 +1,5 @@
 #include "value.h"
 
-namespace Val {
-
 /* invalid data types returns NIL value */
 Val
 Val::operator+ (Val const &other) const
@@ -145,5 +143,4 @@ Val::Val(bool val)
     : type(BOOL), val_bool(val) {};
 Val::Val()
     : type(NIL), val_num(0.0) {};
-}
 

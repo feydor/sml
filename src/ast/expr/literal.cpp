@@ -1,14 +1,17 @@
 #include "expr.h"
-using namespace Ast;
 
-Val::Val
-Literal::val() const
-{
-    return this->_val;
-}
+namespace Ast {
+    Val
+    Literal::eval()
+    {
+        return val_;
+    }
 
-std::string
-Literal::to_str() const
-{
-    return val().to_str();
+    Literal::~Literal() {};
+
+    std::string
+    Literal::to_str()
+    {
+        return val_.to_str();
+    }
 }

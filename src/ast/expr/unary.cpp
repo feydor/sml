@@ -1,36 +1,37 @@
 #include "expr.h"
 #include <iostream>
-using namespace Ast;
 
-Token
-Unary::op() const
-{
-    return this->_op;
-}
-
+namespace Ast {
 Val::Val
-Unary::eval(Token const &op, Val::Val const &a)
+Unary::eval()
 {
-    switch (op.type()) {
+    Val x = right_->eval();
+
+    switch (op_.type()) {
         case MINUS:
-            if (a.is_num())
-                return Val::Val(-(a.get_num()));
+            if (x.is_num())
+                return Val(-(x.get_num()));
             break;
         case BANG:
-            if (a.is_bool())
-                return Val::Val(!(a.get_bool()));
+            if (x.is_bool())
+                return Val(!(x.get_bool()));
             break;
         default: 
-            std::cout << "Unary:eval: Unexpected operator. " + op.lexeme();
-            return Val::Val();
-            break;
+            std::cout << "Unary:eval: Unexpected operator. " + op_.to_str();
+            return Val(); // nil
     }
     /* not reached */
     return Val::Val();
 }
 
+Unary::~Unary()
+{
+    delete right_;
+}
+
 std::string
 Unary::to_str() const
 {
-    return op().to_str() + right()->to_str();
+    return op_.to_str() + right_->to_str();
+}
 }

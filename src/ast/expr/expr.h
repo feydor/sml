@@ -1,102 +1,111 @@
 #ifndef EXPR_H
 #define EXPR_H
-#include "token.h"
+// #include "token.h"
 #include "value.h"
-#include "sym.h"
-#include <stack>
+#include <vector>
 
-// forward declarations
-class SymTable;
-
-enum class Expr_t {
-    BINARY, GROUPING, LITERAL, UNARY, IDENT
-};
+class Token;
 
 namespace Ast {
-    class Literal;
-    
-    class Expr {
-        Expr_t type;
-        Expr *_left = nullptr;
-        Expr *_right = nullptr;
 
+    class Expr {
         public:
-            Expr(Expr_t type, Expr *left, Expr *right)
-                : type(type), _left(left), _right(right) {};
-            virtual ~Expr() {};
-            Expr *left() const;
-            Expr *right() const;
-            bool is_binary() const;
-            bool is_unary() const;
-            bool is_grouping() const;
-            bool is_ident() const;
-            bool is_literal() const;
-            bool is_asgmt() const;
-            std::string to_string(bool b);
+            virtual Val eval() = 0;
             virtual std::string to_str() const = 0;
+            virtual ~Expr() = default;
     };
 
     class Binary : public Expr {
-        Token _op;
-
         public:
-            Binary(Expr *left, Token op, Expr *right)
-                : Expr(Expr_t::BINARY, left, right)
-                , _op(op) {};
-            Token op() const;
-            static Val::Val eval(Val::Val const &a,
-                    Token const &op, Val::Val const &b);
+            Binary(Expr* left, Token op, Expr* right)
+                : op_(op), left_(left), right_(right) {};
+            ~Binary() override;
+            Val eval() override;
             std::string to_str() const override;
 
         private:
-            template<typename Op>
-            static Val::Val eval_logical(Val::Val const &a,
-                    Val::Val const &b, Op fn);
+            Token op_;
+            Expr* left_;
+            Expr* right_;
     };
-    
+
     class Unary : public Expr {
-        Token _op;
-
         public:
-            Unary(Token op, Expr *right)
-                : Expr(Expr_t::UNARY, nullptr, right)
-                , _op(op) {};
-
-            Token op() const;
-            static Val::Val eval(Token const &op, Val::Val const &a);
+            Unary(Token op, Expr* right)
+                : op_(op), right_(right) {};
+            ~Unary() override;
+            Val eval() override;
             std::string to_str() const override;
+
+        private:
+            Token op_;
+            Expr* right_;
     };
 
-    class Grouping : public Expr {
+    // Conditional expression: and, or, comparison
+    class Cond : public Expr {
         public:
-            Grouping(Expr *expr)
-                : Expr(Expr_t::GROUPING, expr, nullptr) {};
-
+            Cond(Token op, Expr* left, Expr* right)
+                : op_(op), left_(left), right_(right) {};
+            ~Cond() override;
+            Val eval() override;
             std::string to_str() const override;
+
+        private:
+            Token op_;
+            Expr* right_;
+            Expr* left_;
+
+            template<typename Op>
+            Val eval_(Val const &a, Val const &b, Op fn);
     };
 
-    class Ident : public Expr {
-        Sym _sym;
-
-        public: 
-           Ident(Sym sym)
-               : Expr(Expr_t::IDENT, nullptr, nullptr)
-               , _sym(sym) {};
-
-            Sym sym() const;
+    // Assignment expression: a = b, evals to b
+    class Asgmt : public Expr {
+        public:
+            Asgmt(Expr* left, Expr* right)
+                : left_(left), right_(right) {};
+            ~Asgmt() override;
+            Val eval() override;
             std::string to_str() const override;
+        private:
+            Expr* left_;
+            Expr* right_;
     };
 
+    // Literal expression: val: string, num, bool, nil
     class Literal : public Expr {
-        Val::Val _val;
-
         public:
-            Literal(Val::Val val)
-                : Expr(Expr_t::LITERAL, nullptr, nullptr)
-                , _val(val) {};
-           
-            Val::Val val() const;
+            Literal(Val val)
+                : val_(std::move(val)) {};
+            ~Literal() override;
+            Val eval() override;
             std::string to_str() const override;
+        private:
+            Val val_;
+    }
+
+    class Var : public Expr {
+        public:
+            Var(std::string name)
+                : name_(std::move(name)) {};
+            Val eval() override;
+            std::string to_str() const override;
+        private:
+            std::string name;
+    };
+
+    class Fn : public Expr {
+        public:
+            Fn(std::string name)
+                : name_(std::move(name)) {};
+            ~Fn() override;
+            Val eval() override;
+            std::string to_str() const override;
+            void add_arg(Expr* expr);
+        private:
+            std::vector<Expr*> exprs_;
+            std::string name_;
     };
 }
 #endif

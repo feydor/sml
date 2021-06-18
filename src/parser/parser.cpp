@@ -6,25 +6,25 @@
 #include <iostream>
 
 namespace Parser {
-std::vector<Ast::Stmt *>
+std::vector<std::shared_ptr<Ast::Stmt>>
 parser::scan_program()
 {
     return program();
 }
 
 // entry point to building AST (abstract syntax tree)
-std::vector<Ast::Stmt *>
+std::vector<std::shared_ptr<Ast::Stmt>>
 parser::program()
 {
     while (!at_end()) {
-        Ast::Stmt *stmt = declaration();
+        std::shared_ptr<Ast::Stmt> stmt = declaration();
         if (stmt)
             this->stmts.push_back(stmt);
     }
     return this->stmts;
 }
 
-Ast::Stmt *
+std::shared_ptr<Ast::Stmt>
 parser::declaration()
 {
     if (match(LET))
@@ -34,7 +34,7 @@ parser::declaration()
     return statement();
 }
 
-Ast::Stmt *
+std::shared_ptr<Ast::Stmt>
 parser::statement()
 {
     if (match(SAY))
@@ -46,30 +46,31 @@ parser::statement()
     return expr_stmt();
 }
 
-Ast::Stmt *
+std::shared_ptr<Ast::Stmt>
 parser::say_stmt()
 {
     Ast::Expr *expr = expression();
     consume(EOL, expr, "say_stmt: Expected newline after expression.");
-    return new Ast::SayStmt(expr);
+    return std::make_shared<Ast::SayStmt>(expr);
 }
 
-Ast::Stmt *
+std::shared_ptr<Ast::Stmt>
 parser::expr_stmt()
 {
     Ast::Expr *expr = expression();
     consume(EOL, expr, "expr_stmt: Expected newline after expression.");
     // expr can be nullptr, if no match
     // for example EOL returns nullptr
-    return expr ? new Ast::ExprStmt(expr) : nullptr;
+    return expr ? std::make_shared<Ast::ExprStmt>(expr) : nullptr;
 }
 
-Ast::Stmt *
+std::shared_ptr<Ast::Stmt>
 parser::block()
 {
     // create a new Env and store in it a list of stmts, like in program()
     // TODO: Mitigate danger of inf loop here when missing closing brace
     match(EOL); // optional linebreak
+    auto block = std::make_shared<Ast::BlockStmt>();
     Ast::BlockStmt *block = new Ast::BlockStmt();
     while (!match(RIGHT_BRACE)) {
         Ast::Stmt *stmt = declaration();
@@ -79,57 +80,69 @@ parser::block()
     return block;
 }
 
-Ast::Stmt *
+std::shared_ptr<Ast::Stmt>
 parser::ifstmt()
 {
     Ast::Expr *cond = expression();
     match(EOL); // optional linebreak
-    Ast::IfStmt *ifstmt = new Ast::IfStmt(cond, declaration());
+    auto ifstmt = std::make_shared<Ast::IfStmt>(cond, declaration());
+    // Ast::IfStmt *ifstmt = new Ast::IfStmt(cond, declaration());
 
     if (peek_type(ELSE_IF)) {
         while (match(ELSE_IF)) {
-            ifstmt->add_elif((Ast::ElifStmt *)elif_stmt());
+            ifstmt->add_elif(
+                dynamic_cast<std::shared_ptr<Ast::ElifStmt>>elif_stmt()
+            );
         }
     } else if (match(ELSE)) {
-        ifstmt->set_else((Ast::ElseStmt *)else_stmt());
+        ifstmt->set_else(
+            dynamic_cast<std::shared_ptr<Ast::ElseStmt>>else_stmt()
+        );
     }
     return ifstmt;
 }
 
-Ast::Stmt *
+std::shared_ptr<Ast::Stmt>
 parser::elif_stmt()
 {
     Ast::Expr *cond = expression();
     match(EOL); // optional linebreak
-    Ast::ElifStmt *elif = new Ast::ElifStmt(cond, declaration());
+    //Ast::ElifStmt *elif = new Ast::ElifStmt(cond, declaration());
+    auto elif = std::make_shared<Ast::ElifStmt>(cond, declaration());
 
     if (match(ELSE)) {
-        elif->set_else((Ast::ElseStmt *)else_stmt());
+        elif->set_else(
+            dynamic_cast<std::shared_ptr<Ast::ElseStmt>>else_stmt()
+        );
     }
 
     return elif;
 }
 
-Ast::Stmt *
+std::shared_ptr<Ast::Stmt>
 parser::else_stmt()
 {
     match(EOL); // optional linebreak
-    Ast::ElseStmt *else_stmt = new Ast::ElseStmt(declaration());
+    // Ast::ElseStmt *else_stmt = new Ast::ElseStmt(declaration());
+    auto else_stmt = std::make_shared<Ast::ElseStmt>(declaration());
     return else_stmt;
 }
 
-Ast::Stmt *
+std::shared_ptr<Ast::Stmt>
 parser::var_decl() {
     consume(IDENTIFIER, nullptr, "Expected identifier after keyword 'let'.");
     auto *ident = new Ast::Ident(Sym(Sym_t::VAR, prev().lexeme()));
+
     if (match(EQUAL)) {
         Ast::Expr *expr = expression();
-        return new Ast::IdentStmt(ident, expr); // var_def
+        return std::make_shared<Ast::IdentStmt>(ident, expr);
+        // return new Ast::IdentStmt(ident, expr); // var_def
     }
-    return new Ast::IdentStmt(ident); // var_decl
+    return std::make_shared<Ast::IdentStmt>(ident);
+    //return new Ast::IdentStmt(ident); // var_decl
 }
 
-Ast::Stmt *
+std::shared_ptr<Ast::Stmt>
 parser::var_redef()
 {
     consume(IDENTIFIER, nullptr, "Expected identifier before token '='.");
@@ -137,7 +150,8 @@ parser::var_redef()
     consume(EQUAL, ident,
             "Expected '=' after identifier '" + prev().lexeme() + "'");
     Ast::Expr *expr = expression();
-    return new Ast::IdentStmt(ident, expr, true); // var_redef
+    return std::make_shared<Ast::IdentStmt>(ident, expr, true);
+    // return new Ast::IdentStmt(ident, expr, true); // var_redef
 }
 
 Ast::Expr *

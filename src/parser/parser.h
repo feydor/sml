@@ -11,28 +11,28 @@
 namespace Parser {
 class parser {
     std::vector<Token> tokens;
-    std::vector<Ast::Stmt *> stmts;
+    std::vector<std::shared_ptr<Ast::Stmt>> stmts;
     int curr = 0;
 
     public:
     parser(std::vector<Token> tokens)
         : tokens(tokens) {};
-    std::vector<Ast::Stmt *> scan_program();
+    std::vector<std::shared_ptr<Ast::Stmt>> scan_program();
     static void error(Token const &tok, Ast::Expr const *curr,
         std::string const &msg);
 
     private:
-    std::vector<Ast::Stmt *> program();
-    Ast::Stmt *declaration();
-    Ast::Stmt *statement();
-    Ast::Stmt *say_stmt();
-    Ast::Stmt *expr_stmt();
-    Ast::Stmt *block();
-    Ast::Stmt *ifstmt();
-    Ast::Stmt *elif_stmt();
-    Ast::Stmt *else_stmt();
-    Ast::Stmt *var_decl();
-    Ast::Stmt *var_redef();
+    std::vector<std::shared_ptr<Ast::Stmt>> program();
+    std::shared_ptr<Ast::Stmt> declaration();
+    std::shared_ptr<Ast::Stmt> statement();
+    std::shared_ptr<Ast::Stmt> say_stmt();
+    std::shared_ptr<Ast::Stmt> expr_stmt();
+    std::shared_ptr<Ast::Stmt> block();
+    std::shared_ptr<Ast::Stmt> ifstmt();
+    std::shared_ptr<Ast::Stmt> elif_stmt();
+    std::shared_ptr<Ast::Stmt> else_stmt();
+    std::shared_ptr<Ast::Stmt> var_decl();
+    std::shared_ptr<Ast::Stmt> var_redef();
     Ast::Expr *expression();
     Ast::Expr *logical();
     Ast::Expr *equality();

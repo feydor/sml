@@ -9,12 +9,12 @@
 
 namespace Intpr {
 class intpr {
-    std::vector<Ast::Stmt *> stmts;
+    std::vector<std::shared_ptr<Ast::Stmt>> stmts;
     std::stack<Val::Val> stack;
     std::vector<Env> envs;
     
     public:
-    intpr(std::vector<Ast::Stmt *> stmts)
+    intpr(std::vector<std::shared_ptr<Ast::Stmt>> stmts)
         : stmts(stmts) {
         // start with globals environment
         envs.emplace_back();
@@ -23,8 +23,8 @@ class intpr {
     void interpret();
 
     private:
-    void interpret_stmts(std::vector<Ast::Stmt *> stmts);
-    void interpret_one(Ast::Stmt *_stmt);
+    void interpret_stmts(std::vector<std::shared_ptr<Ast::Stmt>> stmts);
+    void interpret_one(std::shared_ptr<Ast::Stmt> _stmt);
     void eval_ast(Ast::Expr const *curr);
     void swap_with_sym(Val::Val &curr, Sym &sym);
     Val::Val resolve_sym(Sym const &sym);

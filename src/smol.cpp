@@ -92,7 +92,7 @@ void SMOL::eval(std::string const &src)
     */
 
     Parser::parser parser(tokens);
-    std::vector<Ast::Stmt *> stmts = parser.scan_program();
+    std::vector<std::shared_ptr<Ast::Stmt>> stmts = parser.scan_program();
     // std::vector<Ast::Expr *> exprs = parser.scan_exprs();
 
     std::cout << "Evaluating statements (stmts_size: " 

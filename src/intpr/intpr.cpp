@@ -6,7 +6,7 @@ namespace Intpr {
 // eval statements
 // resolve variable typing
 void
-intpr::interpret_stmts(std::vector<Ast::Stmt *> stmts)
+intpr::interpret_stmts(std::vector<std::shared_ptr<Ast::Stmt>> stmts)
 {
     for (auto& _stmt : stmts) {
         interpret_one(_stmt);
@@ -14,26 +14,28 @@ intpr::interpret_stmts(std::vector<Ast::Stmt *> stmts)
 }
 
 void
-intpr::interpret_one(Ast::Stmt *_stmt)
+intpr::interpret_one(std::shared_ptr<Ast::Stmt> _stmt)
 {
     Val::Val res;
     if (_stmt->is_def_stmt()) {
         // var_decl with definition, add to symtable
         // if definition holds other undeclared vars/idents
         // error in eval
+        auto stmt = dynamic_cast<Ast::IdentStmt&>(
+            _stmt
+        );
         auto stmt = (Ast::IdentStmt *)_stmt;
         eval_ast(stmt->expr());
         res = this->stack.top();
 
-        auto def = std::make_shared<Var>(stmt->ident()->sym(), res);
-        envs.back().insert_var(def);
+        envs.back().insert_var(
+            std::make_shared<Var>(stmt->ident()->sym(), res));
 
     } else if (_stmt->is_decl_stmt()) {
         // var_decl without definition, add to symtable as NIL value
         auto stmt = (Ast::IdentStmt *)_stmt;
-        auto decl = std::make_shared<Var>(stmt->ident()->sym(), res);
-
-        envs.back().insert_var(decl);
+        envs.back().insert_var(
+            std::make_shared<Var>(stmt->ident()->sym(), res));
 
     } else if (_stmt->is_redef_stmt()) {
         auto stmt = (Ast::IdentStmt *)_stmt; 
@@ -45,8 +47,8 @@ intpr::interpret_one(Ast::Stmt *_stmt)
                 eval_ast(stmt->expr());
                 res = this->stack.top();
 
-                auto redef = std::make_shared<Var>(stmt->ident()->sym(), res);
-                (*itr).replace_var(redef);
+                (*itr).replace_var(
+                    std::make_shared<Var>(stmt->ident()->sym(), res));
                 break;
             }
         }

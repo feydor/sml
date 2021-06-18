@@ -6,7 +6,7 @@
 enum Token_t {
     // single-character tokens
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, LEFT_BRACKET,
-    RIGHT_BRACKET, COMMA, DOT,
+    RIGHT_BRACKET, COMMA, DOT, PERCENT,
     MINUS, PLUS, SEMICOLON, SLASH, STAR,
     // one or two character tokens
     BANG, BANG_EQUAL, EQUAL, EQUAL_EQUAL, GREATER, GREATER_EQUAL,

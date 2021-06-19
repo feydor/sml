@@ -70,6 +70,18 @@ parser::statement()
 
         if (match(Token::EQUAL))
             return new Ast::AsgmtStmt(var, expression());
+        else
+            return new Ast::AsgmtStmt(var, new Ast::Literal(Val())); // NIL
+    }
+
+
+    if (match(Token::IDENTIFIER)) {
+        // var redefinition (asgmt_stmt) or expr_stmt
+        std::string var = prev().to_str();
+        if (match(Token::EQUAL))
+            return new Ast::AsgmtStmt(var, expression());
+        else
+            return new Ast::ExprStmt(new Ast::Var(var));
     }
 
     // if none of the above, then expression statement
@@ -186,12 +198,11 @@ parser::primary()
             // TODO: match brace, then body of statements, then closing brace
             return fn_expr;
         } else {
-            // variable
             return new Ast::Var(name);
         }
     }
 
-    // expresssion in parenthesis
+    // expression in parens
     if (match(Token::LEFT_PAREN)) {
         expr = expression();
         if (!match(Token::RIGHT_PAREN))

@@ -10,8 +10,7 @@
 # Statements execute, Expressions evaluate...
 # Type: Stmt
 - program     -> statement* EOF;
-- statement   -> say_stmt | if_stmt | for_stmt | while_stmt |
-                 block_stmt | asgmt_stmt | expr_stmt;
+- statement   -> say_stmt | if_stmt | for_stmt | while_stmt | block_stmt | asgmt_stmt | expr_stmt;
 - say_stmt    -> "say" expression;
 - if_stmt     -> "if" "(" expression ")" statement ("else"
                  statement)?;

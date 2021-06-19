@@ -10,6 +10,6 @@ lexer_inc = include_directories('lexer')
 util_src = files(['util/value.cpp', 'util/fn.cpp'])
 util_inc = include_directories('util')
 
-tables_src = files(['tables/vartable.cpp', 'tables/fntable.cpp'])
-tables_inc = include_directories('tables')
+env_src = files(['env/env.cpp', 'env/fntable.cpp'])
+env_inc = include_directories('env')
 

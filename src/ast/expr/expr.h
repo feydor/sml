@@ -1,7 +1,7 @@
 #ifndef SMOL_EXPR_H
 #define SMOL_EXPR_H
 #include "token.h"
-#include "vartable.h"
+#include "value.h"
 #include <vector>
 
 

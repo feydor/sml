@@ -5,20 +5,20 @@ say x # true
 let y = (54 < 53) or (1 == 0)
 say y # false
 
-x = 15
+x = 16
 say "x = " + x
 y = 15
 say "y = " + y
 
-if x > y
+if (x > y)
     say "x is greater than y"
-elif x == y
-    say "x is equal to y"
+#elif (x == y)
+#    say "x is equal to y"
 else
     say "x is less than y"
 
-if x == y
-    if x
+if (x >= y)
+    if (x)
         x = 10000
 
 say x

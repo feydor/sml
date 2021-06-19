@@ -7,7 +7,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "token.h"
-#include "vartable.h"
+#include "env.h"
 #include "fntable.h"
 #include "ansi.h"
 #include "smol.h"
@@ -108,7 +108,8 @@ void SMOL::eval(std::string const &src)
     std::cout << "Begin interpretation...\n";
 
     // set prelude constants and library functions
-    VarTable::set_var("PI", Val(3.14159265359));
+    Env::set_var(std::string("PI"), Val(3.14159265359));
+    // VarTable::set_var("PI", Val(3.14159265359));
 
     for (auto& stmt : stmts) {
         try {

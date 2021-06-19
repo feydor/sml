@@ -1,12 +1,12 @@
 #include "expr.h"
-#include "vartable.h"
+#include "env.h"
 
 namespace Ast {
 
     Val
     Var::eval()
     {
-        return VarTable::get_var(name_);
+        return Env::get_var(name_);
     }
 
     std::string

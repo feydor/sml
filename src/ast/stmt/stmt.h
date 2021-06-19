@@ -1,5 +1,6 @@
-#ifndef STMT_H
-#define STMT_H
+#ifndef SMOL_STMT_H
+#define SMOL_STMT_H
+#include "expr.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -49,26 +50,26 @@ namespace Ast {
     class IfStmt : public Stmt {
         public:
             IfStmt(Ast::Expr* cond, Stmt* ifstmt, Stmt* else_stmt)
-                : cond_(cond), ifstmt_(ifstmt), else_stmt_(else_stmt) {};
+                : cond_(cond), ifstmt_(ifstmt), elsestmt_(else_stmt) {};
             void exec() override;
             ~IfStmt() override;
 
         private:
             Ast::Expr* cond_;
             Stmt* ifstmt_;
-            Stmt* else_stmt_;
+            Stmt* elsestmt_;
     };
 
     class AsgmtStmt : public Stmt {
         public:
-            AsgmtStmt(Ast::Expr* left, Ast::Expr* right)
-                : left_(left), right_(right) {};
+            AsgmtStmt(std::string name, Ast::Expr* expr)
+                : name_(name), expr(expr) {};
             void exec() override;
             ~AsgmtStmt() override;
 
         private:
-            Ast::Expr* left_;
-            Ast::Expr* right_;
+            std::string name_;
+            Ast::Expr* expr;
     };
 }
 

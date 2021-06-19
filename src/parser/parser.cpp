@@ -6,168 +6,90 @@
 #include <iostream>
 
 namespace Parser {
-std::vector<std::shared_ptr<Ast::Stmt>>
+std::vector<Ast::Stmt *>
 parser::scan_program()
 {
     return program();
 }
 
 // entry point to building AST (abstract syntax tree)
-std::vector<std::shared_ptr<Ast::Stmt>>
+std::vector<Ast::Stmt *>
 parser::program()
 {
     while (!at_end()) {
-        std::shared_ptr<Ast::Stmt> stmt = declaration();
-        if (stmt)
-            this->stmts.push_back(stmt);
+        stmts.push_back(statement());
     }
-    return this->stmts;
+    return stmts;
 }
 
-std::shared_ptr<Ast::Stmt>
-parser::declaration()
-{
-    if (match(LET))
-        return var_decl();        
-    else if (peek_next_type(EQUAL))
-        return var_redef();
-    return statement();
-}
-
-std::shared_ptr<Ast::Stmt>
+Ast::Stmt *
 parser::statement()
 {
-    if (match(SAY))
-        return say_stmt();
-    else if (match(LEFT_BRACE))
-        return block();
-    else if (match(IF))
-        return ifstmt();
-    return expr_stmt();
-}
+    if (match(Token::SAY))
+        return new SayStmt(expression());
 
-std::shared_ptr<Ast::Stmt>
-parser::say_stmt()
-{
-    Ast::Expr *expr = expression();
-    consume(EOL, expr, "say_stmt: Expected newline after expression.");
-    return std::make_shared<Ast::SayStmt>(expr);
-}
+    if (match(Token::IF)) {
+        Ast::Expr* cond = nullptr;
+        Ast::Stmt* ifstmt = nullptr;
+        Ast::Stmt* elsestmt = nullptr;
 
-std::shared_ptr<Ast::Stmt>
-parser::expr_stmt()
-{
-    Ast::Expr *expr = expression();
-    consume(EOL, expr, "expr_stmt: Expected newline after expression.");
-    // expr can be nullptr, if no match
-    // for example EOL returns nullptr
-    return expr ? std::make_shared<Ast::ExprStmt>(expr) : nullptr;
-}
+        if (!match(Token::LEFT_PAREN))
+            throw std::runtime_error("Syntax error: Expected '('.");
+        cond() = expression();
 
-std::shared_ptr<Ast::Stmt>
-parser::block()
-{
-    // create a new Env and store in it a list of stmts, like in program()
-    // TODO: Mitigate danger of inf loop here when missing closing brace
-    match(EOL); // optional linebreak
-    auto block = std::make_shared<Ast::BlockStmt>();
-    Ast::BlockStmt *block = new Ast::BlockStmt();
-    while (!match(RIGHT_BRACE)) {
-        Ast::Stmt *stmt = declaration();
-        if (stmt)
-            block->add_stmt(stmt);
-    }
-    return block;
-}
+        if (!match(Token::RIGHT_PAREN))
+            throw std::runtime_error("Syntax error: Expected ')'.");
+        ifstmt = statement();
 
-std::shared_ptr<Ast::Stmt>
-parser::ifstmt()
-{
-    Ast::Expr *cond = expression();
-    match(EOL); // optional linebreak
-    auto ifstmt = std::make_shared<Ast::IfStmt>(cond, declaration());
-    // Ast::IfStmt *ifstmt = new Ast::IfStmt(cond, declaration());
-
-    if (peek_type(ELSE_IF)) {
-        while (match(ELSE_IF)) {
-            ifstmt->add_elif(
-                dynamic_cast<std::shared_ptr<Ast::ElifStmt>>elif_stmt()
-            );
-        }
-    } else if (match(ELSE)) {
-        ifstmt->set_else(
-            dynamic_cast<std::shared_ptr<Ast::ElseStmt>>else_stmt()
-        );
-    }
-    return ifstmt;
-}
-
-std::shared_ptr<Ast::Stmt>
-parser::elif_stmt()
-{
-    Ast::Expr *cond = expression();
-    match(EOL); // optional linebreak
-    //Ast::ElifStmt *elif = new Ast::ElifStmt(cond, declaration());
-    auto elif = std::make_shared<Ast::ElifStmt>(cond, declaration());
-
-    if (match(ELSE)) {
-        elif->set_else(
-            dynamic_cast<std::shared_ptr<Ast::ElseStmt>>else_stmt()
-        );
+        if (match(Token::ELSE))
+            elsestmt = statement();
+        return new Ast::IfStmt(cond, ifstmt, elsestmt);
     }
 
-    return elif;
-}
+    /*
+    if (match(Token::WHILE)) {
 
-std::shared_ptr<Ast::Stmt>
-parser::else_stmt()
-{
-    match(EOL); // optional linebreak
-    // Ast::ElseStmt *else_stmt = new Ast::ElseStmt(declaration());
-    auto else_stmt = std::make_shared<Ast::ElseStmt>(declaration());
-    return else_stmt;
-}
-
-std::shared_ptr<Ast::Stmt>
-parser::var_decl() {
-    consume(IDENTIFIER, nullptr, "Expected identifier after keyword 'let'.");
-    auto *ident = new Ast::Ident(Sym(Sym_t::VAR, prev().lexeme()));
-
-    if (match(EQUAL)) {
-        Ast::Expr *expr = expression();
-        return std::make_shared<Ast::IdentStmt>(ident, expr);
-        // return new Ast::IdentStmt(ident, expr); // var_def
     }
-    return std::make_shared<Ast::IdentStmt>(ident);
-    //return new Ast::IdentStmt(ident); // var_decl
-}
+    if (match(Token::FOR)) {
+    
+    }
+    */
 
-std::shared_ptr<Ast::Stmt>
-parser::var_redef()
-{
-    consume(IDENTIFIER, nullptr, "Expected identifier before token '='.");
-    auto *ident = new Ast::Ident(Sym(Sym_t::VAR, prev().lexeme()));
-    consume(EQUAL, ident,
-            "Expected '=' after identifier '" + prev().lexeme() + "'");
-    Ast::Expr *expr = expression();
-    return std::make_shared<Ast::IdentStmt>(ident, expr, true);
-    // return new Ast::IdentStmt(ident, expr, true); // var_redef
+    if (match(Token::LEFT_BRACE)) {
+        auto blockstmt = new Ast::BlockStmt();
+        while (!match(Token::RIGHT_BRACE))
+            blockstmt->add_stmt(statement());
+        return blockstmt;
+    }
+
+    if (match(Token::LET)) {
+        if (!match(Token::IDENTIFIER))
+            throw new std::runtime_error("Syntax error: Expected identifier.");
+        std::string var = prev().to_str();
+
+        if (match(Token::EQUAL))
+            return new Ast::AsgmtExpr(var, expression());
+    }
+
+    // if none of the above, then expression statement
+    return new Ast::ExprStmt(expression());
 }
 
 Ast::Expr *
 parser::expression()
 {
     return logical();
+
 }
 
 Ast::Expr *
 parser::logical()
 {
     Ast::Expr *expr = equality();
-    while (match(OR, AND)) {
+    while (match(Token::OR, Token::AND)) {
         Token op = prev();
         Ast::Expr *right = equality();
-        expr = new Ast::Binary(expr, op, right);
+        expr = new Ast::Cond(expr, op, right);
     }
     return expr;
 }
@@ -176,10 +98,10 @@ Ast::Expr *
 parser::equality()
 {
     Ast::Expr *expr = comparison();
-    while (match(BANG_EQUAL, EQUAL_EQUAL)) {
+    while (match(Token::BANG_EQUAL, Token::EQUAL_EQUAL)) {
         Token op = prev();
         Ast::Expr *right = comparison();
-        expr = new Ast::Binary(expr, op, right);
+        expr = new Ast::Cond(expr, op, right);
     }
     return expr;
 }
@@ -187,10 +109,11 @@ Ast::Expr *
 parser::comparison()
 {
     Ast::Expr *expr = term();
-    while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
+    while (match(Token::GREATER, Token::GREATER_EQUAL,
+        Token::LESS, Token::LESS_EQUAL)) {
         Token op = prev();
         Ast::Expr *right = term();
-        expr = new Ast::Binary(expr, op, right);
+        expr = new Ast::Cond(expr, op, right);
     }
     return expr;
 }
@@ -199,7 +122,7 @@ Ast::Expr *
 parser::term()
 {
     Ast::Expr *expr = factor();
-    while (match(MINUS, PLUS)) {
+    while (match(Token::MINUS, Token::PLUS)) {
         Token op = prev();
         Ast::Expr *right = factor();
         expr = new Ast::Binary(expr, op, right);
@@ -210,7 +133,7 @@ Ast::Expr *
 parser::factor()
 {
     Ast::Expr *expr = unary();
-    while (match(SLASH, STAR)) {
+    while (match(Token::SLASH, Token::STAR, Token::PERCENT)) {
         Token op = prev();
         Ast::Expr *right = unary();
         expr =  new Ast::Binary(expr, op, right);
@@ -221,7 +144,7 @@ parser::factor()
 Ast::Expr *
 parser::unary()
 {
-    if (match(BANG, MINUS)) {
+    if (match(Token::BANG, Token::MINUS)) {
         Token op = prev();
         Ast::Expr *right = unary();
         return new Ast::Unary(op, right);
@@ -232,41 +155,49 @@ parser::unary()
 Ast::Expr *
 parser::primary()
 {
-    if (match(FALSE))
-        return new Ast::Literal(Val::Val(false));
-    if (match(TRUE))
-        return new Ast::Literal(Val::Val(true));
-    if (match(NIL))
-        return new Ast::Literal(Val::Val());
-    if (match(NUMBER))
-        return new Ast::Literal(Val::Val(prev().get_literal_num()));
-    if (match(STRING))
-        return new Ast::Literal(Val::Val(prev().get_literal_str()));
-    if (match(IDENTIFIER)) // user-defined identifers
-        // TODO: handle function idents
-        return new Ast::Ident(Sym(Sym_t::VAR, prev().lexeme()));
-    if (match(LEFT_PAREN)) {
-        Ast::Expr *expr = expression();
-        consume(RIGHT_PAREN, expr, "Expect ')' after expression.");
-        return new Ast::Grouping(expr);
+    Ast::Expr* expr = nullptr;
+
+    if (match(Token::FALSE))
+        return new Ast::Literal(Val(false));
+    if (match(Token::TRUE))
+        return new Ast::Literal(Val(true));
+    if (match(Token::NIL))
+        return new Ast::Literal(Val());
+    if (match(Token::NUMBER))
+        return new Ast::Literal(Val(prev().get_num()));
+    if (match(Token::STRING))
+        return new Ast::Literal(Val(prev().get_str()));
+
+    if (match(Token::IDENTIFIER)) {
+        // function or variable
+        std::string name(prev().to_str());
+        if (match(TOKEN::LEFT_PAREN)) {
+            // function
+            auto fn_expr = Ast::Fn(name);
+            while (!match(Token::RIGHT_PAREN)) {
+                fn_expr->add_arg(expression());
+
+                // match args-seperating comma, if it exists
+                if (peek().type() == Token::COMMA)
+                    match(Token::COMMA);
+            }
+
+            // TODO: match brace, then body of statements, then closing brace
+            return fn_expr;
+        } else {
+            // variable
+            return new Ast::Var(name);
+        }
     }
 
-    // TODO: fix hacky way of getting around assignment ops
-    // evaluates to old lvalue, ignoring the assignment
-    if (peek_type(EQUAL)) {
-        auto ident = new Ast::Ident(Sym(Sym_t::VAR, prev().lexeme()));
-        advance();
-        advance();
-        return ident;
+    // expresssion in parenthesis
+    if (match(Token::LEFT_PAREN)) {
+        expr = expression();
+        if (!match(RIGHT_PAREN))
+            throw std::runtime_error("Expected ')' after expression.");
     }
-    /*
-    if (peek_type(EOL))
-        std::cout << "match EOL\n";
-    else 
-        std::cout << "match nothing " << prev().to_str() <<
-        " " << peek().to_str() << " " << peek_next().to_str() << "\n";
-    */
-    return nullptr; // curr token: EOL
+
+    return expr;
 }
 
 /**
@@ -333,19 +264,6 @@ Token
 parser::prev()
 {
     return this->tokens.at(this->curr - 1);
-}
-
-/* check if next token has type and if so consume, otherwise error */
-Token
-parser::consume(Token_t type, Ast::Expr const *curr,
-    std::string const& msg)
-{
-    if (peek_type(type))
-        return advance();
-    parser::error(peek(), curr, msg);
-
-    // unreached
-    return Token();
 }
     
 bool

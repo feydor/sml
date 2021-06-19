@@ -1,12 +1,12 @@
 #include "expr.h"
-#include "symtable.h"
+#include "vartable.h"
 
 namespace Ast {
 
     Val
     Var::eval()
     {
-        return SymTable::get_var(name_);
+        return VarTable::get_var(name_);
     }
 
     std::string

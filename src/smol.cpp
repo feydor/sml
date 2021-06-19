@@ -4,10 +4,11 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include "intpr.h"
 #include "lexer.h"
 #include "parser.h"
 #include "token.h"
+#include "vartable.h"
+#include "fntable.h"
 #include "ansi.h"
 #include "smol.h"
 
@@ -92,7 +93,7 @@ void SMOL::eval(std::string const &src)
     */
 
     Parser::parser parser(tokens);
-    std::vector<std::shared_ptr<Ast::Stmt>> stmts = parser.scan_program();
+    std::vector<Stmt *> stmts = parser.scan_program();
     // std::vector<Ast::Expr *> exprs = parser.scan_exprs();
 
     std::cout << "Evaluating statements (stmts_size: " 
@@ -103,6 +104,19 @@ void SMOL::eval(std::string const &src)
     std::cout << "\n";
 
     std::cout << "Begin interpretation...\n";
-    Intpr::intpr intpr(stmts);
-    intpr.interpret();
+
+    // set prelude constants and library functions
+    VarTable::set_var("PI", Val(3.14159265359));
+
+    for (auto& stmt : stmts) {
+        try {
+            stmt->exec();
+            delete exec;
+        }
+        catch (const std::runtime_error& e) {
+            std::cout << e << std::endl;
+            // SMOL::error(e);
+        }
+        
+    }
 }

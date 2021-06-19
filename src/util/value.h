@@ -25,6 +25,8 @@ class Val {
     Val operator* (Val const &other) const;
     Val operator% (Val const &other) const;
 
+    // Val operator<< () const;
+
     double get_num() const;
     std::string get_str() const;
     bool get_bool() const;

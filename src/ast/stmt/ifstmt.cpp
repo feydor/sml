@@ -7,8 +7,8 @@ namespace Ast {
 	{
 		if (cond_->eval().get_bool())
 			ifstmt_->exec();
-		else if (else_stmt != nullptr)
-			else_stmt_->exec();
+		else if (elsestmt != nullptr)
+			elsestmt_->exec();
 	}
 
 
@@ -16,6 +16,6 @@ namespace Ast {
 	{
 		delete cond_;
 		delete ifstmt_;
-		delete else_stmt_;
+		delete elsestmt_;
 	}
 }

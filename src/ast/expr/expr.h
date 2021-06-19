@@ -1,7 +1,7 @@
-#ifndef EXPR_H
-#define EXPR_H
+#ifndef SMOL_EXPR_H
+#define SMOL_EXPR_H
 // #include "token.h"
-#include "value.h"
+#include "vartable.h"
 #include <vector>
 
 class Token;
@@ -45,8 +45,8 @@ namespace Ast {
     // Conditional expression: and, or, comparison
     class Cond : public Expr {
         public:
-            Cond(Token op, Expr* left, Expr* right)
-                : op_(op), left_(left), right_(right) {};
+            Cond(Expr* left, Token op Expr* right)
+                : left_(left), op_(op), right_(right) {};
             ~Cond() override;
             Val eval() override;
             std::string to_str() const override;
@@ -104,7 +104,7 @@ namespace Ast {
             std::string to_str() const override;
             void add_arg(Expr* expr);
         private:
-            std::vector<Expr*> exprs_;
+            std::vector<Expr*> args_;
             std::string name_;
     };
 }

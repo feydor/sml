@@ -20,5 +20,4 @@ else
 if (x >= y)
     if (x)
         x = 10000
-
 say x

@@ -32,6 +32,8 @@ class parser {
     Ast::Expr* factor();
     Ast::Expr* unary();
     Ast::Expr* primary();
+    Ast::Stmt* statement_or_block();
+    Ast::Stmt* block();
     
     template <class ...Ts> bool match(Ts... args);
     bool peek_type(Token::type type);

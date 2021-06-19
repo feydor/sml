@@ -24,10 +24,15 @@ namespace Env {
 		return env.vars.find(name) != env.vars.end();
 	}
 
+	// vars can only be set at the current Env (Envs.back())
 	void
 	set_var(const std::string& name, Val val)
 	{
-		Envs.back().vars[name] = std::move(val);
+		auto entry = Envs.back().vars.find(name);
+		if (entry != Envs.back().vars.end())
+			entry->second = val;
+		else
+			Envs.back().vars[name] = val;
 	}
 
 	// starts at most recent env/scope and searches in reverse order

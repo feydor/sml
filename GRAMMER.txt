@@ -16,7 +16,7 @@
                  statement)?;
 - block_stmt  -> "{" statement* "}";
 - asgmt_stmt  -> "let" IDENTIFIER "=" expression();
-- while_stmt  -> "while" "(" cond ")" statement*;
+- while_stmt  -> "while" "(" expression ")" statement*;
 - for_stmt    -> "for" "(" (asgmt_stmt)? ";" (cond)? ";" (
                  expression)? ")" statement*;
 

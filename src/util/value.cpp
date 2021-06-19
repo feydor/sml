@@ -101,7 +101,6 @@ bool
 Val::is_truthy() const
 {
     switch(this->type) {
-
         // 0 evaluates to false, all other numbers are true
         case Val_t::NUM: return this->get_num() != 0;
         case Val_t::STR: return false; // error

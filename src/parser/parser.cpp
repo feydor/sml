@@ -40,28 +40,34 @@ parser::statement()
 
         if (!match(Token::RIGHT_PAREN))
             throw std::runtime_error("Syntax error: Expected ')'.");
-        ifstmt = statement();
+        ifstmt = statement_or_block();
 
         if (match(Token::ELSE))
-            elsestmt = statement();
+            elsestmt = statement_or_block();
         return new Ast::IfStmt(cond, ifstmt, elsestmt);
     }
 
-    /*
+    
     if (match(Token::WHILE)) {
+        Ast::Expr* cond = nullptr;
+        Ast::Stmt* body = nullptr;
 
+        if (!match(Token::LEFT_PAREN))
+            throw std::runtime_error("Syntax error: Expected '('.");
+        cond = expression();
+
+        if (!match(Token::RIGHT_PAREN))
+            throw std::runtime_error("Syntax error: Expected ')'.");
+        body = statement_or_block();
+
+        return new Ast::WhileStmt(cond, body);
     }
+
+    /*
     if (match(Token::FOR)) {
     
     }
     */
-
-    if (match(Token::LEFT_BRACE)) {
-        auto blockstmt = new Ast::BlockStmt();
-        while (!match(Token::RIGHT_BRACE))
-            blockstmt->add_stmt(statement());
-        return blockstmt;
-    }
 
     if (match(Token::LET)) {
         if (!match(Token::IDENTIFIER))
@@ -82,6 +88,10 @@ parser::statement()
             return new Ast::AsgmtStmt(var, expression());
         else
             return new Ast::ExprStmt(new Ast::Var(var));
+    }
+
+    if (match(Token::LEFT_BRACE)) {
+        return block();
     }
 
     // if none of the above, then expression statement
@@ -212,6 +222,26 @@ parser::primary()
     return expr;
 }
 
+Ast::Stmt*
+parser::block()
+{
+    auto block = new Ast::BlockStmt();
+    match(Token::LEFT_BRACE);
+
+    while (!match(Token::RIGHT_BRACE))
+        block->add_stmt(statement());
+
+    return block;
+}
+
+Ast::Stmt*
+parser::statement_or_block()
+{
+    return peek().type() == Token::LEFT_BRACE
+        ? block()
+        : statement();
+}
+
 /**
  * checks curr token for type matches
  * consumes and returns true on the first valid match
@@ -305,17 +335,6 @@ parser::error(Tok const &tok, Ast::Expr const *curr,
             << std::endl;
         exit(-1);
     }
-
-    /*
-    if (curr->is_ident())
-        expr_str = ((Ast::Ident *)curr)->to_str();
-    else if (curr->is_literal())
-        expr_str = ((Ast::Literal *)curr)->to_str();
-    else if (curr->is_binary())
-        expr_str = ((Ast::Binary *)curr)->to_str();
-    else if (curr->is_unary())
-        expr_str = ((Ast::Unary *)curr)->to_str();
-    */
 
     std::cout << err << "error" << def << ": " << bold <<
         msg << "\n " << secondary << "--> " << def << fileloc

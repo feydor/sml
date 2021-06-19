@@ -1,0 +1,11 @@
+say "printing the number from 10 to 0 with a while loop"
+let i = 10
+while (i >= 0) {
+    say i
+    i = i - 1
+}
+
+#i = 100
+#while (i > 0) {
+#    if (i % 15 == 0)
+#}

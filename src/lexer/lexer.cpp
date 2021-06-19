@@ -7,20 +7,20 @@ namespace Lexer {
 lexer::lexer(std::string const& src) 
     : src(src) 
 {
-    this->keywords.emplace("and", AND);
-    this->keywords.emplace("else", ELSE);
-    this->keywords.emplace("elif", ELSE_IF);
-    this->keywords.emplace("false", FALSE);
-    this->keywords.emplace("for", FOR);
-    this->keywords.emplace("fn", FN);
-    this->keywords.emplace("if", IF);
-    this->keywords.emplace("nil", NIL);
-    this->keywords.emplace("or", OR);
-    this->keywords.emplace("say", SAY);
-    this->keywords.emplace("ret", RETURN);
-    this->keywords.emplace("true", TRUE);
-    this->keywords.emplace("let", LET);
-    this->keywords.emplace("while", WHILE);
+    this->keywords.emplace("and", Token::AND);
+    this->keywords.emplace("else", Token::ELSE);
+    this->keywords.emplace("elif", Token::ELSE_IF);
+    this->keywords.emplace("false", Token::FALSE);
+    this->keywords.emplace("for", Token::FOR);
+    this->keywords.emplace("fn", Token::FN);
+    this->keywords.emplace("if", Token::IF);
+    this->keywords.emplace("nil", Token::NIL);
+    this->keywords.emplace("or", Token::OR);
+    this->keywords.emplace("say", Token::SAY);
+    this->keywords.emplace("ret", Token::RETURN);
+    this->keywords.emplace("true", Token::TRUE);
+    this->keywords.emplace("let", Token::LET);
+    this->keywords.emplace("while", Token::WHILE);
 }
 
 /**
@@ -28,7 +28,7 @@ lexer::lexer(std::string const& src)
  * this function detects and adds a token to the tokens vector
  * and returns it.
  */
-std::vector<Token>
+std::vector<Tok>
 lexer::scan_tokens()
 {
     // a lexeme is made by the substring of [start, curr-start)
@@ -38,32 +38,32 @@ lexer::scan_tokens()
 
         char c = advance();
         switch(c) {
-            case '(': add_token(LEFT_PAREN); break;
-            case ')': add_token(RIGHT_PAREN); break;
-            case '{': add_token(LEFT_BRACE); break;
-            case '}': add_token(RIGHT_BRACE); break;
-            case '[': add_token(LEFT_BRACKET); break;
-            case ']': add_token(RIGHT_BRACKET); break;
-            case ',': add_token(COMMA); break;
-            case '.': add_token(DOT); break;
-            case '-': add_token(MINUS); break;
-            case '+': add_token(PLUS); break;
-            case ';': add_token(SEMICOLON); break;
-            case '*': add_token(STAR); break;
-            case '%': add_token(PERCENT); break;
-            case '/': add_token(SLASH); break;
+            case '(': add_token(Token::LEFT_PAREN); break;
+            case ')': add_token(Token::RIGHT_PAREN); break;
+            case '{': add_token(Token::LEFT_BRACE); break;
+            case '}': add_token(Token::RIGHT_BRACE); break;
+            case '[': add_token(Token::LEFT_BRACKET); break;
+            case ']': add_token(Token::RIGHT_BRACKET); break;
+            case ',': add_token(Token::COMMA); break;
+            case '.': add_token(Token::DOT); break;
+            case '-': add_token(Token::MINUS); break;
+            case '+': add_token(Token::PLUS); break;
+            case ';': add_token(Token::SEMICOLON); break;
+            case '*': add_token(Token::STAR); break;
+            case '%': add_token(Token::PERCENT); break;
+            case '/': add_token(Token::SLASH); break;
             case '!':
-                add_token(next_is('=') ? BANG_EQUAL : BANG);
+                add_token(next_is('=') ? Token::BANG_EQUAL : Token::BANG);
                 break;
             case '=':
-                add_token(next_is('=') ? EQUAL_EQUAL : EQUAL);
+                add_token(next_is('=') ? Token::EQUAL_EQUAL : Token::EQUAL);
                 break;
             case '<':
-                add_token(next_is('=') ? LESS_EQUAL : LESS);
+                add_token(next_is('=') ? Token::LESS_EQUAL : Token::LESS);
                 break;
             case '>':
                 add_token(next_is('=') 
-                        ? GREATER_EQUAL : GREATER);
+                        ? Token::GREATER_EQUAL : Token::GREATER);
                 break;
             case '#':
                 // comment goes until end of line; skip it
@@ -96,7 +96,7 @@ lexer::scan_tokens()
         }
     }
 
-    this->tokens.emplace_back(_EOF, "", this->line);
+    this->tokens.emplace_back(Token::_EOF, "", this->line);
     return std::move(this->tokens); // move ownership of smart ptrs
 }
 
@@ -106,7 +106,7 @@ char lexer::advance()
     return this->src.at(this->curr++);
 }
 
-void lexer::add_token(Token_t type)
+void lexer::add_token(Token::type type)
 {
     std::string lexeme(
         this->src.substr(this->start, this->curr - this->start)
@@ -115,7 +115,7 @@ void lexer::add_token(Token_t type)
 }
 
 /* with literal */
-void lexer::add_token(Token_t type, 
+void lexer::add_token(Token::type type, 
         std::variant<double, std::string> const& literal)
 {
     std::string lexeme(
@@ -173,7 +173,7 @@ void lexer::str()
     std::variant<double, std::string> literal(
         this->src.substr(this->start+1, (this->curr - this->start) - 2)
     );
-    add_token(STRING, literal);
+    add_token(Token::STRING, literal);
 }
 
 void lexer::num()
@@ -191,7 +191,7 @@ void lexer::num()
 
     double num = std::stod(this->src.substr(this->start, this->curr - this->start));
     std::variant<double, std::string> literal(num);
-    add_token(NUMBER, literal);
+    add_token(Token::NUMBER, literal);
 }
 
 /* handle non-string letters */
@@ -205,7 +205,7 @@ void lexer::identifier()
             this->src.substr(this->start, this->curr - this->start)
     );
     auto itr = keywords.find(lexeme);
-    itr != keywords.end() ? add_token(itr->second) : add_token(IDENTIFIER);
+    itr != keywords.end() ? add_token(itr->second) : add_token(Token::IDENTIFIER);
 }
 
 bool lexer::at_end()

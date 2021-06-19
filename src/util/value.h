@@ -4,7 +4,7 @@
 #include  <string>
 
 enum class Val_t {
-    NUM, STR, BOOL, NIL, IDENT
+    NUM, STR, BOOL, NIL,
 };
 
 class Val {
@@ -23,7 +23,7 @@ class Val {
     Val operator- (Val const &other) const;
     Val operator/ (Val const &other) const;
     Val operator* (Val const &other) const;
-    Val operator% (Val const &other) const;
+    // Val operator% (Val const &other) const;
 
     // Val operator<< () const;
 

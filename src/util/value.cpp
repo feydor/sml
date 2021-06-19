@@ -70,25 +70,25 @@ Val::get_bool() const
 bool
 Val::is_num() const
 {
-    return this->type == NUM;
+    return this->type == Val_t::NUM;
 }
 
 bool
 Val::is_str() const
 {
-    return this->type == STR;
+    return this->type == Val_t::STR;
 }
 
 bool
 Val::is_bool() const
 {
-    return this->type == BOOL;
+    return this->type == Val_t::BOOL;
 }
 
 bool
 Val::is_nil() const
 {
-    return this->type == NIL;
+    return this->type == Val_t::NIL;
 }
         
 bool
@@ -103,11 +103,10 @@ Val::is_truthy() const
     switch(this->type) {
 
         // 0 evaluates to false, all other numbers are true
-        case NUM: return this->get_num() != 0;
-        case STR: return false; // error
-        case BOOL: return this->get_bool();
-        case NIL: return false;
-        case IDENT: return false; // error
+        case Val_t::NUM: return this->get_num() != 0;
+        case Val_t::STR: return false; // error
+        case Val_t::BOOL: return this->get_bool();
+        case Val_t::NIL: return false;
     }
 }
 
@@ -115,11 +114,10 @@ std::string
 Val::type_to_string() const
 {
     switch(this->type) {
-        case NUM: return "NUM";
-        case STR: return "STR";
-        case BOOL: return "BOOL";
-        case NIL: return "NIL";
-        case IDENT: return "IDENT";
+        case Val_t::NUM: return "NUM";
+        case Val_t::STR: return "STR";
+        case Val_t::BOOL: return "BOOL";
+        case Val_t::NIL: return "NIL";
     }
 }
 
@@ -127,20 +125,19 @@ std::string
 Val::to_str() const
 {
     switch (this->type) {
-        case NUM: return std::to_string(get_num());
-        case STR: return get_str();
-        case BOOL: return get_bool() ? "true" : "false";
-        case NIL: return "nil";
-        case IDENT: return "ERROR: Ident on stack after eval.";
+        case Val_t::NUM: return std::to_string(get_num());
+        case Val_t::STR: return get_str();
+        case Val_t::BOOL: return get_bool() ? "true" : "false";
+        case Val_t::NIL: return "nil";
     }
 }
 
 Val::Val(double val)
-    : type(NUM), val_num(val) {};
+    : type(Val_t::NUM), val_num(val) {};
 Val::Val(std::string val)
-    : type(STR), val_str(val) {};
+    : type(Val_t::STR), val_str(val) {};
 Val::Val(bool val)
-    : type(BOOL), val_bool(val) {};
+    : type(Val_t::BOOL), val_bool(val) {};
 Val::Val()
-    : type(NIL), val_num(0.0) {};
+    : type(Val_t::NIL), val_num(0.0) {};
 

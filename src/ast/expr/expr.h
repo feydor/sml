@@ -1,10 +1,9 @@
 #ifndef SMOL_EXPR_H
 #define SMOL_EXPR_H
-// #include "token.h"
+#include "token.h"
 #include "vartable.h"
 #include <vector>
 
-class Token;
 
 namespace Ast {
 
@@ -17,44 +16,42 @@ namespace Ast {
 
     class Binary : public Expr {
         public:
-            Binary(Expr* left, Token op, Expr* right)
+            Binary(Expr* left, Tok op, Expr* right)
                 : op_(op), left_(left), right_(right) {};
             ~Binary() override;
             Val eval() override;
             std::string to_str() const override;
-
         private:
-            Token op_;
+            Tok op_;
             Expr* left_;
             Expr* right_;
     };
 
     class Unary : public Expr {
         public:
-            Unary(Token op, Expr* right)
+            Unary(Tok op, Expr* right)
                 : op_(op), right_(right) {};
             ~Unary() override;
             Val eval() override;
             std::string to_str() const override;
-
         private:
-            Token op_;
+            Tok op_;
             Expr* right_;
     };
 
     // Conditional expression: and, or, comparison
     class Cond : public Expr {
         public:
-            Cond(Expr* left, Token op Expr* right)
+            Cond(Expr* left, Tok op, Expr* right)
                 : left_(left), op_(op), right_(right) {};
             ~Cond() override;
             Val eval() override;
             std::string to_str() const override;
 
         private:
-            Token op_;
-            Expr* right_;
             Expr* left_;
+            Tok op_;
+            Expr* right_;
 
             template<typename Op>
             Val eval_(Val const &a, Val const &b, Op fn);
@@ -83,7 +80,7 @@ namespace Ast {
             std::string to_str() const override;
         private:
             Val val_;
-    }
+    };
 
     class Var : public Expr {
         public:
@@ -92,14 +89,14 @@ namespace Ast {
             Val eval() override;
             std::string to_str() const override;
         private:
-            std::string name;
+            std::string name_;
     };
 
-    class Fn : public Expr {
+    class FnExpr : public Expr {
         public:
-            Fn(std::string name)
+            FnExpr(std::string name)
                 : name_(std::move(name)) {};
-            ~Fn() override;
+            ~FnExpr() override;
             Val eval() override;
             std::string to_str() const override;
             void add_arg(Expr* expr);

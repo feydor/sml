@@ -42,9 +42,11 @@ namespace Ast {
             void exec() override;
             ~BlockStmt() override;
 
-        private:
-            std::vector<Stmt *> stmts_;
+            // TODO: friend with parser
             void add_stmt(Stmt *stmt);
+
+        private:
+            std::vector<Stmt *> stmts_;       
     };
 
     class IfStmt : public Stmt {
@@ -63,13 +65,13 @@ namespace Ast {
     class AsgmtStmt : public Stmt {
         public:
             AsgmtStmt(std::string name, Ast::Expr* expr)
-                : name_(name), expr(expr) {};
+                : name_(name), expr_(expr) {};
             void exec() override;
             ~AsgmtStmt() override;
 
         private:
             std::string name_;
-            Ast::Expr* expr;
+            Ast::Expr* expr_;
     };
 }
 

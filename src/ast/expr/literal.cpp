@@ -10,7 +10,7 @@ namespace Ast {
     Literal::~Literal() {};
 
     std::string
-    Literal::to_str()
+    Literal::to_str() const
     {
         return val_.to_str();
     }

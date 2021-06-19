@@ -20,23 +20,23 @@ enum type {
 };
 }
 
-class Token {
+class Tok {
     Token::type type_;
     std::string lexeme_;
     int line_;
     std::variant<double, std::string> literal_;
 
     public:
-    Token(Token::type type, std::string lexeme, int line);
-    Token(Token::type type, std::string lexeme, int line,
+    Tok(Token::type type, std::string lexeme, int line);
+    Tok(Token::type type, std::string lexeme, int line,
         std::variant<double, std::string> literal);
-    Token();
+    Tok();
 
     Token::type type() const;
     std::string lexeme() const;
     int line() const;
-    double get_literal_num() const;
-    std::string get_literal_str() const;
+    double get_num() const;
+    std::string get_str() const;
     std::string to_str() const;
     static std::string type_to_string(Token::type type);
 };

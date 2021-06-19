@@ -2,17 +2,17 @@
 #include <iostream>
 
 namespace Ast {
-Val::Val
+Val
 Unary::eval()
 {
     Val x = right_->eval();
 
     switch (op_.type()) {
-        case MINUS:
+        case Token::MINUS:
             if (x.is_num())
                 return Val(-(x.get_num()));
             break;
-        case BANG:
+        case Token::BANG:
             if (x.is_bool())
                 return Val(!(x.get_bool()));
             break;
@@ -21,7 +21,7 @@ Unary::eval()
             return Val(); // nil
     }
     /* not reached */
-    return Val::Val();
+    return Val();
 }
 
 Unary::~Unary()

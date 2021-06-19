@@ -10,11 +10,11 @@ Binary::eval()
     Val right = right_->eval();
 
     switch (op_.type()) {
-        case MINUS: return left - right;
-        case PLUS: return left + right;
-        case SLASH: return left / right;
-        case STAR: return left * right;
-        case PERCENT: return left % right; // TODO: Add to token.type()
+        case Token::MINUS: return left - right;
+        case Token::PLUS: return left + right;
+        case Token::SLASH: return left / right;
+        case Token::STAR: return left * right;
+        // case Token::PERCENT: return left % right; // TODO: Add to token.type()
         default:
             // throw std::runtime_error(
             //    "Operator '" + op.to_str() + "' is unimplemented.");

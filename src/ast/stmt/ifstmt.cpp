@@ -7,7 +7,7 @@ namespace Ast {
 	{
 		if (cond_->eval().get_bool())
 			ifstmt_->exec();
-		else if (elsestmt != nullptr)
+		else if (elsestmt_ != nullptr)
 			elsestmt_->exec();
 	}
 

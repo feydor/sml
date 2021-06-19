@@ -13,8 +13,8 @@ smol_src = ['src/smol.cpp']
 smol_inc = include_directories('src')
 
 # combine main with subsystems
-src = [smol_src, ast_expr_src, ast_stmt_src, intpr_src, parser_src, lexer_src, val_src]
-inc = [smol_inc, ast_expr_inc, ast_stmt_inc, intpr_inc, parser_inc, lexer_inc, val_inc]
+src = [smol_src, ast_expr_src, ast_stmt_src, tables_src, parser_src, lexer_src, util_src]
+inc = [smol_inc, ast_expr_inc, ast_stmt_inc, tables_inc, parser_inc, lexer_inc, util_inc]
 
 exe = executable(
   'smol', 

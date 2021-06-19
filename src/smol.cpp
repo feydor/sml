@@ -84,7 +84,7 @@ void SMOL::error(int line, std::string const &msg)
 void SMOL::eval(std::string const &src)
 {
     Lexer::lexer lexer(src);
-    std::vector<Token> tokens = lexer.scan_tokens();
+    std::vector<Tok> tokens = lexer.scan_tokens();
     /*
     std::cout << "Printing tokens... ";
     for (auto token : tokens)
@@ -93,15 +93,17 @@ void SMOL::eval(std::string const &src)
     */
 
     Parser::parser parser(tokens);
-    std::vector<Stmt *> stmts = parser.scan_program();
+    std::vector<Ast::Stmt *> stmts = parser.scan_program();
     // std::vector<Ast::Expr *> exprs = parser.scan_exprs();
 
     std::cout << "Evaluating statements (stmts_size: " 
         << stmts.size() << ")...";
     
-    for (auto &stmt : stmts)
-        std::cout << Ast::Stmt::type_to_string(stmt) << "::";
+    /*
+    for (auto& stmt : stmts)
+        std::cout << stmt->to_str() << "::";
     std::cout << "\n";
+    */
 
     std::cout << "Begin interpretation...\n";
 
@@ -111,10 +113,10 @@ void SMOL::eval(std::string const &src)
     for (auto& stmt : stmts) {
         try {
             stmt->exec();
-            delete exec;
+            delete stmt;
         }
         catch (const std::runtime_error& e) {
-            std::cout << e << std::endl;
+            std::cout << e.what() << std::endl;
             // SMOL::error(e);
         }
         

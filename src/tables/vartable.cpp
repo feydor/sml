@@ -1,4 +1,5 @@
 #include "vartable.h"
+#include <iostream>
 
 auto VarTable::var_table =
     std::unordered_map<std::string, Val>();
@@ -6,20 +7,26 @@ auto VarTable::var_table =
 void
 VarTable::set_var(std::string name, Val val)
 {
-    var_table[name] = std::move(val);
+    VarTable::var_table[name] = std::move(val);
 }
 
 bool
-VarTable::exists(std::string name) const
+VarTable::exists(std::string name)
 {
-    return var_table.find(name) != var_table.end();
+    return VarTable::var_table.find(name) != VarTable::var_table.end();
+}
+
+std::unordered_map<std::string, Val>
+VarTable::table()
+{
+    return VarTable::var_table;
 }
 
 Val
-get_var(std::string name) const
+VarTable::get_var(std::string name)
 {
-    if (exists(name))
-        return var_table[name];
+    if (VarTable::exists(name))
+        return VarTable::var_table[name];
     else { //throw new std::runtime_error();
         std::cout << "VarTable::get_var var does not exist.\n";
         return Val(); // nil

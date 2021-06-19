@@ -4,6 +4,7 @@
 #include "ansi.h"
 #include <tuple>
 #include <iostream>
+#include <stdexcept>
 
 namespace Parser {
 std::vector<Ast::Stmt *>
@@ -26,7 +27,7 @@ Ast::Stmt *
 parser::statement()
 {
     if (match(Token::SAY))
-        return new SayStmt(expression());
+        return new Ast::SayStmt(expression());
 
     if (match(Token::IF)) {
         Ast::Expr* cond = nullptr;
@@ -35,7 +36,7 @@ parser::statement()
 
         if (!match(Token::LEFT_PAREN))
             throw std::runtime_error("Syntax error: Expected '('.");
-        cond() = expression();
+        cond = expression();
 
         if (!match(Token::RIGHT_PAREN))
             throw std::runtime_error("Syntax error: Expected ')'.");
@@ -68,7 +69,7 @@ parser::statement()
         std::string var = prev().to_str();
 
         if (match(Token::EQUAL))
-            return new Ast::AsgmtExpr(var, expression());
+            return new Ast::AsgmtStmt(var, expression());
     }
 
     // if none of the above, then expression statement
@@ -87,7 +88,7 @@ parser::logical()
 {
     Ast::Expr *expr = equality();
     while (match(Token::OR, Token::AND)) {
-        Token op = prev();
+        Tok op = prev();
         Ast::Expr *right = equality();
         expr = new Ast::Cond(expr, op, right);
     }
@@ -99,7 +100,7 @@ parser::equality()
 {
     Ast::Expr *expr = comparison();
     while (match(Token::BANG_EQUAL, Token::EQUAL_EQUAL)) {
-        Token op = prev();
+        Tok op = prev();
         Ast::Expr *right = comparison();
         expr = new Ast::Cond(expr, op, right);
     }
@@ -111,7 +112,7 @@ parser::comparison()
     Ast::Expr *expr = term();
     while (match(Token::GREATER, Token::GREATER_EQUAL,
         Token::LESS, Token::LESS_EQUAL)) {
-        Token op = prev();
+        Tok op = prev();
         Ast::Expr *right = term();
         expr = new Ast::Cond(expr, op, right);
     }
@@ -123,7 +124,7 @@ parser::term()
 {
     Ast::Expr *expr = factor();
     while (match(Token::MINUS, Token::PLUS)) {
-        Token op = prev();
+        Tok op = prev();
         Ast::Expr *right = factor();
         expr = new Ast::Binary(expr, op, right);
     }
@@ -134,7 +135,7 @@ parser::factor()
 {
     Ast::Expr *expr = unary();
     while (match(Token::SLASH, Token::STAR, Token::PERCENT)) {
-        Token op = prev();
+        Tok op = prev();
         Ast::Expr *right = unary();
         expr =  new Ast::Binary(expr, op, right);
     }
@@ -145,7 +146,7 @@ Ast::Expr *
 parser::unary()
 {
     if (match(Token::BANG, Token::MINUS)) {
-        Token op = prev();
+        Tok op = prev();
         Ast::Expr *right = unary();
         return new Ast::Unary(op, right);
     }
@@ -171,9 +172,9 @@ parser::primary()
     if (match(Token::IDENTIFIER)) {
         // function or variable
         std::string name(prev().to_str());
-        if (match(TOKEN::LEFT_PAREN)) {
+        if (match(Token::LEFT_PAREN)) {
             // function
-            auto fn_expr = Ast::Fn(name);
+            auto fn_expr = new Ast::FnExpr(name);
             while (!match(Token::RIGHT_PAREN)) {
                 fn_expr->add_arg(expression());
 
@@ -193,7 +194,7 @@ parser::primary()
     // expresssion in parenthesis
     if (match(Token::LEFT_PAREN)) {
         expr = expression();
-        if (!match(RIGHT_PAREN))
+        if (!match(Token::RIGHT_PAREN))
             throw std::runtime_error("Expected ')' after expression.");
     }
 
@@ -208,7 +209,7 @@ template <class ...Ts>
 bool 
 parser::match(Ts... args)
 {
-    std::vector<Token_t> types {args...};
+    std::vector<Token::type> types {args...};
     for (auto type : types) {
         if (peek_type(type)) {
             advance();
@@ -221,7 +222,7 @@ parser::match(Ts... args)
 /* checks next token for type match
  * if match, returns true and does not consume */
 bool
-parser::peek_next_type(Token_t type)
+parser::peek_next_type(Token::type type)
 {
     if (at_end())
         return false;
@@ -230,7 +231,7 @@ parser::peek_next_type(Token_t type)
 
 /* checks curr token for given type, does not consume it */
 bool 
-parser::peek_type(Token_t type)
+parser::peek_type(Token::type type)
 {
     if (at_end())
         return false;
@@ -238,21 +239,21 @@ parser::peek_type(Token_t type)
 }  
 
 /* returns curr token, does not consume it */
-Token
+Tok
 parser::peek()
 {
     return this->tokens.at(this->curr);
 }
 
 /* returns next token, does not consume it */
-Token
+Tok
 parser::peek_next()
 {
     return this->tokens.at(this->curr + 1);
 }
 
 /* consumes curr token, returns it, and advances to the next token */
-Token
+Tok
 parser::advance()
 {
     if (!at_end())
@@ -260,7 +261,7 @@ parser::advance()
     return prev();
 }
 
-Token
+Tok
 parser::prev()
 {
     return this->tokens.at(this->curr - 1);
@@ -269,11 +270,11 @@ parser::prev()
 bool
 parser::at_end()
 {
-    return peek().type() == _EOF;
+    return peek().type() == Token::_EOF;
 }
 
 void
-parser::error(Token const &tok, Ast::Expr const *curr,
+parser::error(Tok const &tok, Ast::Expr const *curr,
     std::string const &msg)
 {
     ANSI::Modifier err(Color::FG_RED);
@@ -294,6 +295,7 @@ parser::error(Token const &tok, Ast::Expr const *curr,
         exit(-1);
     }
 
+    /*
     if (curr->is_ident())
         expr_str = ((Ast::Ident *)curr)->to_str();
     else if (curr->is_literal())
@@ -302,6 +304,7 @@ parser::error(Token const &tok, Ast::Expr const *curr,
         expr_str = ((Ast::Binary *)curr)->to_str();
     else if (curr->is_unary())
         expr_str = ((Ast::Unary *)curr)->to_str();
+    */
 
     std::cout << err << "error" << def << ": " << bold <<
         msg << "\n " << secondary << "--> " << def << fileloc

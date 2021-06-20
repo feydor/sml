@@ -17,11 +17,22 @@ The below code fragment is an example written in smol and demonstrates what is s
 # symbol resolution, dynamic typing, etc
 let x = (-23 - (8 + (-12) * 2 - 1 - 12)) / (-21 - (-20)) # x = -6
 let y = x + 1
-{
-    let z = x + y
-    let x = z
-    x = x + 1
-    say x # prints -10
-}
 say x + y # prints -11
+
+# also fizzbuzz with formatting
+let i = 1
+say "[" + to_str(i) + "] "
+while (i <= 100) {
+    if (i % 15 == 0)
+        say "fizzbuzz "
+    elif (i % 3 == 0)
+        say "fizz "
+    elif (i % 5 == 0)
+        say "buzz "
+    else
+        say to_str(i) + " "
+    if (i % 5 == 0)
+        say "\n[" + to_str(i + 1) + "] "
+    i = i + 1
+}
 ```

@@ -8,30 +8,22 @@ namespace Ast {
 	{
 		if (cond_->eval().is_truthy())
 			body_->exec();
-		else if (elsestmt_ != nullptr)
-			elsestmt_->exec();
+		else if (elses_.size() > 0)
+			for (auto& els : elses_)
+				els->exec();
 	}
-
-	void
-	IfStmt::set_else(Stmt* elsestmt)
-	{
-		elsestmt_ = elsestmt;
-	}
-
 
     void
-    IfStmt::add_elif(Stmt* elif)
+    IfStmt::add_else(Stmt* els)
     {
-    	elifs_.push_back(elif);
+    	elses_.push_back(els);
     }
 
 	IfStmt::~IfStmt()
 	{
 		delete cond_;
 		delete body_;
-		if (elsestmt_ != nullptr)
-			delete elsestmt_;
-		for (auto& elif : elifs_)
-			delete elif;
+		for (auto& els : elses_)
+			delete els;
 	}
 }

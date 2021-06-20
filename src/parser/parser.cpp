@@ -29,7 +29,7 @@ parser::statement()
     if (match(Token::SAY))
         return new Ast::SayStmt(expression());
 
-    if (match(Token::IF)) {
+    if (match(Token::IF, Token::ELSE_IF)) {
         Ast::Expr* cond = nullptr;
         Ast::Stmt* body = nullptr;
         Ast::IfStmt* ifstmt = nullptr;
@@ -45,8 +45,9 @@ parser::statement()
         ifstmt = new Ast::IfStmt(cond, body);
 
         if (match(Token::ELSE))
-            ifstmt->set_else(statement_or_block());
-
+            ifstmt->add_else(statement_or_block());
+        else if (peek_type(Token::ELSE_IF))
+            ifstmt->add_else(statement_or_block());
         return ifstmt;
     }
     

@@ -31,8 +31,8 @@ parser::statement()
 
     if (match(Token::IF)) {
         Ast::Expr* cond = nullptr;
-        Ast::Stmt* ifstmt = nullptr;
-        Ast::Stmt* elsestmt = nullptr;
+        Ast::Stmt* body = nullptr;
+        Ast::IfStmt* ifstmt = nullptr;
 
         if (!match(Token::LEFT_PAREN))
             throw std::runtime_error("Syntax error: Expected '('.");
@@ -40,13 +40,15 @@ parser::statement()
 
         if (!match(Token::RIGHT_PAREN))
             throw std::runtime_error("Syntax error: Expected ')'.");
-        ifstmt = statement_or_block();
+        body = statement_or_block();
+
+        ifstmt = new Ast::IfStmt(cond, body);
 
         if (match(Token::ELSE))
-            elsestmt = statement_or_block();
-        return new Ast::IfStmt(cond, ifstmt, elsestmt);
-    }
+            ifstmt->set_else(statement_or_block());
 
+        return ifstmt;
+    }
     
     if (match(Token::WHILE)) {
         Ast::Expr* cond = nullptr;

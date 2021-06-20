@@ -51,15 +51,30 @@ namespace Ast {
 
     class IfStmt : public Stmt {
         public:
-        IfStmt(Ast::Expr* cond, Stmt* ifstmt, Stmt* else_stmt)
-            : cond_(cond), ifstmt_(ifstmt), elsestmt_(else_stmt) {};
+        IfStmt(Ast::Expr* cond, Stmt* body)
+            : cond_(cond), body_(body) {};
         void exec() override;
         ~IfStmt() override;
+        void set_else(Stmt* elsestmt);
+        void add_elif(Stmt* elif);
 
         private:
         Ast::Expr* cond_;
-        Stmt* ifstmt_;
-        Stmt* elsestmt_;
+        Stmt* body_;
+        std::vector<Stmt *> elifs_;
+        Stmt* elsestmt_ = nullptr;
+    };
+
+    class ElIfStmt : public Stmt {
+        public:
+        ElIfStmt(Ast::Expr* cond, Stmt* body)
+            : cond_(cond), body_(body) {};
+        void exec() override;
+        ~ElIfStmt() override;
+
+        private:
+        Ast::Expr* cond_;
+        Stmt* body_;
     };
 
     class AsgmtStmt : public Stmt {

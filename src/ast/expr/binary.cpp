@@ -14,7 +14,7 @@ Binary::eval()
         case Token::PLUS: return left + right;
         case Token::SLASH: return left / right;
         case Token::STAR: return left * right;
-        // case Token::PERCENT: return left % right; // TODO: Add to token.type()
+        case Token::PERCENT: return left % right;
         default:
             // throw std::runtime_error(
             //    "Operator '" + op.to_str() + "' is unimplemented.");

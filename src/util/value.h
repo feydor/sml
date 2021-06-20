@@ -23,7 +23,7 @@ class Val {
     Val operator- (Val const &other) const;
     Val operator/ (Val const &other) const;
     Val operator* (Val const &other) const;
-    // Val operator% (Val const &other) const;
+    Val operator% (Val const &other) const;
 
     // Val operator<< () const;
 

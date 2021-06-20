@@ -1,4 +1,4 @@
-## Precedence (from lowest to highest)
+ ## Precedence (from lowest to highest)
 - logical_and/logical_or, 'and or', left
 - equality, '== !=', left
 - comparison, '> >= <= <', left

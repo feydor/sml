@@ -1,4 +1,5 @@
 #include "value.h"
+#include <cmath>
 
 /* invalid data types returns NIL value */
 Val
@@ -47,6 +48,14 @@ Val::operator* (Val const &other) const
        return Val(this->get_num() * other.get_num());
 
    return Val();
+}
+
+Val
+Val::operator% (Val const &other) const
+{
+    if (this->is_num() && other.is_num())
+        return Val(std::fmod(this->get_num(), other.get_num()));
+    return Val();
 }
 
 double

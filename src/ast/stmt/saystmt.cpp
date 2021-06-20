@@ -5,7 +5,19 @@ namespace Ast {
 	void
 	SayStmt::exec()
 	{
-		std::cout << expr_->eval().to_str() << std::endl;
+		auto out = expr_->eval().to_str();
+		for (unsigned i = 0; i < out.size(); ++i) {
+			if (out[i] == '\\') {
+				i++;
+				switch (out[i]) {
+					case 'n':
+						std::cout << "\n";
+						break;
+				}
+			} else {
+				std::cout << out[i];
+			}
+		}
 	}
 
 	SayStmt::~SayStmt()

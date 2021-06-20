@@ -10,6 +10,7 @@
 #include "env.h"
 #include "fntable.h"
 #include "ansi.h"
+#include "lib.h"
 #include "smol.h"
 
 #define PROJECT_NAME "smol"
@@ -101,8 +102,9 @@ void SMOL::eval(std::string const &src)
     std::cout << "Begin interpretation...\n";
 
     // set prelude constants and library functions
+    // TODO: Move to prelude.h
     Env::set_var(std::string("PI"), Val(3.14159265359));
-    // VarTable::set_var("PI", Val(3.14159265359));
+    FnTable::set_fn(new Lib::to_str());
 
     for (auto& stmt : stmts) {
         try {

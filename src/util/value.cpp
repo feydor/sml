@@ -1,5 +1,9 @@
 #include "value.h"
 #include <cmath>
+#include <stdexcept>
+#include <sstream>
+#include <iostream>
+#include <iomanip>
 
 /* invalid data types returns NIL value */
 Val
@@ -11,14 +15,15 @@ Val::operator+ (Val const &other) const
         else if (other.is_str())
             return Val(std::to_string(this->get_num()) + other.get_str());
     } else if (this->is_str()) {
+        /*
         if (other.is_num())
             return Val(this->get_str() + std::to_string(other.get_num()));
-        else if (other.is_str())
+        */
+        if (other.is_str())
             return Val(this->get_str() + other.get_str());
     }
 
-    // TODO: Show some sort of runtime/intpr error here
-    return Val();
+    throw std::runtime_error("Invalid operand types in binary operator '+'.");
 }
 
 /* invalid data types returns NIL value */
@@ -133,7 +138,20 @@ std::string
 Val::to_str() const
 {
     switch (this->type) {
-        case Val_t::NUM: return std::to_string(get_num());
+        case Val_t::NUM: {
+            int digits = 0;
+            double frac = std::abs(get_num()) - std::trunc(get_num());
+            constexpr double precision = 0.000001;
+            while (frac >= precision) {
+                frac *= 10.0;
+                digits++;
+                frac = frac - std::trunc(frac);
+            }
+
+            std::stringstream sstream;
+            sstream << std::fixed << std::setprecision(digits) << get_num();
+            return sstream.str();
+        } 
         case Val_t::STR: return get_str();
         case Val_t::BOOL: return get_bool() ? "true" : "false";
         case Val_t::NIL: return "nil";

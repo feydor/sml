@@ -13,3 +13,5 @@ util_inc = include_directories('util')
 env_src = files(['env/env.cpp', 'env/fntable.cpp'])
 env_inc = include_directories('env')
 
+lib_src = files(['lib/tostr.cpp'])
+lib_inc = include_directories('lib')

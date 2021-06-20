@@ -72,6 +72,8 @@ parser::statement()
     }
     */
 
+    // TODO: after 'FN', match brace, then body of statements, then closing brace
+
     if (match(Token::LET)) {
         if (!match(Token::IDENTIFIER))
             throw new std::runtime_error("Syntax error: Expected identifier.");
@@ -208,7 +210,6 @@ parser::primary()
                     match(Token::COMMA);
             }
 
-            // TODO: match brace, then body of statements, then closing brace
             return fn_expr;
         } else {
             return new Ast::Var(name);

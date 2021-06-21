@@ -46,12 +46,22 @@ lexer::scan_tokens()
             case ']': add_token(Token::RIGHT_BRACKET); break;
             case ',': add_token(Token::COMMA); break;
             case '.': add_token(Token::DOT); break;
-            case '-': add_token(Token::MINUS); break;
-            case '+': add_token(Token::PLUS); break;
             case ';': add_token(Token::SEMICOLON); break;
-            case '*': add_token(Token::STAR); break;
-            case '%': add_token(Token::PERCENT); break;
-            case '/': add_token(Token::SLASH); break;
+            case '-':
+                add_token(next_is('=') ? Token::MINUS_EQUAL : Token::MINUS);
+                break;
+            case '+':
+                add_token(next_is('=') ? Token::PLUS_EQUAL : Token::PLUS);
+                break;
+            case '*':
+                add_token(next_is('=') ? Token::STAR_EQUAL : Token::STAR);
+                break;
+            case '/':
+                add_token(next_is('=') ? Token::SLASH_EQUAL : Token::SLASH);
+                break;
+            case '%':
+                add_token(next_is('=') ? Token::PERCENT_EQUAL : Token::PERCENT);
+                break;
             case '!':
                 add_token(next_is('=') ? Token::BANG_EQUAL : Token::BANG);
                 break;
@@ -101,12 +111,14 @@ lexer::scan_tokens()
 }
 
 /* consume the current character */
-char lexer::advance()
+char
+lexer::advance()
 {
     return this->src.at(this->curr++);
 }
 
-void lexer::add_token(Token::type type)
+void
+lexer::add_token(Token::type type)
 {
     std::string lexeme(
         this->src.substr(this->start, this->curr - this->start)
@@ -115,7 +127,8 @@ void lexer::add_token(Token::type type)
 }
 
 /* with literal */
-void lexer::add_token(Token::type type, 
+void
+lexer::add_token(Token::type type,
         std::variant<double, std::string> const& literal)
 {
     std::string lexeme(
@@ -125,7 +138,8 @@ void lexer::add_token(Token::type type,
 }
 
 /* look at current character without consumption */
-char lexer::peek()
+char
+lexer::peek()
 {
     if (at_end()) 
         return '\0';
@@ -133,7 +147,8 @@ char lexer::peek()
 }
 
 /* lookahead two characters */
-char lexer::peek_next()
+char
+lexer::peek_next()
 {
     if (this->curr + 1 >= (int)src.length()) 
         return '\0';
@@ -141,7 +156,8 @@ char lexer::peek_next()
 }
 
 /* if the next character matches, consume the current + next character */
-bool lexer::next_is(char c)
+bool
+lexer::next_is(char c)
 {
     if (at_end())
         return false;
@@ -153,7 +169,8 @@ bool lexer::next_is(char c)
 }
 
 /* handle string literals */
-void lexer::str()
+void
+lexer::str()
 {
     // consume characters until matching " mark
     while (peek() != '"' && !at_end()) {
@@ -176,7 +193,8 @@ void lexer::str()
     add_token(Token::STRING, literal);
 }
 
-void lexer::num()
+void
+lexer::num()
 {
     // consume consecutive digits
     while (is_digit(peek()))
@@ -195,7 +213,8 @@ void lexer::num()
 }
 
 /* handle non-string letters */
-void lexer::identifier()
+void
+lexer::identifier()
 {
     // move curr char ptr to end of identifier token
     while (is_alphanumeric(peek()))
@@ -208,23 +227,27 @@ void lexer::identifier()
     itr != keywords.end() ? add_token(itr->second) : add_token(Token::IDENTIFIER);
 }
 
-bool lexer::at_end()
+bool
+lexer::at_end()
 {
     return this->curr >= (int)this->src.length(); 
 }
 
-bool lexer::is_digit(char c)
+bool
+lexer::is_digit(char c)
 {
     return c >= '0' && c <= '9';
 }
 
-bool lexer::is_alpha(char c) {
+bool
+lexer::is_alpha(char c) {
     return (c >= 'a' && c <= 'z') ||
            (c >= 'A' && c <= 'Z') ||
            c == '_';
 }
 
-bool lexer::is_alphanumeric(char c)
+bool
+lexer::is_alphanumeric(char c)
 {
     return is_alpha(c) || is_digit(c);
 }

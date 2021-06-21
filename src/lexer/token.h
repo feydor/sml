@@ -11,7 +11,8 @@ enum type {
     MINUS, PLUS, SEMICOLON, SLASH, STAR,
     // one or two character tokens
     BANG, BANG_EQUAL, EQUAL, EQUAL_EQUAL, GREATER, GREATER_EQUAL,
-    LESS, LESS_EQUAL,
+    LESS, LESS_EQUAL, PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL,
+    PERCENT_EQUAL,
     // literals
     IDENTIFIER, STRING, NUMBER,
     // keywords
@@ -32,13 +33,20 @@ class Tok {
         std::variant<double, std::string> literal);
     Tok();
 
+    // for building a token outside of lexer
+    Tok(Token::type type, std::string lexeme);
+
     Token::type type() const;
     std::string lexeme() const;
     int line() const;
     double get_num() const;
     std::string get_str() const;
     std::string to_str() const;
+    Tok first_subtok() const;
     static std::string type_to_string(Token::type type);
+
+    private:
+    Token::type char_to_type(char c) const;
 };
 
 #endif

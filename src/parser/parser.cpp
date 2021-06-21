@@ -103,7 +103,7 @@ parser::statement()
         // if no cond, infinite loop 
         if (!cond)
             cond = new Ast::Literal(Val(true));
-        
+
         if (asgmt)
             stmts.push_back(asgmt);
         return new Ast::WhileStmt(cond, final_body);
@@ -128,7 +128,11 @@ parser::statement()
         std::string var = prev().to_str();
         if (match(Token::EQUAL))
             return new Ast::AsgmtStmt(var, expression());
-        else
+        else if (match(Token::PLUS_EQUAL, Token::MINUS_EQUAL, Token::STAR_EQUAL,
+            Token::SLASH_EQUAL, Token::PERCENT_EQUAL))
+            return new Ast::AsgmtStmt(var, new Ast::Binary(new Ast::Var(var),
+                prev().first_subtok(), expression()));
+        else // expr_stmt, a standalone identifier whose evaluation is discarded
             return new Ast::ExprStmt(new Ast::Var(var));
     }
 

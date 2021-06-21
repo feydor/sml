@@ -19,6 +19,5 @@ while (i <= 100) {
 i = 9.06
 say "checking precision for doubles: " + to_str(i) + "\n"
 
-for (let j = 0; j < 5; j = j + 1) {
+for (let j = 0; j < 5; j += 1)
     say to_str(j) + "\n"
-}

@@ -1,4 +1,5 @@
 #include "token.h"
+#include <stdexcept>
 
 Tok::Tok(Token::type type, std::string lexeme, int line)
     : type_(type), lexeme_(std::move(lexeme)), line_(line)
@@ -11,6 +12,9 @@ Tok::Tok(Token::type type, std::string lexeme, int line,
     : type_(type), lexeme_(std::move(lexeme)), line_(line), 
     literal_(std::move(literal))
 {}
+
+Tok::Tok(Token::type type, std::string lexeme)
+    : type_(type), lexeme_(lexeme), line_(0) {};
 
 Tok::Tok() {}
 
@@ -42,6 +46,25 @@ std::string
 Tok::to_str() const
 {
     return lexeme_;
+}
+
+Tok
+Tok::first_subtok() const
+{
+    return Tok(char_to_type(to_str()[0]), to_str());
+}
+
+Token::type
+Tok::char_to_type(char c) const
+{
+    switch (c) {
+        case '+': return Token::PLUS;
+        case '-': return Token::MINUS;
+        case '/': return Token::SLASH;
+        case '*': return Token::STAR;
+        case '%': return Token::PERCENT;
+        default: throw std::runtime_error("char_to_type: type not implemented.");
+    }
 }
 
 std::string

@@ -12,7 +12,7 @@ enum type {
     // one or two character tokens
     BANG, BANG_EQUAL, EQUAL, EQUAL_EQUAL, GREATER, GREATER_EQUAL,
     LESS, LESS_EQUAL, PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL,
-    PERCENT_EQUAL,
+    PERCENT_EQUAL, PLUS_PLUS, MINUS_MINUS,
     // literals
     IDENTIFIER, STRING, NUMBER,
     // keywords

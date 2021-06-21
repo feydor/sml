@@ -48,10 +48,20 @@ lexer::scan_tokens()
             case '.': add_token(Token::DOT); break;
             case ';': add_token(Token::SEMICOLON); break;
             case '-':
-                add_token(next_is('=') ? Token::MINUS_EQUAL : Token::MINUS);
+                if (next_is('='))
+                    add_token(Token::MINUS_EQUAL);
+                else if (next_is('-'))
+                    add_token(Token::MINUS_MINUS);
+                else
+                    add_token(Token::MINUS);
                 break;
             case '+':
-                add_token(next_is('=') ? Token::PLUS_EQUAL : Token::PLUS);
+                if (next_is('='))
+                    add_token(Token::PLUS_EQUAL);
+                else if (next_is('+'))
+                    add_token(Token::PLUS_PLUS);
+                else
+                    add_token(Token::PLUS);
                 break;
             case '*':
                 add_token(next_is('=') ? Token::STAR_EQUAL : Token::STAR);

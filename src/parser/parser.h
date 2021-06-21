@@ -32,8 +32,10 @@ class parser {
     Ast::Expr* factor();
     Ast::Expr* unary();
     Ast::Expr* primary();
+
     Ast::Stmt* statement_or_block();
     Ast::Stmt* block();
+    Ast::Stmt* inc_decrement(const std::string &var, const Tok &op);
     
     template <class ...Ts> bool match(Ts... args);
     bool peek_type(Token::type type);

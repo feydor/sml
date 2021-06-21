@@ -130,8 +130,12 @@ parser::statement()
             return new Ast::AsgmtStmt(var, expression());
         else if (match(Token::PLUS_EQUAL, Token::MINUS_EQUAL, Token::STAR_EQUAL,
             Token::SLASH_EQUAL, Token::PERCENT_EQUAL))
-            return new Ast::AsgmtStmt(var, new Ast::Binary(new Ast::Var(var),
-                prev().first_subtok(), expression()));
+            return new Ast::AsgmtStmt(var,
+                new Ast::Binary(new Ast::Var(var),
+                    prev().first_subtok(), expression())
+            );
+        else if (match(Token::PLUS_PLUS, Token::MINUS_MINUS))
+            return inc_decrement(var, prev().first_subtok());
         else // expr_stmt, a standalone identifier whose evaluation is discarded
             return new Ast::ExprStmt(new Ast::Var(var));
     }
@@ -285,6 +289,16 @@ parser::statement_or_block()
     return peek().type() == Token::LEFT_BRACE
         ? block()
         : statement();
+}
+
+// syntactic sugar gen for post/pre incrementer/decrementer
+// x++ as x = x + 1 which evals to x+1
+Ast::Stmt*
+parser::inc_decrement(const std::string &var, const Tok &op)
+{
+    return new Ast::AsgmtStmt(var,
+        new Ast::Binary(new Ast::Var(var), op, new Ast::Literal(Val(1.0)))
+    );
 }
 
 /**

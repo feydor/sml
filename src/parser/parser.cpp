@@ -66,11 +66,48 @@ parser::statement()
         return new Ast::WhileStmt(cond, body);
     }
 
-    /*
     if (match(Token::FOR)) {
-    
+        Ast::Stmt* asgmt = nullptr;
+        Ast::Expr* cond = nullptr;
+        Ast::Stmt* control = nullptr;
+        Ast::Stmt* body = nullptr;
+        Ast::BlockStmt* final_body = nullptr;
+
+        if (!match(Token::LEFT_PAREN))
+            throw std::runtime_error("Syntax error: Expected '('.");
+        
+        if (!peek_type(Token::SEMICOLON))
+            asgmt = statement(); // TODO: var_decl()
+
+        if (!match(Token::SEMICOLON))
+            throw std::runtime_error("Syntax error: Expected ';'.");
+        else
+            cond = expression();
+
+        if (!match(Token::SEMICOLON))
+            throw std::runtime_error("Syntax error: Expected ';'.");
+        else
+            control = statement();
+
+        if (!match(Token::RIGHT_PAREN))
+            throw std::runtime_error("Syntax error: Expected ')'.");
+
+        body = statement_or_block();
+
+        // desugar into while loop
+        final_body = new Ast::BlockStmt();
+        final_body->add_stmt(body);
+        if (control)
+            final_body->add_stmt(control);
+
+        // if no cond, infinite loop 
+        if (!cond)
+            cond = new Ast::Literal(Val(true));
+        
+        if (asgmt)
+            stmts.push_back(asgmt);
+        return new Ast::WhileStmt(cond, final_body);
     }
-    */
 
     // TODO: after 'FN', match brace, then body of statements, then closing brace
 

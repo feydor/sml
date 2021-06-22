@@ -47,4 +47,19 @@ namespace Env {
 		throw new std::runtime_error("variable '" + name + "' does not exist.");			
 	}
 
+	std::string
+	to_str()
+	{
+		std::string out("");
+		int i = 0;
+		for (auto env : Envs) {
+			out += "----------ENV" + std::to_string(i) + "---------\n";
+			out += "size: " + std::to_string(env.vars.size()) + "\n";
+			i++;
+			for (auto var : env.vars)
+				out += var.first + " = " + var.second.to_str() + "\n";
+		}
+		return out;
+	}
+
 }

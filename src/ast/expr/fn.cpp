@@ -13,7 +13,7 @@ namespace Ast {
         for (auto& arg : args_)
             args.push_back(arg->eval());
   
-        return FnTable::get_fn(name_)->invoke(args);       
+        return FnTable::get_fn(name_)->invoke(args);
     }
 
     void

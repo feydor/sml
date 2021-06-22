@@ -2,6 +2,7 @@
 #include "parser.h"
 #include "smol.h"
 #include "ansi.h"
+#include "fntable.h"
 #include <tuple>
 #include <iostream>
 #include <stdexcept>
@@ -18,7 +19,9 @@ std::vector<Ast::Stmt *>
 parser::program()
 {
     while (!at_end()) {
-        stmts.push_back(statement());
+        auto stmt = statement();
+        if (stmt != nullptr) // ignore null statements, which are empty statements
+            stmts.push_back(stmt);
     }
     return stmts;
 }
@@ -26,6 +29,31 @@ parser::program()
 Ast::Stmt *
 parser::statement()
 {
+    // parse user-defined fn and add to FnTable
+    if (match(Token::FN)) {
+        if (!match(Token::IDENTIFIER))
+            throw std::runtime_error("Syntax error: Expected identifier.");
+
+        std::string ident = std::string(prev().to_str());
+        if (!match(Token::LEFT_PAREN))
+            throw std::runtime_error("Syntax error: Expected '('.");
+
+        UserFn* userfn = new UserFn(ident);
+        while (!match(Token::RIGHT_PAREN)) {
+            if (!match(Token::IDENTIFIER))
+                throw std::runtime_error("Syntax error: Expected identifier.");
+            userfn->add_argname(prev().to_str());
+
+            // match args-seperating comma, if it exists
+            if (peek().type() == Token::COMMA)
+                match(Token::COMMA);
+        }
+
+        userfn->set_body(statement_or_block());
+        FnTable::set_fn(userfn);
+        return nullptr; // return empty statement, trash it
+    }
+
     if (match(Token::SAY))
         return new Ast::SayStmt(expression());
 
@@ -109,8 +137,6 @@ parser::statement()
         return new Ast::WhileStmt(cond, final_body);
     }
 
-    // TODO: after 'FN', match brace, then body of statements, then closing brace
-
     if (match(Token::LET)) {
         if (!match(Token::IDENTIFIER))
             throw new std::runtime_error("Syntax error: Expected identifier.");
@@ -122,9 +148,15 @@ parser::statement()
             return new Ast::AsgmtStmt(var, new Ast::Literal(Val())); // NIL
     }
 
+    // fn_expr
+    if (peek_type(Token::IDENTIFIER)) {
+        if (peek_next_type(Token::LEFT_PAREN)) {
+            return new Ast::ExprStmt(call());
+        }
+    }
 
     if (match(Token::IDENTIFIER)) {
-        // var redefinition (asgmt_stmt) or expr_stmt
+        // var redefinition (asgmt_stmt) or expr_stmt TODO: (var or fn?)
         std::string var = prev().to_str();
         if (match(Token::EQUAL))
             return new Ast::AsgmtStmt(var, expression());
@@ -148,84 +180,110 @@ parser::statement()
     return new Ast::ExprStmt(expression());
 }
 
-Ast::Expr *
+Ast::Expr*
 parser::expression()
 {
     return logical();
 
 }
 
-Ast::Expr *
+Ast::Expr*
 parser::logical()
 {
-    Ast::Expr *expr = equality();
+    Ast::Expr* expr = equality();
     while (match(Token::OR, Token::AND)) {
         Tok op = prev();
-        Ast::Expr *right = equality();
+        Ast::Expr* right = equality();
         expr = new Ast::Cond(expr, op, right);
     }
     return expr;
 }
 
-Ast::Expr *
+Ast::Expr*
 parser::equality()
 {
-    Ast::Expr *expr = comparison();
+    Ast::Expr* expr = comparison();
     while (match(Token::BANG_EQUAL, Token::EQUAL_EQUAL)) {
         Tok op = prev();
-        Ast::Expr *right = comparison();
+        Ast::Expr* right = comparison();
         expr = new Ast::Cond(expr, op, right);
     }
     return expr;
 }
-Ast::Expr *
+Ast::Expr*
 parser::comparison()
 {
-    Ast::Expr *expr = term();
+    Ast::Expr* expr = term();
     while (match(Token::GREATER, Token::GREATER_EQUAL,
         Token::LESS, Token::LESS_EQUAL)) {
         Tok op = prev();
-        Ast::Expr *right = term();
+        Ast::Expr* right = term();
         expr = new Ast::Cond(expr, op, right);
     }
     return expr;
 }
 
-Ast::Expr *
+Ast::Expr*
 parser::term()
 {
-    Ast::Expr *expr = factor();
+    Ast::Expr* expr = factor();
     while (match(Token::MINUS, Token::PLUS)) {
         Tok op = prev();
-        Ast::Expr *right = factor();
+        Ast::Expr* right = factor();
         expr = new Ast::Binary(expr, op, right);
     }
     return expr;
 }
-Ast::Expr *
+Ast::Expr*
 parser::factor()
 {
-    Ast::Expr *expr = unary();
+    Ast::Expr* expr = unary();
     while (match(Token::SLASH, Token::STAR, Token::PERCENT)) {
         Tok op = prev();
-        Ast::Expr *right = unary();
+        Ast::Expr* right = unary();
         expr =  new Ast::Binary(expr, op, right);
     }
     return expr;
 }
 
-Ast::Expr *
+Ast::Expr*
 parser::unary()
 {
     if (match(Token::BANG, Token::MINUS)) {
         Tok op = prev();
-        Ast::Expr *right = unary();
+        Ast::Expr* right = unary();
         return new Ast::Unary(op, right);
     }
-    return primary();
+    return call();
 }
 
-Ast::Expr *
+Ast::Expr*
+parser::call()
+{
+    Ast::Expr* expr = primary();
+    std::string name(prev().to_str()); // TODO: Make sure this is an identifier only
+
+    if (match(Token::LEFT_PAREN)) {
+        auto fn_expr = new Ast::FnExpr(name);
+        int argc = 0;
+        while (!match(Token::RIGHT_PAREN)) {
+            auto expr = expression();
+            fn_expr->add_arg(expr);
+            argc++;
+
+            //if (argc >= 128)
+            //    ; // TODO: show an error
+
+            // match args-seperating comma, if it exists
+            if (peek().type() == Token::COMMA)
+                match(Token::COMMA);
+        }
+        return fn_expr;
+    }
+    return expr;
+}
+
+Ast::Expr*
 parser::primary()
 {
     Ast::Expr* expr = nullptr;
@@ -240,25 +298,9 @@ parser::primary()
         return new Ast::Literal(Val(prev().get_num()));
     if (match(Token::STRING))
         return new Ast::Literal(Val(prev().get_str()));
-
     if (match(Token::IDENTIFIER)) {
-        // function or variable
-        std::string name(prev().to_str());
-        if (match(Token::LEFT_PAREN)) {
-            // function
-            auto fn_expr = new Ast::FnExpr(name);
-            while (!match(Token::RIGHT_PAREN)) {
-                fn_expr->add_arg(expression());
-
-                // match args-seperating comma, if it exists
-                if (peek().type() == Token::COMMA)
-                    match(Token::COMMA);
-            }
-
-            return fn_expr;
-        } else {
-            return new Ast::Var(name);
-        }
+        // only variable matched here
+        return new Ast::Var(prev().to_str());
     }
 
     // expression in parens

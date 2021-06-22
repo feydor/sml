@@ -12,6 +12,7 @@ class FnTable {
     static void set_fn(Fn* fn);
     static Fn* get_fn(std::string name);
     static bool exists(std::string name);
+    static std::string to_str();
     
     private:
     static std::unordered_map<std::string, Fn*> fn_table;

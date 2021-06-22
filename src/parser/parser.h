@@ -31,6 +31,7 @@ class parser {
     Ast::Expr* term();
     Ast::Expr* factor();
     Ast::Expr* unary();
+    Ast::Expr* call();
     Ast::Expr* primary();
 
     Ast::Stmt* statement_or_block();

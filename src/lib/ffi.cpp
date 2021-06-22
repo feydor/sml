@@ -1,7 +1,8 @@
-#include "fn.h"
+/* ffi.cpp - foreign function interface (FFI) common methods */
+#include "ffi.h"
 #include <stdexcept>
 void
-Fn::check_args(std::vector<Val> args, int count)
+FFInterface::check_nargs(std::vector<Val> args, int count)
 {
     if (args.size() != (unsigned)count)
         throw std::runtime_error(name() + ": arguments required (" +

@@ -44,7 +44,8 @@ namespace Env {
 			if (var_exists((*itr), name))
 				return (*itr).vars[name];
 		}
-		throw new std::runtime_error("variable '" + name + "' does not exist.");			
+		return Val("<fn " + name + ">");
+		//throw std::runtime_error("variable '" + name + "' does not exist.");			
 	}
 
 	std::string

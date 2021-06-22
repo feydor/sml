@@ -22,7 +22,6 @@ Val::operator+ (Val const &other) const
         if (other.is_str())
             return Val(this->get_str() + other.get_str());
     }
-
     throw std::runtime_error("Invalid operand types in binary operator '+'.");
 }
 
@@ -32,9 +31,7 @@ Val::operator- (Val const &other) const
 {
    if (this->is_num())
        return Val(this->get_num() - other.get_num());
-
-    // TODO: Show some sort of runtime/intpr error here
-   return Val();
+  throw std::runtime_error("Invalid operand types in binary operator '-'.");
 }
 
 Val
@@ -42,8 +39,7 @@ Val::operator/ (Val const &other) const
 {
    if (this->is_num())
        return Val(this->get_num() / other.get_num());
-
-   return Val();
+   throw std::runtime_error("Invalid operand types in binary operator '/'.");
 }
 
 Val
@@ -51,8 +47,7 @@ Val::operator* (Val const &other) const
 {
    if (this->is_num())
        return Val(this->get_num() * other.get_num());
-
-   return Val();
+   throw std::runtime_error("Invalid operand types in binary operator '*'.");
 }
 
 Val
@@ -60,7 +55,7 @@ Val::operator% (Val const &other) const
 {
     if (this->is_num() && other.is_num())
         return Val(std::fmod(this->get_num(), other.get_num()));
-    return Val();
+    throw std::runtime_error("Invalid operand types in binary operator '%'.");
 }
 
 double

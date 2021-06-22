@@ -10,7 +10,7 @@ namespace Lib {
 	Val
 	to_str::invoke(std::vector<Val> args)
 	{
-		check_args(args, 1);
+		check_nargs(args, 1);
 		return args[0].to_str();
 	}
 }

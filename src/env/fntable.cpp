@@ -1,12 +1,11 @@
-#include "fn.h"
 #include "fntable.h"
 #include <iostream>
 
 auto FnTable::fn_table =
-    std::unordered_map<std::string, Fn*>();
+    std::unordered_map<std::string, FFInterface*>();
 
 void
-FnTable::set_fn(Fn* fn)
+FnTable::set_fn(FFInterface* fn)
 {
     fn_table[fn->name()] = std::move(fn);
 }
@@ -17,7 +16,7 @@ FnTable::exists(std::string name)
     return fn_table.find(name) != fn_table.end();
 }
 
-Fn*
+FFInterface*
 FnTable::get_fn(std::string name)
 {
     if (exists(name))

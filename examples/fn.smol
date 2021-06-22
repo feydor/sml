@@ -14,3 +14,4 @@ fn fizzbuzz(x) {
         say to_str(x) + "\n"
     }
 }
+

@@ -1,7 +1,7 @@
 #ifndef SMOL_FNTABLE_H
 #define SMOL_FNTABLE_H
 #include "value.h"
-#include "fn.h"
+#include "ffi.h"
 #include <string>
 #include <unordered_map>
 
@@ -9,13 +9,13 @@
 // and their values, if defined
 class FnTable {
     public:
-    static void set_fn(Fn* fn);
-    static Fn* get_fn(std::string name);
+    static void set_fn(FFInterface* fn);
+    static FFInterface* get_fn(std::string name);
     static bool exists(std::string name);
     static std::string to_str();
     
     private:
-    static std::unordered_map<std::string, Fn*> fn_table;
+    static std::unordered_map<std::string, FFInterface*> fn_table;
 };
 
 #endif

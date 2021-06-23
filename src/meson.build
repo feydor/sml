@@ -10,7 +10,7 @@ lexer_inc = include_directories('lexer')
 util_src = files(['util/value.cpp'])
 util_inc = include_directories('util')
 
-env_src = files(['env/env.cpp', 'env/fntable.cpp'])
+env_src = files(['env/env.cpp', 'env/fntable.cpp', 'env/retstack.cpp'])
 env_inc = include_directories('env')
 
 lib_src = files(['lib/ffi.cpp', 'lib/userfn.cpp', 'lib/tostr.cpp'])

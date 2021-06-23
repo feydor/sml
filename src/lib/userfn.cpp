@@ -3,6 +3,7 @@
 #include "stmt.h"
 #include "env.h"
 #include "fntable.h"
+#include "retstack.h"
 #include <iostream>
 
 void
@@ -38,8 +39,9 @@ UserFn::invoke(std::vector<Val> args)
 	// std::cout << Env::to_str() << std::endl;
 	// std::cout << FnTable::to_str() << std::endl;
 	body_->exec();
+	auto ret_val = RetStack::pop();
 	Env::pop();
-	return Val(); // TODO: Find a way to get values out of fn,
+	return ret_val; // TODO: Find a way to get values out of fn,
 	              // through return statement, for now return NIL value
 }
 
@@ -47,3 +49,4 @@ UserFn::~UserFn()
 {
 	delete body_;
 }
+

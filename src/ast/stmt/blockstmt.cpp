@@ -1,15 +1,15 @@
 #include "stmt.h"
 #include "expr.h"
 #include "env.h"
-#include <iostream>
 
 namespace Ast {
 
     void
     BlockStmt::exec()
     {
-        for (auto& stmt : stmts_)
+        for (auto& stmt : stmts_) {
             stmt->exec();
+        }
     }
 
     BlockStmt::~BlockStmt()

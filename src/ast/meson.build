@@ -8,7 +8,7 @@ ast_expr_inc = include_directories('expr')
 
 ast_stmt_src = files(['stmt/asgmtstmt.cpp', 'stmt/blockstmt.cpp',
   'stmt/ifstmt.cpp', 'stmt/saystmt.cpp', 'stmt/exprstmt.cpp',
-  'stmt/whilestmt.cpp'])
+  'stmt/whilestmt.cpp', 'stmt/retstmt.cpp'])
 ast_stmt_inc = include_directories('stmt')
 
 ast_src = [ast_expr_src, ast_stmt_src]

@@ -11,6 +11,7 @@
 #include "fntable.h"
 #include "ansi.h"
 #include "lib.h"
+#include "retstack.h"
 #include "smol.h"
 
 #define PROJECT_NAME "smol"
@@ -115,6 +116,10 @@ void SMOL::eval(std::string const &src)
             std::cout << e.what() << std::endl;
             // SMOL::error(e);
         }
-        
+    }
+
+    if (!RetStack::is_empty()) {
+        std::cout << "err: ReturnStack was not empty upon exiting statement execution./n";
+        std::cout << RetStack::to_str();
     }
 }

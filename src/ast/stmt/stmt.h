@@ -98,6 +98,17 @@ namespace Ast {
         Ast::Stmt* body_;
         int argc_;
     };
+
+    class RetStmt : public Stmt {
+        public:
+        RetStmt(Ast::Expr* expr)
+            : expr_(expr) {};
+        void exec() override;
+        ~RetStmt() override;
+
+        private:
+        Ast::Expr* expr_;
+    };
 }
 
 #endif

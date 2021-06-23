@@ -3,7 +3,7 @@
 #include <stdexcept>
 
 namespace Env {
-
+	// start with an Environment for globals
 	auto Envs = std::vector<Environment>({Environment()});
 
 	void
@@ -44,8 +44,7 @@ namespace Env {
 			if (var_exists((*itr), name))
 				return (*itr).vars[name];
 		}
-		return Val("<fn " + name + ">");
-		//throw std::runtime_error("variable '" + name + "' does not exist.");			
+		return Val("<fn " + name + ">");		
 	}
 
 	std::string

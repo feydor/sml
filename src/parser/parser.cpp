@@ -54,6 +54,15 @@ parser::statement()
         return nullptr; // return empty statement, trash it
     }
 
+    if (match(Token::RETURN)) {
+        Ast::Expr* expr = nullptr;
+        if (!peek_type(Token::SEMICOLON))
+            expr = expression();
+        if (!match(Token::SEMICOLON))
+            throw std::runtime_error("Syntax error: Expected ';' after return value.");
+        return new Ast::RetStmt(expr);
+    }
+
     if (match(Token::SAY))
         return new Ast::SayStmt(expression());
 
@@ -177,7 +186,9 @@ parser::statement()
     }
 
     // if none of the above, then expression statement
-    return new Ast::ExprStmt(expression());
+    std::cout << "ERR: Expression statement\n";
+    throw std::runtime_error("Syntax error: Expected a statement.");
+    // return new Ast::ExprStmt(expression());
 }
 
 Ast::Expr*

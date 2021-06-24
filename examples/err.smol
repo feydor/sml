@@ -1,0 +1,5 @@
+fn error(a) {
+    ret a
+}
+
+say error("HI")

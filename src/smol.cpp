@@ -12,6 +12,7 @@
 #include "ansi.h"
 #include "lib.h"
 #include "retstack.h"
+#include "smol_error.h"
 #include "smol.h"
 
 #define PROJECT_NAME "smol"
@@ -89,7 +90,14 @@ void SMOL::eval(std::string const &src)
     std::vector<Tok> tokens = lexer.scan_tokens();
 
     Parser::parser parser(tokens);
-    std::vector<Ast::Stmt *> stmts = parser.scan_program();
+    std::vector<Ast::Stmt *> stmts;
+    try {
+        stmts = parser.scan_program(); 
+    } catch (const std::runtime_error& e) {
+        std::cout << e.what() << std::endl;
+    } catch (Smol::SyntaxError& e) {
+        std::cout << e.to_str() << std::endl;
+    }
 
     std::cout << "Evaluating statements (stmts_size: " 
         << stmts.size() << ")...";
@@ -111,8 +119,7 @@ void SMOL::eval(std::string const &src)
         try {
             stmt->exec();
             delete stmt;
-        }
-        catch (const std::runtime_error& e) {
+        } catch (const std::runtime_error& e) {
             std::cout << e.what() << std::endl;
             // SMOL::error(e);
         }

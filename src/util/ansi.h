@@ -1,3 +1,5 @@
+#ifndef SMOL_ANSI_H
+#define SMOL_ANSI_H
 #include <ostream>
 #include <unistd.h>
 #include <stdio.h>
@@ -29,6 +31,7 @@ namespace Format {
 
 namespace ANSI {
 	class Modifier {
+		private:
 		union {
 			Color::Code col_code;
 			Format::Code fmt_code;
@@ -37,24 +40,21 @@ namespace ANSI {
 		enum mod_t { COLOR, FORMAT } type;
 
 		public:
-			/*
-			Modifier(Color::Code col, Format::Code fmt)
-			    : col_code(col), fmt_code(fmt) {};
-			*/
-			Modifier(Color::Code col)
-			    : col_code(col), type(COLOR) {};
-			Modifier(Format::Code fmt)
-			    : fmt_code(fmt), type(FORMAT) {};
+		Modifier(Color::Code col)
+		    : col_code(col), type(COLOR) {};
+		Modifier(Format::Code fmt)
+		    : fmt_code(fmt), type(FORMAT) {};
 
-			static bool istty() {
-				return isatty(fileno(stdin));
-			}
+		static bool istty() {
+			return isatty(fileno(stdin));
+		}
 
-			friend std::ostream&
-			operator<< (std::ostream& os, Modifier const &mod) {
-				return mod.type == COLOR
-					? os << "\033[" << mod.col_code << "m"
-					: os << "\033[" << mod.fmt_code << "m";	
-			}
+		friend std::ostream&
+		operator<< (std::ostream& os, Modifier const &mod) {
+			return mod.type == COLOR
+				? os << "\033[" << mod.col_code << "m"
+				: os << "\033[" << mod.fmt_code << "m";	
+		}
 	};
 }
+#endif

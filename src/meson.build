@@ -7,7 +7,7 @@ parser_inc = include_directories('parser')
 lexer_src = files(['lexer/lexer.cpp', 'lexer/token.cpp'])
 lexer_inc = include_directories('lexer')
 
-util_src = files(['util/value.cpp'])
+util_src = files(['util/value.cpp', 'util/smol_error.cpp'])
 util_inc = include_directories('util')
 
 env_src = files(['env/env.cpp', 'env/fntable.cpp', 'env/retstack.cpp'])

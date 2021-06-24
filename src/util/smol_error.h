@@ -1,0 +1,26 @@
+#ifndef SMOL_ERROR_H
+#define SMOL_ERROR_H
+#include <exception>
+#include <string>
+#include "ansi.h"
+
+namespace Smol {
+
+	class SyntaxError : public std::exception {
+		public:
+		SyntaxError(std::string msg, std::string expected,
+			std::string found, int nline)
+			: msg_(msg), expected_(expected), found_(found), nline_(nline) {};
+		const std::string to_str() const throw();
+		std::string to_quote(const std::string& s) const;
+		std::string get_line() const;
+
+		private:
+		std::string msg_;
+		std::string expected_;
+		std::string found_;
+		int nline_;
+	};
+
+}
+#endif

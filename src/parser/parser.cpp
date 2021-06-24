@@ -1,7 +1,6 @@
 /* parser.cpp - Recursive descent parser - See GRAMMER.txt for overview */
 #include "parser.h"
-#include "smol.h"
-#include "ansi.h"
+#include "smol_error.h"
 #include "fntable.h"
 #include <tuple>
 #include <iostream>
@@ -59,7 +58,7 @@ parser::statement()
         if (!peek_type(Token::SEMICOLON))
             expr = expression();
         if (!match(Token::SEMICOLON))
-            throw std::runtime_error("Syntax error: Expected ';' after return value.");
+            throw Smol::SyntaxError("unexpected character", ";", expr->to_str(), peek().line());
         return new Ast::RetStmt(expr);
     }
 
@@ -426,6 +425,7 @@ parser::at_end()
     return peek().type() == Token::_EOF;
 }
 
+/*
 void
 parser::error(Tok const &tok, Ast::Expr const *curr,
     std::string const &msg)
@@ -454,5 +454,6 @@ parser::error(Tok const &tok, Ast::Expr const *curr,
         << std::endl;
     exit(-1);
 }
+*/
 
 }

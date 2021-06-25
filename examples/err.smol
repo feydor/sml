@@ -1,5 +1,5 @@
 fn error(a) {
-    ret a
+    for (i = 0);
 }
 
 say error("HI")

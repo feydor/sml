@@ -11,7 +11,7 @@ namespace Smol {
 		SyntaxError(std::string msg, std::string expected,
 			std::string found, int nline)
 			: msg_(msg), expected_(expected), found_(found), nline_(nline) {};
-		const std::string to_str() const throw();
+		void print() const throw();
 
 		private:
 		std::string msg_;

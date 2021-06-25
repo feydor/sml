@@ -2,25 +2,27 @@
 #include "smol.h"
 #include <fstream>
 #include <string>
+#include <iostream>
 
 namespace Smol {
 
-	const std::string
-	SyntaxError::to_str() const throw()
+	void
+	SyntaxError::print() const throw()
 	{
 		/* tty modifiers */
 		ANSI::Modifier err(Color::FG_RED);
     	ANSI::Modifier secondary(Color::FG_BLUE);
     	ANSI::Modifier bold(Format::BOLD);
-    	ANSI::Modifier def(Color::FG_DEFAULT);
+    	ANSI::Modifier resetc(Color::FG_DEFAULT);
+    	ANSI::Modifier resetf(Format::NORMAL);
 
-		std::string err_str("");
-		err_str += "error: " + msg_ + "\n" + "  --> " + SMOL::fname + ":" + std::to_string(nline_) + "\n" +
-			"  |\n" + "  |    " + "- expected " + to_quote(expected_) + ", but found " +
-			to_quote(found_) + ".\n" + std::to_string(nline_) + " |    " + get_line() + "\n" +
-			"  |\n";
-		err_str += "error: aborting due to previous errors.";
-		return err_str;
+		std::cout << err << "error" << resetc << ": " << bold << msg_ << resetf << "\n" <<
+			secondary << "  --> " << resetc << SMOL::fname + ":" + std::to_string(nline_) + "\n" <<
+			secondary << "  |\n" << "  |    " << resetc << "- expected " + to_quote(expected_) + ", but found " +
+			to_quote(found_) + ".\n" <<
+			secondary << std::to_string(nline_) + " |    " << resetc << get_line() + "\n" <<
+			secondary << "  |\n" << resetc;
+		std::cout << err << "error" << resetc << ": " << bold << "aborting due to previous errors.\n" << resetf;
 	}
 	
 	std::string

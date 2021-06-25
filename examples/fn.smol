@@ -1,17 +1,10 @@
-# fizzbuzz in a function
-
-for (let i = 1; i <= 100; i++)
-    fizzbuzz(i)
-    
-fn fizzbuzz(x) {
-    if (x % 15 == 0) {
-        say "fizzbuzz\n" 
-    } elif (x % 3 == 0) {
-        say "buzz\n"
-    } elif (x % 5 == 0) {
-        say "fizz\n"
-    } else {
-        say to_str(x) + "\n"
-    }
+# recursive function calls
+fn fact(n)
+{
+    if (n == 1)
+        ret 1;
+    else
+        ret n * fact(n - 1);
 }
 
+say fact(7) # fact(7) = 5040

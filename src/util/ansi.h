@@ -25,7 +25,6 @@ namespace Format {
 		UNDERLINED = 4,
 		INVERT	   = 7,
 		NORMAL     = 0,
-
 	};
 }
 

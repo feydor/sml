@@ -96,7 +96,8 @@ void SMOL::eval(std::string const &src)
     } catch (const std::runtime_error& e) {
         std::cout << e.what() << std::endl;
     } catch (Smol::SyntaxError& e) {
-        std::cout << e.to_str() << std::endl;
+        e.print();
+        exit(1);
     }
 
     std::cout << "Evaluating statements (stmts_size: " 

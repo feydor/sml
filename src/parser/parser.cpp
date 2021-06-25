@@ -4,7 +4,6 @@
 #include "fntable.h"
 #include <tuple>
 #include <iostream>
-#include <stdexcept>
 
 namespace Parser {
 std::vector<Ast::Stmt *>
@@ -31,16 +30,19 @@ parser::statement()
     // parse user-defined fn and add to FnTable
     if (match(Token::FN)) {
         if (!match(Token::IDENTIFIER))
-            throw std::runtime_error("Syntax error: Expected identifier.");
+            throw Smol::SyntaxError("unexpected token", "an identifier",
+                    peek().to_str(), prev().line());
 
         std::string ident = std::string(prev().to_str());
         if (!match(Token::LEFT_PAREN))
-            throw std::runtime_error("Syntax error: Expected '('.");
+            throw Smol::SyntaxError("unexpected character", "(",
+                    peek().to_str(), prev().line());
 
         UserFn* userfn = new UserFn(ident);
         while (!match(Token::RIGHT_PAREN)) {
             if (!match(Token::IDENTIFIER))
-                throw std::runtime_error("Syntax error: Expected identifier.");
+                throw Smol::SyntaxError("unexpected token", "an identifier",
+                    peek().to_str(), prev().line());
             userfn->add_argname(prev().to_str());
 
             // match args-seperating comma, if it exists
@@ -58,7 +60,8 @@ parser::statement()
         if (!peek_type(Token::SEMICOLON))
             expr = expression();
         if (!match(Token::SEMICOLON))
-            throw Smol::SyntaxError("unexpected character", ";", expr->to_str(), prev().line());
+            throw Smol::SyntaxError("unexpected character", ";",
+                expr->to_str(), prev().line());
         return new Ast::RetStmt(expr);
     }
 
@@ -71,11 +74,13 @@ parser::statement()
         Ast::IfStmt* ifstmt = nullptr;
 
         if (!match(Token::LEFT_PAREN))
-            throw std::runtime_error("Syntax error: Expected '('.");
+            throw Smol::SyntaxError("unexpected character", "(",
+                peek().to_str(), prev().line());
         cond = expression();
 
         if (!match(Token::RIGHT_PAREN))
-            throw std::runtime_error("Syntax error: Expected ')'.");
+            throw Smol::SyntaxError("unexpected character", ")",
+                peek().to_str(), prev().line());
         body = statement_or_block();
 
         ifstmt = new Ast::IfStmt(cond, body);
@@ -92,11 +97,13 @@ parser::statement()
         Ast::Stmt* body = nullptr;
 
         if (!match(Token::LEFT_PAREN))
-            throw std::runtime_error("Syntax error: Expected '('.");
+            throw Smol::SyntaxError("unexpected character", "(",
+                peek().to_str(), prev().line());
         cond = expression();
 
         if (!match(Token::RIGHT_PAREN))
-            throw std::runtime_error("Syntax error: Expected ')'.");
+            throw Smol::SyntaxError("unexpected character", ")",
+                peek().to_str(), prev().line());
         body = statement_or_block();
 
         return new Ast::WhileStmt(cond, body);
@@ -110,23 +117,27 @@ parser::statement()
         Ast::BlockStmt* final_body = nullptr;
 
         if (!match(Token::LEFT_PAREN))
-            throw std::runtime_error("Syntax error: Expected '('.");
+            throw Smol::SyntaxError("unexpected character", "(",
+                peek().to_str(), prev().line());
         
         if (!peek_type(Token::SEMICOLON))
             asgmt = statement(); // TODO: var_decl()
 
         if (!match(Token::SEMICOLON))
-            throw std::runtime_error("Syntax error: Expected ';'.");
+            throw Smol::SyntaxError("unexpected character", ";",
+                peek().to_str(), prev().line());
         else
             cond = expression();
 
         if (!match(Token::SEMICOLON))
-            throw std::runtime_error("Syntax error: Expected ';'.");
+            throw Smol::SyntaxError("unexpected character", ";",
+                peek().to_str(), prev().line());
         else
             control = statement();
 
         if (!match(Token::RIGHT_PAREN))
-            throw std::runtime_error("Syntax error: Expected ')'.");
+            throw Smol::SyntaxError("unexpected character", ")",
+                peek().to_str(), prev().line());
 
         body = statement_or_block();
 
@@ -147,7 +158,8 @@ parser::statement()
 
     if (match(Token::LET)) {
         if (!match(Token::IDENTIFIER))
-            throw new std::runtime_error("Syntax error: Expected identifier.");
+            throw Smol::SyntaxError("unexpected token", "an identifier",
+                peek().to_str(), prev().line());
         std::string var = prev().to_str();
 
         if (match(Token::EQUAL))
@@ -186,8 +198,8 @@ parser::statement()
 
     // if none of the above, then expression statement
     std::cout << "ERR: Expression statement\n";
-    throw std::runtime_error("Syntax error: Expected a statement.");
-    // return new Ast::ExprStmt(expression());
+    throw Smol::SyntaxError("expected a statement", "a statement",
+        expression()->to_str(), prev().line());
 }
 
 Ast::Expr*
@@ -317,7 +329,8 @@ parser::primary()
     if (match(Token::LEFT_PAREN)) {
         expr = expression();
         if (!match(Token::RIGHT_PAREN))
-            throw std::runtime_error("Expected ')' after expression.");
+            throw Smol::SyntaxError("unexpected character", ")",
+                expr->to_str(), prev().line());
     }
 
     return expr;

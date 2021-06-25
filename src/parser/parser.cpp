@@ -58,7 +58,7 @@ parser::statement()
         if (!peek_type(Token::SEMICOLON))
             expr = expression();
         if (!match(Token::SEMICOLON))
-            throw Smol::SyntaxError("unexpected character", ";", expr->to_str(), peek().line());
+            throw Smol::SyntaxError("unexpected character", ";", expr->to_str(), prev().line());
         return new Ast::RetStmt(expr);
     }
 

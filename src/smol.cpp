@@ -101,12 +101,6 @@ void SMOL::eval(std::string const &src)
 
     std::cout << "Evaluating statements (stmts_size: " 
         << stmts.size() << ")...";
-    
-    /*
-    for (auto& stmt : stmts)
-        std::cout << stmt->to_str() << "::";
-    std::cout << "\n";
-    */
 
     std::cout << "Begin interpretation...\n";
 
@@ -121,7 +115,6 @@ void SMOL::eval(std::string const &src)
             delete stmt;
         } catch (const std::runtime_error& e) {
             std::cout << e.what() << std::endl;
-            // SMOL::error(e);
         }
     }
 

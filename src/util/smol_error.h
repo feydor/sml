@@ -12,14 +12,14 @@ namespace Smol {
 			std::string found, int nline)
 			: msg_(msg), expected_(expected), found_(found), nline_(nline) {};
 		const std::string to_str() const throw();
-		std::string to_quote(const std::string& s) const;
-		std::string get_line() const;
 
 		private:
 		std::string msg_;
 		std::string expected_;
 		std::string found_;
 		int nline_;
+		std::string to_quote(const std::string& s) const;
+		std::string get_line() const;
 	};
 
 }

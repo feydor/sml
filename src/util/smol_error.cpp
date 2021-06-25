@@ -1,5 +1,7 @@
 #include "smol_error.h"
 #include "smol.h"
+#include <fstream>
+#include <string>
 
 namespace Smol {
 
@@ -20,7 +22,7 @@ namespace Smol {
 		err_str += "error: aborting due to previous errors.";
 		return err_str;
 	}
-
+	
 	std::string
 	SyntaxError::to_quote(const std::string& s) const
 	{
@@ -30,7 +32,12 @@ namespace Smol {
 	std::string
 	SyntaxError::get_line() const
 	{
-		return "GET THE nline-th line from the source code.";
+		std::string out;
+		std::fstream file(SMOL::fname);
+		file.seekg(std::ios::beg);
+		for (int i = 0; i < nline_; ++i)
+			std::getline(file, out);
+		return out;
 	}
 
 }

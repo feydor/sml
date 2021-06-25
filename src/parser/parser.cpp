@@ -199,7 +199,7 @@ parser::statement()
     // if none of the above, then expression statement
     std::cout << "ERR: Expression statement\n";
     throw Smol::SyntaxError("expected a statement", "a statement",
-        expression()->to_str(), prev().line());
+        peek().to_str(), prev().line());
 }
 
 Ast::Expr*
@@ -437,36 +437,5 @@ parser::at_end()
 {
     return peek().type() == Token::_EOF;
 }
-
-/*
-void
-parser::error(Tok const &tok, Ast::Expr const *curr,
-    std::string const &msg)
-{
-    ANSI::Modifier err(Color::FG_RED);
-    ANSI::Modifier secondary(Color::FG_BLUE);
-    ANSI::Modifier bold(Format::BOLD);
-    ANSI::Modifier def(Color::FG_DEFAULT);
-
-    std::string fileloc("");
-    std::string expr_str("");
-
-    if (!SMOL::is_repl) // add tok.offset()
-        fileloc += SMOL::fname + ":" + std::to_string(tok.line());
-
-    if (!curr) {
-        std::cout << err << "error" << def << ": " << bold <<
-            msg << "\n " << secondary << "--> " << def << fileloc
-            << std::endl;
-        exit(-1);
-    }
-
-    std::cout << err << "error" << def << ": " << bold <<
-        msg << "\n " << secondary << "--> " << def << fileloc
-        << secondary << "\n  |    " << def << expr_str
-        << std::endl;
-    exit(-1);
-}
-*/
 
 }

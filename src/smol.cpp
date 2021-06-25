@@ -92,9 +92,7 @@ void SMOL::eval(std::string const &src)
     Parser::parser parser(tokens);
     std::vector<Ast::Stmt *> stmts;
     try {
-        stmts = parser.scan_program(); 
-    } catch (const std::runtime_error& e) {
-        std::cout << e.what() << std::endl;
+        stmts = parser.scan_program();
     } catch (Smol::SyntaxError& e) {
         e.print();
         exit(1);

@@ -1,0 +1,14 @@
+fn pascal(row) {
+    say "Pascal's triangle, row #" + to_str(row) + ": "
+    for (let i = 0; i < row; i++)
+        say to_str(pascal_calc(row, i)) + " "
+}
+
+fn pascal_calc(row, i) {
+    if (i == 0 or i == row - 1)
+        ret 1;
+    else
+        ret pascal_calc(row - 1, i - 1) + pascal_calc(row - 1, i);
+}
+
+pascal(15)

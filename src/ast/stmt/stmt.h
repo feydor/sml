@@ -87,18 +87,6 @@ namespace Ast {
         Stmt* body_;
     };
 
-    class FnStmt : public Stmt {
-        public:
-        FnStmt(Ast::Stmt* body, int argc)
-            : body_(body), argc_(argc) {};
-        void exec() override;
-        ~FnStmt() override;
-
-        private:
-        Ast::Stmt* body_;
-        int argc_;
-    };
-
     class RetStmt : public Stmt {
         public:
         RetStmt(Ast::Expr* expr)

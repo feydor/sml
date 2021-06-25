@@ -36,8 +36,8 @@ UserFn::invoke(std::vector<Val> args)
 	for (auto i = 0; i < (int) args.size(); ++i)
 		Env::set_var(argnames_[i], args[i]);
 
-	// std::cout << Env::to_str() << std::endl;
 	// std::cout << FnTable::to_str() << std::endl;
+	// std::cout << Env::to_str() << std::endl;
 	body_->exec();
 	auto ret_val = RetStack::pop();
 	Env::pop();

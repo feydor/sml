@@ -7,7 +7,7 @@ auto FnTable::fn_table =
 void
 FnTable::set_fn(FFInterface* fn)
 {
-    fn_table[fn->name()] = std::move(fn);
+    fn_table[fn->name()] = fn;
 }
 
 bool
@@ -37,4 +37,10 @@ FnTable::to_str()
         out += fn_pair.first + "\n";
     }
     return out;
+}
+
+FnTable::~FnTable()
+{
+    for (auto fn : fn_table)
+        delete fn.second;
 }

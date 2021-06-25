@@ -7,8 +7,6 @@ namespace Ast {
         return val_;
     }
 
-    Literal::~Literal() {};
-
     std::string
     Literal::to_str() const
     {

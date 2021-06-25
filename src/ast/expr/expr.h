@@ -75,7 +75,6 @@ namespace Ast {
         public:
             Literal(Val val)
                 : val_(std::move(val)) {};
-            ~Literal() override;
             Val eval() override;
             std::string to_str() const override;
         private:

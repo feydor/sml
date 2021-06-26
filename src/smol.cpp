@@ -98,10 +98,10 @@ void SMOL::eval(std::string const &src)
         exit(1);
     }
 
+    /*
     std::cout << "Evaluating statements (stmts_size: " 
         << stmts.size() << ")...";
-
-    std::cout << "Begin interpretation...\n";
+    */
 
     // set prelude constants and library functions
     // TODO: Move to prelude.h

@@ -1,6 +1,10 @@
 # variable declaration test
-# say 0
-let x = (-23 - (8 + (-12) * 2 - 1 - 12)) / (-21 - (-20))
+say "testing variable resolution:"
+let x = -6
 let y = 3
 let z = y
-say x + y + z
+
+if ((x + y + z) == 0) {
+	say "PASSED, x+y+z = 0"
+	say "where x = -6, y = 3, and z = y"
+}

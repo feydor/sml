@@ -18,6 +18,7 @@ namespace Ast {
 				std::cout << out[i];
 			}
 		}
+		std::cout << std::endl;
 	}
 
 	SayStmt::~SayStmt()

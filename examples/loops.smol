@@ -1,23 +1,20 @@
-say "fizzbuzz-level achieved\n"
+say "fizzbuzz-level achieved:"
 let i = 1
-say "[" + to_str(i) + "] "
 while (i <= 100) {
     if (i % 15 == 0)
-        say "fizzbuzz "
+        say "fizzbuzz"
     elif (i % 3 == 0)
-        say "fizz "
+        say "fizz"
     elif (i % 5 == 0)
-        say "buzz "
+        say "buzz"
     else
-        say to_str(i) + " "
-
-    if (i % 5 == 0)
-        say "\n[" + to_str(i + 1) + "] "
+        say to_str(i)
     i++
 }
 
 i = 9.06
-say "checking precision for doubles: " + to_str(i) + "\n"
+say "checking precision for doubles: " + to_str(i)
 
+say "for 0...4"
 for (let j = 0; j < 5; j++)
-    say to_str(j) + "\n"
+    say to_str(j)

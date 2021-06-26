@@ -1,3 +1,4 @@
+say "testing deliberate syntax errors:"
 fn error(a) {
     for (i = 0);
 }

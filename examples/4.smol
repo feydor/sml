@@ -1,4 +1,5 @@
-# logical/comparison operators, branching, looping
+# logical/comparison operators, branching
+say "testing logical operators, if/else branching, expression statements:"
 let x = (54 > 53) and (1 <= 100)
 say x # true
 
@@ -6,18 +7,21 @@ let y = (54 < 53) or (1 == 0)
 say y # false
 
 x = 16
-say "x = " + x
+say "x = " + to_str(x)
 y = 15
-say "y = " + y
+say "y = " + to_str(y)
 
+say "is x > y ?"
 if (x > y)
-    say "x is greater than y"
-#elif (x == y)
-#    say "x is equal to y"
+    say "PASSED, x is greater than y"
 else
-    say "x is less than y"
+    say "FAILED, " + to_str(x) + " > " + to_str(y)
 
 if (x >= y)
     if (x)
         x = 10000
-say x
+
+if (x == 10000)
+    say "PASSED, x was was redefined as " + to_str(x)
+else
+    say "FAILED, x was not redefined as 10000"

@@ -1,8 +1,0 @@
-fn fib(n) {
-    if (n <= 1)
-        ret n;
-    else
-        ret fib(n-2) + fib(n-1);
-}
-
-say fib(9)

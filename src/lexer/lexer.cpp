@@ -47,6 +47,8 @@ lexer::scan_tokens()
             case ',': add_token(Token::COMMA); break;
             case '.': add_token(Token::DOT); break;
             case ';': add_token(Token::SEMICOLON); break;
+            case ':': add_token(Token::COLON); break;
+            case '?': add_token(Token::QUESTION); break;
             case '-':
                 if (next_is('='))
                     add_token(Token::MINUS_EQUAL);

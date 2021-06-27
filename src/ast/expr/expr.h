@@ -39,6 +39,20 @@ namespace Ast {
             Expr* right_;
     };
 
+    class Ternary : public Expr {
+        public:
+            Ternary(Expr* cond, Tok op, Expr* iftrue, Expr* iffalse)
+                : cond_(cond), op_(op), iftrue_(iftrue), iffalse_(iffalse) {};
+            ~Ternary() override;
+            Val eval() override;
+            std::string to_str() const override;
+        private:
+            Expr* cond_;
+            Tok op_;
+            Expr* iftrue_;
+            Expr* iffalse_;
+    };
+
     // Conditional expression: and, or, comparison
     class Cond : public Expr {
         public:

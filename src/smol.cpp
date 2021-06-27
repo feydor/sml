@@ -5,7 +5,6 @@
 #include "fntable.h"
 #include "ansi.h"
 #include "lib.h"
-#include "retstack.h"
 #include "smol_error.h"
 #include "smol.h"
 #include <iostream>
@@ -52,7 +51,7 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void SMOL::run_file(std::string const &fname) 
+void SMOL::run_file(std::string const &fname)
 {
     SMOL::fname = fname;
     SMOL::is_repl = false;
@@ -167,10 +166,5 @@ void SMOL::eval(std::string const &src)
         t2 = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double, std::milli> ms_double = t2 - t1;
         std::cout << "Duration: " << ms_double.count() << "ms\n";
-    }
-
-    if (!RetStack::is_empty()) {
-        std::cout << "err: ReturnStack was not empty upon exiting statement execution./n";
-        std::cout << RetStack::to_str();
     }
 }

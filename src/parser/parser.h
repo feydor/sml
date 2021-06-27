@@ -25,6 +25,7 @@ class parser {
     std::vector<Ast::Stmt*> program();
     Ast::Stmt* statement();
     Ast::Expr* expression();
+    Ast::Expr* ternary();
     Ast::Expr* logical();
     Ast::Expr* equality();
     Ast::Expr* comparison();

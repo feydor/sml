@@ -197,7 +197,6 @@ parser::statement()
     }
 
     // if none of the above, then expression statement
-    std::cout << "ERR: Expression statement\n";
     throw Smol::SyntaxError("expected a statement", "a statement",
         peek().to_str(), prev().line());
 }
@@ -205,8 +204,24 @@ parser::statement()
 Ast::Expr*
 parser::expression()
 {
-    return logical();
+    return ternary();
 
+}
+
+Ast::Expr*
+parser::ternary()
+{
+    Ast::Expr* expr = logical();
+    while (match(Token::QUESTION)) {
+        Tok op = prev();
+        Ast::Expr* iftrue = expression();
+        // TODO: consume(":", "unexpected token");
+        if (!match(Token::COLON))
+            throw new Smol::SyntaxError("unexpected token", ":", peek().to_str(), prev().line());
+        Ast::Expr* iffalse = expression();
+        expr = new Ast::Ternary(expr, op, iftrue, iffalse);
+    }
+    return expr;
 }
 
 Ast::Expr*

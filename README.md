@@ -15,18 +15,18 @@ ninja -C build
 The below code fragment is an example written in smol and demonstrates what is so far implemented:
 ```
 # prints the nth row of Pascal's triangle... because why not?
-fn print_pascal(row) {
+fn pascal(row) {
     say "Pascal's triangle, row #" + to_str(row) + ": "
     for (let i = 0; i < row; i++)
-        say to_str(pascal_calc(row, i)) + " "
+        say pascal_calc(row, i) + " "
 }
 
 # just a basic tree recursion I did in SICP js once
+# really slow, about 310 ms on my machine (using option -b when running)
 fn pascal_calc(row, i) {
     if (i == 0 or i == row - 1)
         ret 1;
-    else
-        ret pascal_calc(row - 1, i - 1) + pascal_calc(row - 1, i);
+    ret pascal_calc(row - 1, i - 1) + pascal_calc(row - 1, i);
 }
 
 pascal(15) # 1 14 91 364 1001 2002 3003 3432 3003 2002 1001 364 91 14 1
@@ -43,6 +43,6 @@ pascal(15) # 1 14 91 364 1001 2002 3003 3432 3003 2002 1001 364 91 14 1
     - util/ - the definition of a SMOL value, (wip) ANSI terminal support for errors.
     - smol.cpp - the main entry point for (wip) REPL and file execution.
 ## TODO
-- error: ret falls through because it is not really returning, just pushing the result onto the retstack.
-    - action: make it jump up the call stack back to UserFn::invoke (throw? or something else?)
-    - work-around: use explicit else statements, no work after an if-else block.
+- wishlist: array variables with implicit sizes and foreach looping.
+- wishlist: builtin functions such as getc(), putc(), fopen(), etc.
+- wishlist: brainfsck interpreter in SMOL

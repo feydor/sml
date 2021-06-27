@@ -1,4 +1,5 @@
 #include "tostr.h"
+#include <iostream>
 
 namespace Lib {
 	std::string

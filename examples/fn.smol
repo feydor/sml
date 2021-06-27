@@ -1,29 +1,24 @@
 say "testing basic function recursion:"
-let res = fact(7)
-if (res == 5040)
-    say "fact(7) = " + to_str(res)
+let res = fact(25)
+if (res == 15511210043330985984000000)
+    say "fact(25) = " + to_str(res)
 else
     say "FAILED, fact(7) != " + to_str(res)
 
-res = fib(9)
-if (res == 34)
-    say "And the 9th number in the fibonacci sequence is: " + to_str(fib(9))
+res = fib(22)
+if (res == 17711)
+    say "And the 22nd number in the fibonacci sequence is: " + to_str(res)
 else
-    say "FAILED, fib(9) != " + to_str(res)
+    say "FAILED, fib(22) != " + to_str(res)
 
 # naive factorial of n
-fn fact(n)
-{
-    if (n == 1)
-        ret 1;
-    else
-        ret n * fact(n - 1);
+fn fact(n) {
+    ret (n == 1) ? 1 : n * fact(n-1);
 }
 
 # nth row of the fibonacci sequence
 fn fib(n) {
     if (n <= 1)
         ret n;
-    else
-        ret fib(n-2) + fib(n-1);
+    ret fib(n-2) + fib(n-1);
 }

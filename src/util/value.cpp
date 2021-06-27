@@ -15,10 +15,8 @@ Val::operator+ (Val const &other) const
         else if (other.is_str())
             return Val(std::to_string(this->get_num()) + other.get_str());
     } else if (this->is_str()) {
-        /*
         if (other.is_num())
             return Val(this->get_str() + std::to_string(other.get_num()));
-        */
         if (other.is_str())
             return Val(this->get_str() + other.get_str());
     }
@@ -76,6 +74,12 @@ Val::get_bool() const
     return val_bool;
 }
 
+std::vector<Val>
+Val::get_arr() const
+{
+    return val_arr;
+}
+
 bool
 Val::is_num() const
 {
@@ -92,6 +96,12 @@ bool
 Val::is_bool() const
 {
     return this->type == Val_t::BOOL;
+}
+
+bool
+Val::is_arr() const
+{
+    return this->type == Val_t::ARR;
 }
 
 bool
@@ -114,6 +124,7 @@ Val::is_truthy() const
         case Val_t::NUM: return this->get_num() != 0;
         case Val_t::STR: return false; // error
         case Val_t::BOOL: return this->get_bool();
+        case Val_t::ARR: return false;
         case Val_t::NIL: return false;
     }
 }
@@ -125,6 +136,7 @@ Val::type_to_string() const
         case Val_t::NUM: return "NUM";
         case Val_t::STR: return "STR";
         case Val_t::BOOL: return "BOOL";
+        case Val_t::ARR: return "ARR";
         case Val_t::NIL: return "NIL";
     }
 }
@@ -133,24 +145,32 @@ std::string
 Val::to_str() const
 {
     switch (this->type) {
-        case Val_t::NUM: {
-            int digits = 0;
-            double frac = std::abs(get_num()) - std::trunc(get_num());
-            constexpr double precision = 0.000001;
-            while (frac >= precision) {
-                frac *= 10.0;
-                digits++;
-                frac = frac - std::trunc(frac);
-            }
-
+        case Val_t::NUM:
+        {
             std::stringstream sstream;
-            sstream << std::fixed << std::setprecision(digits) << get_num();
+            sstream << std::fixed << std::setprecision(ndigits(get_num())) << get_num();
             return sstream.str();
         } 
         case Val_t::STR: return get_str();
         case Val_t::BOOL: return get_bool() ? "true" : "false";
+        case Val_t::ARR: return get_arr()[0].to_str();
         case Val_t::NIL: return "nil";
     }
+}
+
+// gets the number of significant digits post-decimal
+int
+Val::ndigits(double n) const
+{
+    int digits = 0;
+    double frac = std::abs(n) - std::trunc(n);
+    constexpr double precision = 0.000001;
+    while (frac >= precision) {
+        frac *= 10.0;
+        digits++;
+        frac = frac - std::trunc(frac);
+    }
+    return digits;
 }
 
 Val::Val(double val)
@@ -159,6 +179,8 @@ Val::Val(std::string val)
     : type(Val_t::STR), val_str(val) {};
 Val::Val(bool val)
     : type(Val_t::BOOL), val_bool(val) {};
+Val::Val(std::vector<Val> arr)
+    : type(Val_t::ARR), val_arr(arr) {};
 Val::Val()
     : type(Val_t::NIL), val_num(0.0) {};
 

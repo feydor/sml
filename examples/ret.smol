@@ -1,0 +1,10 @@
+fn f(n) {
+    if (n == 1)
+        ret true;
+    elif (n == 2)
+        ret true;
+    ret false;
+}
+
+let x = f(2)
+say "res: " + to_str(x)

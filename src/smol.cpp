@@ -31,26 +31,19 @@ int main(int argc, char **argv)
     int i;
     while ((c = getopt(argc, argv, "vhb:")) != -1) {
         switch (c) {
-            case 'v':
-                SMOL::print_version();
-                exit(0);
-            case 'h':
-                SMOL::print_usage();
-                exit(0);
-            case 'b':
-                SMOL::benchmark = true;
-                break;
+            case 'v': SMOL::print_version(), exit(0);
+            case 'h': SMOL::print_usage(), exit(0);
+            case 'b': SMOL::benchmark = true; break;
             case '?':
                 if (optopt == 'b')
                     std::cerr << "";
                 else
                     SMOL::print_usage();
-                exit(64);
-            default:
-                abort();
+                exit(1);
+            default: abort();
         }
     }
-    i = argc == 3 ? 2 : 1;
+    i = (argc == 3) ? 2 : 1;
 
     if (argc > 1)
         SMOL::run_file(argv[i]);
@@ -148,11 +141,6 @@ void SMOL::eval(std::string const &src)
         exit(1);
     }
 
-    /*
-    std::cout << "Evaluating statements (stmts_size: " 
-        << stmts.size() << ")...";
-    */
-
     // set prelude constants and library functions
     // TODO: Move to prelude.h
     Env::set_var(std::string("PI"), Val(3.14159265359));
@@ -169,6 +157,9 @@ void SMOL::eval(std::string const &src)
             delete stmt;
         } catch (const std::runtime_error& e) {
             std::cout << e.what() << std::endl;
+        } catch (Val& ret_outside_fn) {
+            // TODO: catch a Smol::runtime_error here, but do not exit
+            std::cout << "Error: return statement outside a function.\n";
         }
     }
 

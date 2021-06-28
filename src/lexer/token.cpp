@@ -9,7 +9,7 @@ Tok::Tok(Token::type type, std::string lexeme, int line)
 
 Tok::Tok(Token::type type, std::string lexeme, int line,
     std::variant<double, std::string> literal)
-    : type_(type), lexeme_(std::move(lexeme)), line_(line), 
+    : type_(type), lexeme_(std::move(lexeme)), line_(line),
     literal_(std::move(literal))
 {}
 
@@ -81,10 +81,13 @@ Tok::type_to_string(Token::type type)
         case Token::DOT: return ".";
         case Token::MINUS: return "-";
         case Token::PLUS: return "+";
+        case Token::MINUS_MINUS: return "--";
+        case Token::PLUS_PLUS: return "++";
         case Token::SEMICOLON: return ";";
-        case Token::SLASH: return "/"; 
+        case Token::SLASH: return "/";
         case Token::STAR: return "*";
         case Token::BANG: return "!";
+        case Token::QUESTION: return "?";
         case Token::PERCENT: return "%";
         case Token::BANG_EQUAL: return "!=";
         case Token::EQUAL: return "=";

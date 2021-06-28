@@ -46,7 +46,7 @@ namespace Ast {
         void add_stmt(Stmt *stmt);
 
         private:
-        std::vector<Stmt *> stmts_;       
+        std::vector<Stmt *> stmts_;
     };
 
     class IfStmt : public Stmt {

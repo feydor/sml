@@ -16,7 +16,7 @@ Unary::eval()
             if (x.is_bool())
                 return Val(!(x.get_bool()));
             break;
-        default: 
+        default:
             std::cout << "Unary:eval: Unexpected operator. " + op_.to_str();
             return Val(); // nil
     }

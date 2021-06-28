@@ -3,4 +3,4 @@ fn error(a) {
     for (i = 0);
 }
 
-say error("HI")
+say error("WALRUS")

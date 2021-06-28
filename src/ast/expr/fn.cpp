@@ -8,11 +8,11 @@ namespace Ast {
     {
         if (!FnTable::exists(name_))
             throw std::runtime_error("Function " + name_ + " is not a defined function.");
-        
+
         std::vector<Val> args = {};
         for (auto& arg : args_)
             args.push_back(arg->eval());
-  
+
         return FnTable::get_fn(name_)->invoke(args);
     }
 

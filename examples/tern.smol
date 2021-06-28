@@ -1,7 +1,7 @@
 say "testing nested ternary expressions:"
 let x = 99
 say to_str(x)
-let str = (x % 2 == 0) 
+let str = (x % 2 == 0)
           ? (x > 100 ? "iseven and greater than 100" : "iseven and less than 100")
           : (x > 100 ? "isodd and greater than 100" : "isodd and less than 100")
 say str

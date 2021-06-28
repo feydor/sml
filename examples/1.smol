@@ -1,7 +1,7 @@
 # binary/unary/operator precedence test,
 say "testing operator precedence:"
 let x = (-23 - (8 + (-12) * 2 - 1 - 12)) / (-21 - (-20))
-say "(-23 - (8 + (-12) * 2 - 1 - 12)) / (-21 - (-20)) = -6"  
+say "(-23 - (8 + (-12) * 2 - 1 - 12)) / (-21 - (-20)) = -6"
 
 if (x == -6)
 	say "PASSED, result = " + to_str(x)

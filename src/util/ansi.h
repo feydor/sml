@@ -39,10 +39,8 @@ namespace ANSI {
 		enum mod_t { COLOR, FORMAT } type;
 
 		public:
-		Modifier(Color::Code col)
-		    : col_code(col), type(COLOR) {};
-		Modifier(Format::Code fmt)
-		    : fmt_code(fmt), type(FORMAT) {};
+		Modifier(Color::Code col) : col_code(col), type(COLOR) {};
+		Modifier(Format::Code fmt) : fmt_code(fmt), type(FORMAT) {};
 
 		static bool istty() {
 			return isatty(fileno(stdin));
@@ -51,8 +49,8 @@ namespace ANSI {
 		friend std::ostream&
 		operator<< (std::ostream& os, Modifier const &mod) {
 			return mod.type == COLOR
-				? os << "\033[" << mod.col_code << "m"
-				: os << "\033[" << mod.fmt_code << "m";	
+					? os << "\033[" << mod.col_code << "m"
+				: os << "\033[" << mod.fmt_code << "m";
 		}
 	};
 }

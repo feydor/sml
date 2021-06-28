@@ -29,20 +29,13 @@ parser::statement()
 {
     // parse user-defined fn and add to FnTable
     if (match(Token::FN)) {
-        if (!match(Token::IDENTIFIER))
-            throw Smol::SyntaxError("unexpected token", "an identifier",
-                    peek().to_str(), prev().line());
-
+        consume(Token::IDENTIFIER, "an identifier", "unexpected token");
         std::string ident = std::string(prev().to_str());
-        if (!match(Token::LEFT_PAREN))
-            throw Smol::SyntaxError("unexpected character", "(",
-                    peek().to_str(), prev().line());
+        consume(Token::LEFT_PAREN, "(", "unexpected character");
 
         UserFn* userfn = new UserFn(ident);
         while (!match(Token::RIGHT_PAREN)) {
-            if (!match(Token::IDENTIFIER))
-                throw Smol::SyntaxError("unexpected token", "an identifier",
-                    peek().to_str(), prev().line());
+            consume(Token::IDENTIFIER, "an identifier", "unexpected token");
             userfn->add_argname(prev().to_str());
 
             // match args-seperating comma, if it exists
@@ -59,9 +52,7 @@ parser::statement()
         Ast::Expr* expr = nullptr;
         if (!peek_type(Token::SEMICOLON))
             expr = expression();
-        if (!match(Token::SEMICOLON))
-            throw Smol::SyntaxError("unexpected character", ";",
-                expr->to_str(), prev().line());
+        consume(Token::SEMICOLON, ";", "unexpected character");
         return new Ast::RetStmt(expr);
     }
 
@@ -73,14 +64,9 @@ parser::statement()
         Ast::Stmt* body = nullptr;
         Ast::IfStmt* ifstmt = nullptr;
 
-        if (!match(Token::LEFT_PAREN))
-            throw Smol::SyntaxError("unexpected character", "(",
-                peek().to_str(), prev().line());
+        consume(Token::LEFT_PAREN, "(", "unexpected character");
         cond = expression();
-
-        if (!match(Token::RIGHT_PAREN))
-            throw Smol::SyntaxError("unexpected character", ")",
-                peek().to_str(), prev().line());
+        consume(Token::RIGHT_PAREN, ")", "unexpected character");
         body = statement_or_block();
 
         ifstmt = new Ast::IfStmt(cond, body);
@@ -91,21 +77,15 @@ parser::statement()
             ifstmt->add_else(statement_or_block());
         return ifstmt;
     }
-    
+
     if (match(Token::WHILE)) {
         Ast::Expr* cond = nullptr;
         Ast::Stmt* body = nullptr;
 
-        if (!match(Token::LEFT_PAREN))
-            throw Smol::SyntaxError("unexpected character", "(",
-                peek().to_str(), prev().line());
+        consume(Token::LEFT_PAREN, "(", "unexpected character");
         cond = expression();
-
-        if (!match(Token::RIGHT_PAREN))
-            throw Smol::SyntaxError("unexpected character", ")",
-                peek().to_str(), prev().line());
+        consume(Token::RIGHT_PAREN, ")", "unexpected character");
         body = statement_or_block();
-
         return new Ast::WhileStmt(cond, body);
     }
 
@@ -116,29 +96,19 @@ parser::statement()
         Ast::Stmt* body = nullptr;
         Ast::BlockStmt* final_body = nullptr;
 
-        if (!match(Token::LEFT_PAREN))
-            throw Smol::SyntaxError("unexpected character", "(",
-                peek().to_str(), prev().line());
-        
+        consume(Token::LEFT_PAREN, "(", "unexpected character");
+
         if (!peek_type(Token::SEMICOLON))
-            asgmt = statement(); // TODO: var_decl()
+            asgmt = statement();
+        consume(Token::SEMICOLON, ";", "unexpected character");
 
-        if (!match(Token::SEMICOLON))
-            throw Smol::SyntaxError("unexpected character", ";",
-                peek().to_str(), prev().line());
-        else
+        if (!peek_type(Token::SEMICOLON))
             cond = expression();
+        consume(Token::SEMICOLON, ";", "unexpected character");
 
-        if (!match(Token::SEMICOLON))
-            throw Smol::SyntaxError("unexpected character", ";",
-                peek().to_str(), prev().line());
-        else
+        if (!peek_type(Token::RIGHT_PAREN))
             control = statement();
-
-        if (!match(Token::RIGHT_PAREN))
-            throw Smol::SyntaxError("unexpected character", ")",
-                peek().to_str(), prev().line());
-
+        consume(Token::RIGHT_PAREN, ")", "unexpected character");
         body = statement_or_block();
 
         // desugar into while loop
@@ -147,7 +117,7 @@ parser::statement()
         if (control)
             final_body->add_stmt(control);
 
-        // if no cond, infinite loop 
+        // if no cond, infinite loop
         if (!cond)
             cond = new Ast::Literal(Val(true));
 
@@ -157,9 +127,7 @@ parser::statement()
     }
 
     if (match(Token::LET)) {
-        if (!match(Token::IDENTIFIER))
-            throw Smol::SyntaxError("unexpected token", "an identifier",
-                peek().to_str(), prev().line());
+        consume(Token::IDENTIFIER, "an identifier", "unexpected token");
         std::string var = prev().to_str();
 
         if (match(Token::EQUAL))
@@ -215,9 +183,7 @@ parser::ternary()
     while (match(Token::QUESTION)) {
         Tok op = prev();
         Ast::Expr* iftrue = expression();
-        // TODO: consume(":", "unexpected token");
-        if (!match(Token::COLON))
-            throw new Smol::SyntaxError("unexpected token", ":", peek().to_str(), prev().line());
+        consume(Token::COLON, ":", "unexpected token");
         Ast::Expr* iffalse = expression();
         expr = new Ast::Ternary(expr, op, iftrue, iffalse);
     }
@@ -386,7 +352,7 @@ parser::inc_decrement(const std::string &var, const Tok &op)
  * consumes and returns true on the first valid match
  */
 template <class ...Ts>
-bool 
+bool
 parser::match(Ts... args)
 {
     std::vector<Token::type> types {args...};
@@ -397,6 +363,16 @@ parser::match(Ts... args)
         }
     }
     return false;
+}
+
+/* if present, consumes the passed-in token,
+ * otherwise, throws a syntax error
+ */
+void
+parser::consume(const Token::type& tok, const std::string& expected, const std::string& msg)
+{
+    if (!match(tok))
+        throw Smol::SyntaxError(msg, expected, peek().to_str(), prev().line());
 }
 
 /* checks next token for type match
@@ -410,13 +386,13 @@ parser::peek_next_type(Token::type type)
 }
 
 /* checks curr token for given type, does not consume it */
-bool 
+bool
 parser::peek_type(Token::type type)
 {
     if (at_end())
         return false;
     return peek().type() == type;
-}  
+}
 
 /* returns curr token, does not consume it */
 Tok
@@ -446,7 +422,7 @@ parser::prev()
 {
     return this->tokens.at(this->curr - 1);
 }
-    
+
 bool
 parser::at_end()
 {

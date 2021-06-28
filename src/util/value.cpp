@@ -109,7 +109,7 @@ Val::is_nil() const
 {
     return this->type == Val_t::NIL;
 }
-        
+
 bool
 Val::same_type(Val const &val) const
 {
@@ -150,7 +150,7 @@ Val::to_str() const
             std::stringstream sstream;
             sstream << std::fixed << std::setprecision(ndigits(get_num())) << get_num();
             return sstream.str();
-        } 
+        }
         case Val_t::STR: return get_str();
         case Val_t::BOOL: return get_bool() ? "true" : "false";
         case Val_t::ARR: return get_arr()[0].to_str();

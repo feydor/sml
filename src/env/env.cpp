@@ -44,7 +44,7 @@ namespace Env {
 			if (var_exists((*itr), name))
 				return (*itr).vars[name];
 		}
-		return Val("<fn " + name + ">");		
+		return Val("<fn " + name + ">");
 	}
 
 	std::string

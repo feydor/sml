@@ -13,7 +13,7 @@ ninja -C build
 ```
 ## Examples
 The below code fragment is an example written in smol and demonstrates what is so far implemented:
-```
+```python
 # prints the nth row of Pascal's triangle... because why not?
 fn pascal(row) {
     say "Pascal's triangle, row #" + to_str(row) + ": "

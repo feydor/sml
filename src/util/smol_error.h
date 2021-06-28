@@ -5,7 +5,6 @@
 #include "ansi.h"
 
 namespace Smol {
-
 	class SyntaxError : public std::exception {
 		public:
 		SyntaxError(std::string msg, std::string expected,

@@ -1,0 +1,14 @@
+fn fact(n) {
+    ret (n < 2) ? 1 : n * fact(n-1);
+}
+
+fn inf() {
+    for (let i = 1;;i++) {
+        say fact(i)
+        if (i == 170)
+            ret;
+    }
+}
+
+inf()
+

@@ -37,10 +37,7 @@ parser::statement()
         while (!match(Token::RIGHT_PAREN)) {
             consume(Token::IDENTIFIER, "an identifier", "unexpected token");
             userfn->add_argname(prev().to_str());
-
-            // match args-seperating comma, if it exists
-            if (peek().type() == Token::COMMA)
-                match(Token::COMMA);
+            match(Token::COMMA);
         }
 
         userfn->set_body(statement_or_block());
@@ -49,10 +46,13 @@ parser::statement()
     }
 
     if (match(Token::RETURN)) {
+        // two types: ret; (implicit return NIL) or ret ident;
+        Ast::Literal* def = new Ast::Literal(Val());
         Ast::Expr* expr = nullptr;
-        if (!peek_type(Token::SEMICOLON))
-            expr = expression();
-        consume(Token::SEMICOLON, ";", "unexpected character");
+        if (match(Token::SEMICOLON))
+            return new Ast::RetStmt(def);
+        expr = expression();
+        match(Token::SEMICOLON);
         return new Ast::RetStmt(expr);
     }
 
@@ -165,6 +165,7 @@ parser::statement()
     }
 
     // if none of the above, then expression statement
+    // return new Ast::ExprStmt(expression());
     throw Smol::SyntaxError("expected a statement", "a statement",
         peek().to_str(), prev().line());
 }

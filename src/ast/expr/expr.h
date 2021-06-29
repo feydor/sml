@@ -117,5 +117,16 @@ namespace Ast {
             std::vector<Expr*> args_;
             std::string name_;
     };
+
+    class Arr : public Expr {
+        public:
+            Arr(std::vector<Expr*> exprs) : exprs_(std::move(exprs)) {};
+            ~Arr() override;
+            Val eval() override;
+            std::string to_str() const override;
+            void add_expr(Expr* expr);
+        private:
+            std::vector<Expr*> exprs_;
+    };
 }
 #endif

@@ -153,7 +153,15 @@ Val::to_str() const
         }
         case Val_t::STR: return get_str();
         case Val_t::BOOL: return get_bool() ? "true" : "false";
-        case Val_t::ARR: return get_arr()[0].to_str();
+        case Val_t::ARR:
+        {
+            std::string s;
+            for (Val val : get_arr()) {
+                s += val.to_str();
+                s += " ";
+            }
+            return s;
+        }
         case Val_t::NIL: return "nil";
     }
 }

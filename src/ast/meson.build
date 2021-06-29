@@ -1,8 +1,8 @@
 # gather ast sources and headers into vars
 ast_expr_src = files(
-  ['expr/literal.cpp', 'expr/asgmt.cpp',
-    'expr/binary.cpp', 'expr/unary.cpp', 'expr/var.cpp',
-    'expr/fn.cpp', 'expr/cond.cpp', 'expr/ternary.cpp']
+  ['expr/literal.cpp', 'expr/asgmt.cpp', 'expr/binary.cpp',
+    'expr/unary.cpp', 'expr/var.cpp', 'expr/fn.cpp',
+    'expr/cond.cpp', 'expr/ternary.cpp', 'expr/arr.cpp']
 )
 ast_expr_inc = include_directories('expr')
 

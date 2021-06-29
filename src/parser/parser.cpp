@@ -160,12 +160,7 @@ parser::statement()
             return new Ast::ExprStmt(new Ast::Var(var));
     }
 
-    if (match(Token::LEFT_BRACE)) {
-        return block();
-    }
-
     // if none of the above, then expression statement
-    // return new Ast::ExprStmt(expression());
     throw Smol::SyntaxError("expected a statement", "a statement",
         peek().to_str(), prev().line());
 }
@@ -174,7 +169,6 @@ Ast::Expr*
 parser::expression()
 {
     return ternary();
-
 }
 
 Ast::Expr*
@@ -278,9 +272,7 @@ parser::call()
             //if (argc >= 128)
             //    ; // TODO: show an error
 
-            // match args-seperating comma, if it exists
-            if (peek().type() == Token::COMMA)
-                match(Token::COMMA);
+            match(Token::COMMA);
         }
         return fn_expr;
     }
@@ -303,8 +295,22 @@ parser::primary()
     if (match(Token::STRING))
         return new Ast::Literal(Val(prev().get_str()));
     if (match(Token::IDENTIFIER)) {
-        // only variable matched here
-        return new Ast::Var(prev().to_str());
+         // only variable matched here
+         return new Ast::Var(prev().to_str());
+    }
+    if (match(Token::LEFT_BRACKET)) {
+        int argc = 0;
+        std::vector<Ast::Expr*> exprs;
+        while (!match(Token::RIGHT_BRACKET)) {
+            exprs.push_back(expression());
+            match(Token::COMMA);
+            argc++;
+            /*
+            if (argc > 255)
+                throw some error
+            */
+        }
+        return new Ast::Arr(exprs);
     }
 
     // expression in parens

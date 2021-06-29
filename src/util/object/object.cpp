@@ -68,6 +68,16 @@ namespace Obj {
 		throw type_error("Cannot mod", type(), other.type());
 	}
 
+	Object*
+	Object::operator[](const Object& other) const
+	{
+		const Object* a = this;
+		const Object* b = &other;
+		if (type() == Object_t::ARR && other.type() == Object_t::NUM)
+			return ((Array*)a)->get(((Number*)b)->num());
+		throw type_error("Cannot subscript", type(), other.type());
+	}
+
 	// Conditional operators
 	Object*
 	Object::operator==(const Object& other) const

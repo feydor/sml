@@ -25,6 +25,7 @@ class Object {
 		Object* operator*(const Object& other) const;
 		Object* operator/(const Object& other) const;
 		Object* operator%(const Object& other) const;
+		Object* operator[](const Object& other) const;
 
 		// Conditional operators
 		Object* operator&&(const Object& other) const;

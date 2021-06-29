@@ -295,9 +295,17 @@ parser::primary()
     if (match(Token::STRING))
         return new Ast::Literal(new Obj::String(prev().get_str()));
     if (match(Token::IDENTIFIER)) {
-         // only variable matched here
-         return new Ast::Var(prev().to_str());
+        Ast::Expr* expr = new Ast::Var(prev().to_str());
+        if (match(Token::LEFT_BRACKET)) {
+            Tok op = prev();
+            Ast::Expr* right = primary();
+            consume(Token::RIGHT_BRACKET, "]", "unexpected character");
+            expr = new Ast::Binary(expr, op, right);
+        }
+        return expr;
     }
+
+    // array primitive
     if (match(Token::LEFT_BRACKET)) {
         int argc = 0;
         std::vector<Ast::Expr*> exprs;

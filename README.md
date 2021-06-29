@@ -40,7 +40,8 @@ pascal(15) # 1 14 91 364 1001 2002 3003 3432 3003 2002 1001 364 91 14 1
     - lexer/ - token definitions, smallest language constructs.
     - lib/ - the foreign function interface (FFI) for user-defined functions and the (wip) prelude.
     - parser/ - creates ASTs recursively.
-    - util/ - the definition of a SMOL value, (wip) ANSI terminal support for errors.
+    - util/ - error handling, (wip) ANSI terminal support.
+        - object/ - the SMOL primitive definition.
     - smol.cpp - the main entry point for (wip) REPL and file execution.
 ## TODO
 - wishlist: array variables with implicit sizes and foreach looping.

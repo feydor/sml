@@ -27,14 +27,6 @@ namespace Obj {
 		return num() == 0 ? false : true;
 	}
 
-	/*
-	Object*
-	Number::operator+(const Number* other) const
-	{
-		return new Number(this->num() + other->num());
-	}
-	*/
-
 	double
 	Number::num() const
 	{

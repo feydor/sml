@@ -50,4 +50,3 @@ class Val {
 };
 
 #endif
-

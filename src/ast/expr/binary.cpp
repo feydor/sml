@@ -3,24 +3,21 @@
 
 namespace Ast {
 
-Val
+Obj::Object*
 Binary::eval()
 {
-    Val left = left_->eval();
-    Val right = right_->eval();
+    Obj::Object* left = left_->eval();
+    Obj::Object* right = right_->eval();
 
     switch (op_.type()) {
-        case Token::MINUS: return left - right;
-        case Token::PLUS: return left + right;
-        case Token::SLASH: return left / right;
-        case Token::STAR: return left * right;
-        case Token::PERCENT: return left % right;
+        case Token::MINUS: return *left - *right;
+        case Token::PLUS: return *left + *right;
+        case Token::SLASH: return *left / *right;
+        case Token::STAR: return *left * *right;
+        case Token::PERCENT: return *left % *right;
         // case Token::LEFT_BRACKET: return left[right];
         default:
-            // throw std::runtime_error(
-            //    "Operator '" + op.to_str() + "' is unimplemented.");
-            std::cout << "BINARY:eval: Unimplemented operator.\n";
-            return Val(); // nil
+            throw std::runtime_error("Operator '" + op_.to_str() + "' is unimplemented.");
     }
 }
 

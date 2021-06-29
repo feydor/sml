@@ -8,10 +8,10 @@ namespace Lib {
 		return "to_str";
 	}
 
-	Val
-	to_str::invoke(std::vector<Val> args)
+	Obj::Object*
+	to_str::invoke(std::vector<Obj::Object*> args)
 	{
 		check_nargs(args, 1);
-		return args[0].to_str();
+		return new Obj::String(args[0]->to_str());
 	}
 }

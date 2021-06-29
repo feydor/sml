@@ -4,13 +4,13 @@
 #include <assert.h>
 
 namespace Ast {
-	Val
+	Obj::Object*
 	Arr::eval()
 	{
-		std::vector<Val> arr;
+		std::vector<Obj::Object*> arr;
 		for (auto& expr : exprs_)
 			arr.push_back(expr->eval());
-		return Val(arr);
+		return new Obj::Array(arr);
 	}
 
 	Arr::~Arr()

@@ -12,6 +12,7 @@ say "testing array declarations and foreach looping"
 # fixed, implicit size of 5, can be mixed-type
 let d = [1, 2, 3, 4, 5, "six"]
 say d
+say 1 + "two"
 
 # access through subscripts
 #say d[0]

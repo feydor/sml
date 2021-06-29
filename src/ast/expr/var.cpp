@@ -3,7 +3,7 @@
 
 namespace Ast {
 
-    Val
+    Obj::Object*
     Var::eval()
     {
         return Env::get_var(name_);

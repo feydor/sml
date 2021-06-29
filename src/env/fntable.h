@@ -1,6 +1,5 @@
 #ifndef SMOL_FNTABLE_H
 #define SMOL_FNTABLE_H
-#include "value.h"
 #include "ffi.h"
 #include <string>
 #include <unordered_map>

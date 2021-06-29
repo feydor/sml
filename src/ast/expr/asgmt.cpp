@@ -2,7 +2,7 @@
 
 namespace Ast {
 
-    Val
+    Obj::Object*
     Asgmt::eval()
     {
         return right_->eval();

@@ -47,7 +47,7 @@ parser::statement()
 
     if (match(Token::RETURN)) {
         // two types: ret; (implicit return NIL) or ret ident;
-        Ast::Literal* def = new Ast::Literal(Val());
+        Ast::Literal* def = new Ast::Literal(new Obj::Number(0));
         Ast::Expr* expr = nullptr;
         if (match(Token::SEMICOLON))
             return new Ast::RetStmt(def);
@@ -119,7 +119,7 @@ parser::statement()
 
         // if no cond, infinite loop
         if (!cond)
-            cond = new Ast::Literal(Val(true));
+            cond = new Ast::Literal(new Obj::Bool(true));
 
         if (asgmt)
             stmts.push_back(asgmt);
@@ -133,7 +133,7 @@ parser::statement()
         if (match(Token::EQUAL))
             return new Ast::AsgmtStmt(var, expression());
         else
-            return new Ast::AsgmtStmt(var, new Ast::Literal(Val())); // NIL
+            return new Ast::AsgmtStmt(var, new Ast::Literal(new Obj::Number(0))); // NIL
     }
 
     // fn_expr
@@ -285,15 +285,15 @@ parser::primary()
     Ast::Expr* expr = nullptr;
 
     if (match(Token::FALSE))
-        return new Ast::Literal(Val(false));
+        return new Ast::Literal(new Obj::Bool(false));
     if (match(Token::TRUE))
-        return new Ast::Literal(Val(true));
+        return new Ast::Literal(new Obj::Bool(true));
     if (match(Token::NIL))
-        return new Ast::Literal(Val());
+        return new Ast::Literal(new Obj::Number(0));
     if (match(Token::NUMBER))
-        return new Ast::Literal(Val(prev().get_num()));
+        return new Ast::Literal(new Obj::Number(prev().get_num()));
     if (match(Token::STRING))
-        return new Ast::Literal(Val(prev().get_str()));
+        return new Ast::Literal(new Obj::String(prev().get_str()));
     if (match(Token::IDENTIFIER)) {
          // only variable matched here
          return new Ast::Var(prev().to_str());
@@ -350,7 +350,7 @@ Ast::Stmt*
 parser::inc_decrement(const std::string &var, const Tok &op)
 {
     return new Ast::AsgmtStmt(var,
-        new Ast::Binary(new Ast::Var(var), op, new Ast::Literal(Val(1.0)))
+        new Ast::Binary(new Ast::Var(var), op, new Ast::Literal(new Obj::Number(1.0)))
     );
 }
 

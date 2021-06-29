@@ -26,7 +26,7 @@ namespace Env {
 
 	// vars can only be set at the current Env (Envs.back())
 	void
-	set_var(const std::string& name, Val val)
+	set_var(const std::string& name, Obj::Object* val)
 	{
 		auto entry = Envs.back().vars.find(name);
 		if (entry != Envs.back().vars.end())
@@ -36,7 +36,7 @@ namespace Env {
 	}
 
 	// starts at most recent env/scope and searches in reverse order
-	Val
+	Obj::Object*
 	get_var(const std::string& name)
 	{
 		// iterate from back to front of vector, calling var_exists on each Environment
@@ -44,7 +44,7 @@ namespace Env {
 			if (var_exists((*itr), name))
 				return (*itr).vars[name];
 		}
-		return Val("<fn " + name + ">");
+		return new Obj::String("<fn " + name + ">");
 	}
 
 	std::string
@@ -57,7 +57,7 @@ namespace Env {
 			out += "size: " + std::to_string(env.vars.size()) + "\n";
 			i++;
 			for (auto var : env.vars)
-				out += var.first + " = " + var.second.to_str() + "\n";
+				out += var.first + " = " + var.second->to_str() + "\n";
 		}
 		return out;
 	}

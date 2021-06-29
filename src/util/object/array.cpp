@@ -1,6 +1,6 @@
 #include "object.h"
 
-namespace Smol {
+namespace Obj {
 
 	Object_t
 	Array::type() const
@@ -20,12 +20,6 @@ namespace Smol {
 		return true; // TODO: is an array identifier truthy?
 	}
 
-	std::unique_ptr<Object>
-	Array::operator+(const Object& other) const
-	{
-		return nullptr;// TODO: std::make_unique<Number>(get() + other.get());
-	}
-
 	Object*
 	Array::get(size_t i) const
 	{
@@ -42,6 +36,22 @@ namespace Smol {
 	Array::push_back(Object* obj)
 	{
 		objects_.push_back(obj);
+	}
+
+	size_t
+	Array::size() const
+	{
+		return objects_.size();
+	}
+
+	bool
+	Array::compare(const Array* other) const
+	{
+		if (size() != other->size()) return false;
+		for (size_t i = 0; i < size(); ++i)
+			if (get(i) != other->get(i))
+				return false;
+		return true;
 	}
 
 	Array::~Array()

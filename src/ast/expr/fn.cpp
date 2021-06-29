@@ -3,13 +3,13 @@
 
 namespace Ast {
 
-    Val
+    Obj::Object*
     FnExpr::eval()
     {
         if (!FnTable::exists(name_))
             throw std::runtime_error("Function " + name_ + " is not a defined function.");
 
-        std::vector<Val> args = {};
+        std::vector<Obj::Object*> args = {};
         for (auto& arg : args_)
             args.push_back(arg->eval());
 

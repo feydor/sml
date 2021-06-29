@@ -14,9 +14,9 @@ smol_inc = include_directories('src')
 
 # combine main with subsystems
 src = [smol_src, ast_src, env_src, lib_src,
-      parser_src, lexer_src, util_src]
+      parser_src, lexer_src, util_src, object_src]
 inc = [smol_inc, ast_inc, env_inc, lib_inc,
-      parser_inc, lexer_inc, util_inc]
+      parser_inc, lexer_inc, util_inc, object_inc]
 
 exe = executable(
   'smol', 

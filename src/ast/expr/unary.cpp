@@ -2,26 +2,20 @@
 #include <iostream>
 
 namespace Ast {
-Val
+Obj::Object*
 Unary::eval()
 {
-    Val x = right_->eval();
+    Obj::Object* x = right_->eval();
 
     switch (op_.type()) {
-        case Token::MINUS:
-            if (x.is_num())
-                return Val(-(x.get_num()));
-            break;
-        case Token::BANG:
-            if (x.is_bool())
-                return Val(!(x.get_bool()));
-            break;
+
+        case Token::MINUS: return -*x;
+        case Token::BANG: return !*x;
         default:
-            std::cout << "Unary:eval: Unexpected operator. " + op_.to_str();
-            return Val(); // nil
+            throw std::runtime_error("Unary: Unexpected operator. " + op_.to_str());
     }
     /* not reached */
-    return Val();
+    return nullptr;
 }
 
 Unary::~Unary()

@@ -3,16 +3,15 @@
 
 namespace Ast {
 
-    Val
+    Obj::Object*
     Ternary::eval()
     {
-        Val cond = cond_->eval();
+        auto cond = cond_->eval();
 
         switch (op_.type()) {
-            case Token::QUESTION: return cond.is_truthy() ? iftrue_->eval() : iffalse_->eval();
+            case Token::QUESTION: return cond->is_truthy() ? iftrue_->eval() : iffalse_->eval();
             default:
-                std::cout << "Ternary:eval: Unimplemented operator.\n";
-                return Val(); // nil
+                throw std::runtime_error("Ternary: Unimplemented operator.");
         }
     }
 

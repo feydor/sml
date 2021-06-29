@@ -5,7 +5,7 @@ namespace Ast {
 	void
 	SayStmt::exec()
 	{
-		auto out = expr_->eval().to_str();
+		auto out = expr_->eval()->to_str();
 		for (unsigned i = 0; i < out.size(); ++i) {
 			if (out[i] == '\\') {
 				i++;

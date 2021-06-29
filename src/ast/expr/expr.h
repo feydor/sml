@@ -1,7 +1,7 @@
 #ifndef SMOL_EXPR_H
 #define SMOL_EXPR_H
 #include "token.h"
-#include "value.h"
+#include "object.h"
 #include <vector>
 
 
@@ -9,7 +9,7 @@ namespace Ast {
 
     class Expr {
         public:
-            virtual Val eval() = 0;
+            virtual Obj::Object* eval() = 0;
             virtual std::string to_str() const = 0;
             virtual ~Expr() = default;
     };
@@ -19,7 +19,7 @@ namespace Ast {
             Binary(Expr* left, Tok op, Expr* right)
                 : op_(op), left_(left), right_(right) {};
             ~Binary() override;
-            Val eval() override;
+            Obj::Object* eval() override;
             std::string to_str() const override;
         private:
             Tok op_;
@@ -29,10 +29,9 @@ namespace Ast {
 
     class Unary : public Expr {
         public:
-            Unary(Tok op, Expr* right)
-                : op_(op), right_(right) {};
+            Unary(Tok op, Expr* right) : op_(op), right_(right) {};
             ~Unary() override;
-            Val eval() override;
+            Obj::Object* eval() override;
             std::string to_str() const override;
         private:
             Tok op_;
@@ -44,7 +43,7 @@ namespace Ast {
             Ternary(Expr* cond, Tok op, Expr* iftrue, Expr* iffalse)
                 : cond_(cond), op_(op), iftrue_(iftrue), iffalse_(iffalse) {};
             ~Ternary() override;
-            Val eval() override;
+            Obj::Object* eval() override;
             std::string to_str() const override;
         private:
             Expr* cond_;
@@ -59,47 +58,41 @@ namespace Ast {
             Cond(Expr* left, Tok op, Expr* right)
                 : left_(left), op_(op), right_(right) {};
             ~Cond() override;
-            Val eval() override;
+            Obj::Object* eval() override;
             std::string to_str() const override;
 
         private:
             Expr* left_;
             Tok op_;
             Expr* right_;
-
-            template<typename Op>
-            Val eval_(Val const &a, Val const &b, Op fn);
     };
 
     // Assignment expression: a = b, evals to b
     class Asgmt : public Expr {
         public:
-            Asgmt(Expr* left, Expr* right)
-                : left_(left), right_(right) {};
+            Asgmt(Expr* left, Expr* right) : left_(left), right_(right) {};
             ~Asgmt() override;
-            Val eval() override;
+            Obj::Object* eval() override;
             std::string to_str() const override;
         private:
             Expr* left_;
             Expr* right_;
     };
 
-    // Literal expression: val: string, num, bool, nil
+    // Literal expression: val: string, num, bool, nil, arr, hash
     class Literal : public Expr {
         public:
-            Literal(Val val)
-                : val_(std::move(val)) {};
-            Val eval() override;
+            Literal(Obj::Object* val) : val_(std::move(val)) {};
+            Obj::Object* eval() override;
             std::string to_str() const override;
         private:
-            Val val_;
+            Obj::Object* val_;
     };
 
     class Var : public Expr {
         public:
-            Var(std::string name)
-                : name_(std::move(name)) {};
-            Val eval() override;
+            Var(std::string name) : name_(std::move(name)) {};
+            Obj::Object* eval() override;
             std::string to_str() const override;
         private:
             std::string name_;
@@ -107,10 +100,9 @@ namespace Ast {
 
     class FnExpr : public Expr {
         public:
-            FnExpr(std::string name)
-                : name_(std::move(name)) {};
+            FnExpr(std::string name) : name_(std::move(name)) {};
             ~FnExpr() override;
-            Val eval() override;
+            Obj::Object* eval() override;
             std::string to_str() const override;
             void add_arg(Expr* expr);
         private:
@@ -122,7 +114,7 @@ namespace Ast {
         public:
             Arr(std::vector<Expr*> exprs) : exprs_(std::move(exprs)) {};
             ~Arr() override;
-            Val eval() override;
+            Obj::Object* eval() override;
             std::string to_str() const override;
             void add_expr(Expr* expr);
         private:

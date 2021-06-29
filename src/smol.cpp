@@ -142,7 +142,7 @@ void SMOL::eval(std::string const &src)
 
     // set prelude constants and library functions
     // TODO: Move to prelude.h
-    Env::set_var(std::string("PI"), Val(3.14159265359));
+    Env::set_var(std::string("PI"), new Obj::Number(3.14159265359));
     FnTable::set_fn(new Lib::to_str());
 
     std::chrono::system_clock::time_point t1, t2;
@@ -156,7 +156,7 @@ void SMOL::eval(std::string const &src)
             delete stmt;
         } catch (const std::runtime_error& e) {
             std::cout << e.what() << std::endl;
-        } catch (Val& ret_outside_fn) {
+        } catch (Obj::Object* ret_outside_fn) {
             // TODO: catch a Smol::runtime_error here, but do not exit
             std::cout << "Error: return statement outside a function.\n";
         }

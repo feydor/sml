@@ -9,7 +9,7 @@ namespace Ast {
     WhileStmt::exec()
     {
         Env::push_back();
-        while (cond_->eval().is_truthy())
+        while (cond_->eval()->is_truthy())
             body_->exec();
         Env::pop();
     }

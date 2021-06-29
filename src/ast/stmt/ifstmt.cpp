@@ -6,7 +6,7 @@ namespace Ast {
 	void
 	IfStmt::exec()
 	{
-		if (cond_->eval().is_truthy())
+		if (cond_->eval()->is_truthy())
 			body_->exec();
 		else if (elses_.size() > 0)
 			for (auto& els : elses_)

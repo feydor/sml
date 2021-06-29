@@ -1,7 +1,7 @@
 #include "expr.h"
 
 namespace Ast {
-    Val
+    Obj::Object*
     Literal::eval()
     {
         return val_;
@@ -10,6 +10,6 @@ namespace Ast {
     std::string
     Literal::to_str() const
     {
-        return val_.to_str();
+        return val_->to_str();
     }
 }

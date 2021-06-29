@@ -1,5 +1,6 @@
 # gather subsystem sources and headers into vars
 subdir('ast')
+subdir('util')
 
 parser_src = files(['parser/parser.cpp'])
 parser_inc = include_directories('parser')

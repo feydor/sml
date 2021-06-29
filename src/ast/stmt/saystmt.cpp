@@ -9,10 +9,9 @@ namespace Ast {
 		for (unsigned i = 0; i < out.size(); ++i) {
 			if (out[i] == '\\') {
 				i++;
+				// switch on special character ex: '\n'
 				switch (out[i]) {
-					case 'n':
-						std::cout << "\n";
-						break;
+					case 'n': std::cout << "\n"; break;
 				}
 			} else {
 				std::cout << out[i];

@@ -6,7 +6,6 @@ namespace Ast {
 	void
 	ExprStmt::exec()
 	{
-		// std::cout << expr_->to_str() << std::endl;
 		expr_->eval();
 	}
 

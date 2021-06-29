@@ -9,7 +9,7 @@ namespace Ast {
 		if (cond_->eval()->is_truthy())
 			body_->exec();
 		else if (elses_.size() > 0)
-			for (auto& els : elses_)
+			for (const auto& els : elses_)
 				els->exec();
 	}
 

@@ -7,7 +7,7 @@ namespace Ast {
     void
     BlockStmt::exec()
     {
-        for (auto& stmt : stmts_) {
+        for (const auto& stmt : stmts_) {
             stmt->exec();
         }
     }

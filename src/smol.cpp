@@ -156,7 +156,7 @@ void SMOL::eval(std::string const &src)
             delete stmt;
         } catch (const std::runtime_error& e) {
             std::cout << e.what() << std::endl;
-        } catch (Obj::Object* ret_outside_fn) {
+        } catch (Obj::Object& ret_outside_fn) {
             // TODO: catch a Smol::runtime_error here, but do not exit
             std::cout << "Error: return statement outside a function.\n";
         }

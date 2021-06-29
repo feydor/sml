@@ -10,7 +10,7 @@ namespace Ast {
             throw std::runtime_error("Function " + name_ + " is not a defined function.");
 
         std::vector<Obj::Object*> args = {};
-        for (auto& arg : args_)
+        for (const auto& arg : args_)
             args.push_back(arg->eval());
 
         return FnTable::get_fn(name_)->invoke(args);
@@ -26,7 +26,7 @@ namespace Ast {
     FnExpr::to_str() const
     {
         std::string res(name_ + " (");
-        for (auto& arg : args_)
+        for (const auto& arg : args_)
             res += arg->to_str() + ", ";
         return res.substr(0, res.size() - 2) + ")";
     }

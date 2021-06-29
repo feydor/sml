@@ -33,7 +33,7 @@ FnTable::to_str()
     std::string out("");
     out += "--------FN_TABLE-------\n";
     out += "size: " + std::to_string(fn_table.size()) + "\n";
-    for (auto fn_pair : fn_table) {
+    for (const auto& fn_pair : fn_table) {
         out += fn_pair.first + "\n";
     }
     return out;

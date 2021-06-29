@@ -371,7 +371,7 @@ bool
 parser::match(Ts... args)
 {
     std::vector<Token::type> types {args...};
-    for (auto type : types) {
+    for (const auto& type : types) {
         if (peek_type(type)) {
             advance();
             return true;

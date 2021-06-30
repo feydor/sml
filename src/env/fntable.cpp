@@ -39,8 +39,9 @@ FnTable::to_str()
     return out;
 }
 
-FnTable::~FnTable()
+void
+FnTable::free_fns()
 {
-    for (auto fn : fn_table)
+    for (auto& fn : fn_table)
         delete fn.second;
 }

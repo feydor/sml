@@ -26,7 +26,7 @@ namespace Env {
 
 	// vars can only be set at the current Env (Envs.back())
 	void
-	set_var(const std::string& name, Obj::Object* val)
+	set_var(const std::string& name, std::shared_ptr<Obj::Object> val)
 	{
 		auto entry = Envs.back().vars.find(name);
 		if (entry != Envs.back().vars.end())
@@ -36,7 +36,7 @@ namespace Env {
 	}
 
 	// starts at most recent env/scope and searches in reverse order
-	Obj::Object*
+	std::shared_ptr<Obj::Object>
 	get_var(const std::string& name)
 	{
 		// iterate from back to front of vector, calling var_exists on each Environment
@@ -44,7 +44,7 @@ namespace Env {
 			if (var_exists((*itr), name))
 				return (*itr).vars[name];
 		}
-		return new Obj::String("<fn " + name + ">");
+		return std::make_shared<Obj::String>("<fn " + name + ">");//new Obj::String("<fn " + name + ">");
 	}
 
 	std::string

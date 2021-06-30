@@ -12,7 +12,7 @@ class FnTable {
     static FFInterface* get_fn(std::string name);
     static bool exists(std::string name);
     static std::string to_str();
-    ~FnTable();
+    static void free_fns();
 
     private:
     static std::unordered_map<std::string, FFInterface*> fn_table;

@@ -20,20 +20,20 @@ namespace Obj {
 		return true; // TODO: is an array identifier truthy?
 	}
 
-	Object*
+	std::shared_ptr<Object>
 	Array::get(size_t i) const
 	{
 		return objects_[i];
 	}
 
 	void
-	Array::put(size_t i, Object* obj)
+	Array::put(size_t i, std::shared_ptr<Object> obj)
 	{
 		objects_[i] = obj;
 	}
 
 	void
-	Array::push_back(Object* obj)
+	Array::push_back(std::shared_ptr<Object> obj)
 	{
 		objects_.push_back(obj);
 	}
@@ -56,8 +56,10 @@ namespace Obj {
 
 	Array::~Array()
 	{
+		/*
 		for (auto& obj : objects_)
 			delete obj;
+		*/
 	}
 
 };

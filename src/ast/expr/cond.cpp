@@ -3,7 +3,7 @@
 #include <functional>
 
 namespace Ast {
-Obj::Object*
+std::shared_ptr<Obj::Object>
 Cond::eval()
 {
 	auto left = left_->eval();

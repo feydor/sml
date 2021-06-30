@@ -2,7 +2,7 @@
 #include "ffi.h"
 #include <stdexcept>
 void
-FFInterface::check_nargs(const std::vector<Obj::Object*> &args, int count)
+FFInterface::check_nargs(const std::vector<std::shared_ptr<Obj::Object>> &args, int count)
 {
     if (args.size() != (unsigned)count)
         throw std::runtime_error(name() + ": arguments required (" +

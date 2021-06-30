@@ -26,8 +26,8 @@ UserFn::name()
 /* setups an environment for the user-defined function call
  * and passes control to its exec function
  */
-Obj::Object*
-UserFn::invoke(std::vector<Obj::Object*> args)
+std::shared_ptr<Obj::Object>
+UserFn::invoke(std::vector<std::shared_ptr<Obj::Object>> args)
 {
     check_nargs(args, argnames_.size());
 
@@ -39,7 +39,7 @@ UserFn::invoke(std::vector<Obj::Object*> args)
 	// std::cout << Env::to_str() << std::endl;
 	try {
 		body_->exec();
-	} catch (Obj::Object* rval) {
+	} catch (std::shared_ptr<Obj::Object>& rval) {
 		Env::pop();
 		return rval;
 	}

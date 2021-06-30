@@ -2,10 +2,10 @@
 #include <iostream>
 
 namespace Ast {
-Obj::Object*
+std::shared_ptr<Obj::Object>
 Unary::eval()
 {
-    Obj::Object* x = right_->eval();
+    auto x = right_->eval();
 
     switch (op_.type()) {
 

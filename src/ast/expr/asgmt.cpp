@@ -2,7 +2,7 @@
 
 namespace Ast {
 
-    Obj::Object*
+    std::shared_ptr<Obj::Object>
     Asgmt::eval()
     {
         return right_->eval();

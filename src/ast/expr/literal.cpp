@@ -1,7 +1,7 @@
 #include "expr.h"
 
 namespace Ast {
-    Obj::Object*
+    std::shared_ptr<Obj::Object>
     Literal::eval()
     {
         return val_;

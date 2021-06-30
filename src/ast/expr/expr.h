@@ -9,7 +9,7 @@ namespace Ast {
 
     class Expr {
         public:
-            virtual Obj::Object* eval() = 0;
+            virtual std::shared_ptr<Obj::Object> eval() = 0;
             virtual std::string to_str() const = 0;
             virtual ~Expr() = default;
     };
@@ -19,7 +19,7 @@ namespace Ast {
             Binary(Expr* left, Tok op, Expr* right)
                 : op_(op), left_(left), right_(right) {};
             ~Binary() override;
-            Obj::Object* eval() override;
+            std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
         private:
             Tok op_;
@@ -31,7 +31,7 @@ namespace Ast {
         public:
             Unary(Tok op, Expr* right) : op_(op), right_(right) {};
             ~Unary() override;
-            Obj::Object* eval() override;
+            std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
         private:
             Tok op_;
@@ -43,7 +43,7 @@ namespace Ast {
             Ternary(Expr* cond, Tok op, Expr* iftrue, Expr* iffalse)
                 : cond_(cond), op_(op), iftrue_(iftrue), iffalse_(iffalse) {};
             ~Ternary() override;
-            Obj::Object* eval() override;
+            std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
         private:
             Expr* cond_;
@@ -58,7 +58,7 @@ namespace Ast {
             Cond(Expr* left, Tok op, Expr* right)
                 : left_(left), op_(op), right_(right) {};
             ~Cond() override;
-            Obj::Object* eval() override;
+            std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
 
         private:
@@ -72,7 +72,7 @@ namespace Ast {
         public:
             Asgmt(Expr* left, Expr* right) : left_(left), right_(right) {};
             ~Asgmt() override;
-            Obj::Object* eval() override;
+            std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
         private:
             Expr* left_;
@@ -82,18 +82,18 @@ namespace Ast {
     // Literal expression: val: string, num, bool, nil, arr, hash
     class Literal : public Expr {
         public:
-            explicit Literal(Obj::Object* val) : val_(val) {};
-            Obj::Object* eval() override;
+            explicit Literal(std::shared_ptr<Obj::Object> val) : val_(val) {};
+            std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
             ~Literal() override;
         private:
-            Obj::Object* val_;
+            std::shared_ptr<Obj::Object> val_;
     };
 
     class Var : public Expr {
         public:
             explicit Var(std::string name) : name_(std::move(name)) {};
-            Obj::Object* eval() override;
+            std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
         private:
             std::string name_;
@@ -103,7 +103,7 @@ namespace Ast {
         public:
             explicit FnExpr(std::string name) : name_(std::move(name)) {};
             ~FnExpr() override;
-            Obj::Object* eval() override;
+            std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
             void add_arg(Expr* expr);
         private:
@@ -115,7 +115,7 @@ namespace Ast {
         public:
             explicit Arr(std::vector<Expr*> exprs) : exprs_(std::move(exprs)) {};
             ~Arr() override;
-            Obj::Object* eval() override;
+            std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
             void add_expr(Expr* expr);
         private:

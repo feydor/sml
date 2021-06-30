@@ -3,11 +3,11 @@
 
 namespace Ast {
 
-Obj::Object*
+std::shared_ptr<Obj::Object>
 Binary::eval()
 {
-    Obj::Object* left = left_->eval();
-    Obj::Object* right = right_->eval();
+    auto left = left_->eval();
+    auto right = right_->eval();
 
     switch (op_.type()) {
         case Token::MINUS: return *left - *right;

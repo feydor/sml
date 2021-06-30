@@ -6,7 +6,7 @@ namespace Lib {
 	class to_str : public FFInterface {
 		public:
 		std::string name() override;
-		Obj::Object* invoke(std::vector<Obj::Object*> args) override;
+		std::shared_ptr<Obj::Object> invoke(std::vector<std::shared_ptr<Obj::Object>> args) override;
 	};
 }
 

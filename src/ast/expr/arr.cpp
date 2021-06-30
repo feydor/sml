@@ -4,13 +4,13 @@
 #include <assert.h>
 
 namespace Ast {
-	Obj::Object*
+	std::shared_ptr<Obj::Object>
 	Arr::eval()
 	{
-		std::vector<Obj::Object*> arr;
+		std::vector<std::shared_ptr<Obj::Object>> arr;
 		for (auto& expr : exprs_)
 			arr.push_back(expr->eval());
-		return new Obj::Array(arr);
+		return std::make_shared<Obj::Array>(arr);//Obj::Array(arr);
 	}
 
 	Arr::~Arr()

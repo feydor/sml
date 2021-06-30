@@ -2,8 +2,9 @@
 say "testing operator precedence:"
 let x = (-23 - (8 + (-12) * 2 - 1 - 12)) / (-21 - (-20))
 say "(-23 - (8 + (-12) * 2 - 1 - 12)) / (-21 - (-20)) = -6"
-
-if (x == -6)
-	say "PASSED, result = " + to_str(x)
-else
-	say "FAILED, result = " + to_str(x)
+let a = 100 + "one-hundred"
+say a
+#if (x == -6)
+#	say "PASSED, result = " + to_str(x)
+#else
+#	say "FAILED, result = " + to_str(x)

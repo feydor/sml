@@ -8,10 +8,11 @@ namespace Lib {
 		return "to_str";
 	}
 
-	Obj::Object*
-	to_str::invoke(std::vector<Obj::Object*> args)
+	std::shared_ptr<Obj::Object>
+	to_str::invoke(std::vector<std::shared_ptr<Obj::Object>> args)
 	{
 		check_nargs(args, 1);
-		return new Obj::String(args[0]->to_str());
+		return std::make_shared<Obj::String>(args[0]->to_str());
+		//return new Obj::String(args[0]->to_str());
 	}
 }

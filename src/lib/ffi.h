@@ -9,8 +9,8 @@
 class FFInterface {
 	public:
 	virtual std::string name() = 0;
-	virtual Obj::Object* invoke(std::vector<Obj::Object*> args) = 0;
-	void check_nargs(const std::vector<Obj::Object*> &args, int count);
+	virtual std::shared_ptr<Obj::Object> invoke(std::vector<std::shared_ptr<Obj::Object>> args) = 0;
+	void check_nargs(const std::vector<std::shared_ptr<Obj::Object>> &args, int count);
 	virtual ~FFInterface() = default;
 };
 
@@ -21,7 +21,7 @@ class UserFn : public FFInterface {
 	void set_body(Ast::Stmt* body);
 	void add_argname(std::string name);
 	std::string name() override;
-	Obj::Object* invoke(std::vector<Obj::Object*> args) override;
+	std::shared_ptr<Obj::Object> invoke(std::vector<std::shared_ptr<Obj::Object>> args) override;
 	~UserFn() override;
 
 	private:

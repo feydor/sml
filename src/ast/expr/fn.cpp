@@ -3,13 +3,13 @@
 
 namespace Ast {
 
-    Obj::Object*
+    std::shared_ptr<Obj::Object>
     FnExpr::eval()
     {
         if (!FnTable::exists(name_))
             throw std::runtime_error("Function " + name_ + " is not a defined function.");
 
-        std::vector<Obj::Object*> args = {};
+        std::vector<std::shared_ptr<Obj::Object>> args = {};
         for (const auto& arg : args_)
             args.push_back(arg->eval());
 

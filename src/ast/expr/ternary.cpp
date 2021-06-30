@@ -3,7 +3,7 @@
 
 namespace Ast {
 
-    Obj::Object*
+    std::shared_ptr<Obj::Object>
     Ternary::eval()
     {
         auto cond = cond_->eval();

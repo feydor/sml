@@ -142,7 +142,7 @@ void SMOL::eval(std::string const &src)
 
     // set prelude constants and library functions
     // TODO: Move to prelude.h
-    //Env::set_var(std::string("PI"), new Obj::Number(3.14159265359));
+    Env::set_var(std::string("PI"), std::make_shared<Obj::Number>(3.14159265359));
     FnTable::set_fn(new Lib::to_str());
 
     std::chrono::system_clock::time_point t1, t2;
@@ -167,4 +167,6 @@ void SMOL::eval(std::string const &src)
         std::chrono::duration<double, std::milli> ms_double = t2 - t1;
         std::cout << "Duration: " << ms_double.count() << "ms\n";
     }
+
+    FnTable::free_fns();
 }

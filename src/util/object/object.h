@@ -16,36 +16,36 @@ class Object {
 	public:
 		virtual Object_t type() const = 0;
 		virtual std::string to_str() const = 0;
-		virtual bool is_truthy() const  = 0;
+		virtual bool is_truthy() const = 0;
 		virtual ~Object() = default;
 
 		// Binary operators
-		Object* operator+(const Object& other) const;
-		Object* operator-(const Object& other) const;
-		Object* operator*(const Object& other) const;
-		Object* operator/(const Object& other) const;
-		Object* operator%(const Object& other) const;
-		Object* operator[](const Object& other) const;
+		std::shared_ptr<Object> operator+(const Object& other) const;
+		std::shared_ptr<Object> operator-(const Object& other) const;
+		std::shared_ptr<Object> operator*(const Object& other) const;
+		std::shared_ptr<Object> operator/(const Object& other) const;
+		std::shared_ptr<Object> operator%(const Object& other) const;
+		std::shared_ptr<Object> operator[](const Object& other) const;
 
 		// Conditional operators
-		Object* operator&&(const Object& other) const;
-		Object* operator||(const Object& other) const;
-		Object* operator==(const Object& other) const;
-		Object* operator!=(const Object& other) const;
-		Object* operator<(const Object& other) const;
-		Object* operator<=(const Object& other) const;
-		Object* operator>(const Object& other) const;
-		Object* operator>=(const Object& other) const;
+		std::shared_ptr<Object> operator&&(const Object& other) const;
+		std::shared_ptr<Object> operator||(const Object& other) const;
+		std::shared_ptr<Object> operator==(const Object& other) const;
+		std::shared_ptr<Object> operator!=(const Object& other) const;
+		std::shared_ptr<Object> operator<(const Object& other) const;
+		std::shared_ptr<Object> operator<=(const Object& other) const;
+		std::shared_ptr<Object> operator>(const Object& other) const;
+		std::shared_ptr<Object> operator>=(const Object& other) const;
 
 		// Unary operators
-		Object* operator-() const;
-		Object* operator!() const;
+		std::shared_ptr<Object> operator-() const;
+		std::shared_ptr<Object> operator!() const;
 
 		// utility
 		std::string type_str() const;
 		static std::string type_str(Object_t type);
 		std::runtime_error type_error(const std::string& msg, Object_t, Object_t) const;
-		std::runtime_error type_error(const std::string& msg, Object_t t1) const;
+		std::runtime_error type_error(const std::string& msg, Object_t) const;
 };
 
 class Number : public Object {
@@ -94,14 +94,14 @@ class Array : public Object {
 		bool is_truthy() const override;
 		~Array() override;
 
-		explicit Array(const std::vector<Object*>& objects) : objects_(objects) {};
-		Object* get(size_t i) const;
-		void put(size_t i, Object* obj);
-		void push_back(Object* obj);
+		explicit Array(const std::vector<std::shared_ptr<Object>>& objects) : objects_(objects) {};
+		std::shared_ptr<Object> get(size_t i) const;
+		void put(size_t i, std::shared_ptr<Object> obj);
+		void push_back(std::shared_ptr<Object> obj);
 		size_t size() const;
 		bool compare(const Array* other) const;
 	private:
-		std::vector<Object*> objects_;
+		std::vector<std::shared_ptr<Object>> objects_;
 };
 
 }

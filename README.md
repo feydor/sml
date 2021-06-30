@@ -44,8 +44,5 @@ pascal(15) # 1 14 91 364 1001 2002 3003 3432 3003 2002 1001 364 91 14 1
         - object/ - the SMOL primitive definition.
     - smol.cpp - the main entry point for (wip) REPL and file execution.
 ## TODO
-- error: memleak in all binary/unary operations, i.e. for(;;) say 1 + 1 will crash the program.
-    - work-around: infinite loops with operations are broken.
-    - solution: remove heap allocation from Object operator overloads. 
 - wishlist: builtin functions such as getc(), putc(), fopen(), etc.
 - wishlist: brainfsck interpreter in SMOL.

@@ -1,5 +1,6 @@
 #include "object.h"
 #include <cmath>  // for std::fmod
+#include <iostream>
 
 namespace Obj {
 	
@@ -85,10 +86,15 @@ namespace Obj {
 		const Object* a = this;
 		const Object* b = &other;
 		if (type() == Object_t::NUM) {
-			if (other.type() == Object_t::NUM)
-				return std::make_shared<Bool>(((Number*)a)->num() == ((Number*)b)->num());
-			else if (other.type() == Object_t::BOOL)
-				return std::make_shared<Bool>(((Number*)a)->is_truthy() == ((Bool*)b)->bol());
+			auto a = dynamic_cast<const Number*>(this);
+			if (other.type() == Object_t::NUM) {
+				auto b = dynamic_cast<const Number*>(&other);
+				return std::make_shared<Bool>(a->num() == b->num());
+			}
+			else if (other.type() == Object_t::BOOL) {
+				auto b = dynamic_cast<const Bool*>(&other);
+				return std::make_shared<Bool>(a->is_truthy() == b->bol());
+			}
 		} else if (type() == Object_t::BOOL) {
 			if (other.type() == Object_t::BOOL)
 				return std::make_shared<Bool>(((Bool*)a)->bol() == ((Bool*)b)->bol());
@@ -96,10 +102,10 @@ namespace Obj {
 				return std::make_shared<Bool>(((Bool*)a)->bol() == ((Number*)b)->is_truthy());
 		} else if (type() == Object_t::STR) {
 			if (other.type() == Object_t::STR)
-				return std::make_shared<Bool>(((String*)a)->compare((String*)b));
+				return std::make_shared<Bool>(((String*)a)->compare(*(String*)b));
 		} else if (type() == Object_t::ARR) {
 			if (other.type() == Object_t::ARR)
-				return std::make_shared<Bool>(((Array*)a)->compare((Array*)b));
+				return std::make_shared<Bool>(((Array*)a)->compare(*(Array*)b));
 		}
 		throw type_error("Cannot compare(==)", type(), other.type());
 	}
@@ -121,10 +127,10 @@ namespace Obj {
 				return std::make_shared<Bool>(((Bool*)a)->bol() != ((Number*)b)->is_truthy());
 		} else if (type() == Object_t::STR) {
 			if (other.type() == Object_t::STR)
-				return std::make_shared<Bool>(((String*)a)->compare((String*)b));
+				return std::make_shared<Bool>(((String*)a)->compare(*(String*)b));
 		} else if (type() == Object_t::ARR) {
 			if (other.type() == Object_t::ARR)
-				return std::make_shared<Bool>(((Array*)a)->compare((Array*)b));
+				return std::make_shared<Bool>(((Array*)a)->compare(*(Array*)b));
 		}
 
 		throw type_error("Cannot compare(!=)", type(), other.type());
@@ -133,21 +139,13 @@ namespace Obj {
 	std::shared_ptr<Object>
 	Object::operator&&(const Object& other) const
 	{
-		const Object* a = this;
-		const Object* b = &other;
-		if (type() == Object_t::BOOL && other.type() == Object_t::BOOL)
-			return std::make_shared<Bool>(((Bool*)a)->bol() && ((Bool*)b)->bol());
-		throw type_error("Cannot do boolean operation(&&)", type(), other.type());
+		return std::make_shared<Bool>(this->is_truthy() && other.is_truthy());
 	}
 
 	std::shared_ptr<Object>
 	Object::operator||(const Object& other) const
 	{
-		const Object* a = this;
-		const Object* b = &other;
-		if (type() == Object_t::BOOL && other.type() == Object_t::BOOL)
-			return std::make_shared<Bool>(((Bool*)a)->bol() || ((Bool*)b)->bol());
-		throw type_error("Cannot do boolean operation(||)", type(), other.type());
+		return std::make_shared<Bool>(this->is_truthy() || other.is_truthy());
 	}
 
 	std::shared_ptr<Object>

@@ -1,0 +1,121 @@
+run_tests()
+
+# main tests case
+fn run_tests() {
+    say "****** BEGIN basic test cases ******"
+    math_test()
+    var_decl_test()
+    var_redef_test()
+    logical_branching_test()
+    ternary_test()
+    arr_init_test()
+    say "****** END basic test cases ******"
+}
+
+# binary/unary/operator precedence test
+fn math_test() {
+    say "*** testing operator precedence ***"
+    let x = (-23 - (8 + (-12) * 2 - 1 - 12)) / (-21 - (-20))
+    say "(-23 - (8 + (-12) * 2 - 1 - 12)) / (-21 - (-20)) = -6"
+
+    if (x == -6)
+	    say "PASSED, result = " + to_str(x)
+    else
+	    say "FAILED, result = " + to_str(x)
+}
+
+# var declaration test
+fn var_decl_test() {
+    say "*** testing variable resolution ***"
+    let x = -6
+    let y = 3
+    let z = y
+
+    if ((x + y + z) == 0) {
+	    say "PASSED, x+y+z = 0"
+	    say "where x = -6, y = 3, and z = y"
+    } else {
+        say "FAILED, x+y+z = " + to_str(x+y+z)
+        say "where x = -6, y = 3, and z = y"
+    }
+}
+
+# variable re-definition, dynamic typing test
+fn var_redef_test() {
+    say "*** Testing variable re-definition ***"
+    let a   # a is 0
+    let b = 7 * 5
+    say "b = " + to_str(b)
+
+    b = "b is now a string" # redefine b
+    say b
+
+    say "a = " + to_str(a)
+    a = "a is now a string" # redefine a
+    say a
+
+    let z = 10 - 1
+    z = "Seven ate " + to_str(z)
+    if (z == "Seven ate 9")
+        say "PASSED, " + z
+    else
+        say "FAILED, " + z
+}
+
+# logical/comparison operators, branching test
+fn logical_branching_test() {
+    say "*** testing logical operators, if/else branching, expression statements ***"
+    let x = (54 > 53) and (1 <= 100) # true
+    if (x)
+        say "PASSED, x = " + to_str(x)
+    else
+        say "FAILED, x = " + to_str(x)
+
+    let y = (54 < 53) or (1 == 0) # false
+    if (!y)
+        say "PASSED, y = " + to_str(y)
+    else
+        say "FAILED, y = " + to_str(y)
+
+    x = 16
+    say "x = " + to_str(x)
+    y = 15
+    say "y = " + to_str(y)
+
+    say "is x > y ?"
+    if (x > y)
+        say "PASSED, x is greater than y"
+    else
+        say "FAILED, " + to_str(x) + " > " + to_str(y)
+
+    if (x >= y)
+        if (x)
+            x = 10000
+
+    if (x == 10000)
+        say "PASSED, x was was redefined as " + to_str(x)
+    else
+        say "FAILED, x was not redefined as 10000"
+}
+
+fn ternary_test() {
+    say "*** testing nested ternary expressions ***"
+    let x = 99
+    say to_str(x)
+    let str = (x % 2 == 0)
+              ? (x > 100 ? "is even and greater than 100" : "is even and less than 100")
+              : (x > 100 ? "is odd and greater than 100" : "is odd and less than 100")
+    if (str == "is odd and less than 100")
+        say "PASSED, " + x + " " + str
+    else
+        say "FAILED, " + x + " " + str
+}
+
+fn arr_init_test() {
+    say "*** testing array initialization ***"
+    let d = [1, 2, 3, 4, 5, "six"]
+    if (d[5] == "six")
+        say "PASSED, d[5] = " + d[5]
+    else
+        say "FAILED, d[5] = " + d[6]
+}

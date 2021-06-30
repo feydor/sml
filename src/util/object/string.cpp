@@ -33,11 +33,11 @@ namespace Obj {
 	}
 
 	bool
-	String::compare(const String* other) const
+	String::compare(const String& other) const
 	{
-		if (size() != other->size()) return false;
+		if (size() != other.size()) return false;
 		for (size_t i = 0; i < size(); ++i)
-			if (str()[i] != other->str()[i])
+			if (str()[i] != other.str()[i])
 				return false;
 		return true;
 	}

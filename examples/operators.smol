@@ -1,0 +1,77 @@
+run_tests()
+
+# main tests case
+fn run_tests() {
+    say "****** BEGIN operator test cases ******"
+    add_test()
+    sub_test()
+    mult_test()
+    div_test()
+    mod_test()
+    subscript_test()
+    equality_test()
+    say "****** END operator test cases ******"
+}
+
+fn add_test() {
+    say "*** operator+ test ***"
+    let x = 1
+    let y = 2
+    if (1 + 2 == 3) say "PASSED, 1+2=" + to_str(1+2)
+    else say "FAILED, 1+2=" + to_str(1+2)
+
+    if (1 + "two" == "1two") say "PASSED, 1+'two'=" + to_str(1+"two")
+    else say "FAILED, 1+'two'=" + to_str(1+"two")
+
+    if ("one" + "two" == "onetwo") say "PASSED, 'one'+'two'=" + "one" + "two"
+    else say "FAILED, 'one'+'two'=" + "one" + "two"
+
+    if (true + false == false) say "PASSED, true+false=" + to_str(true+false)
+    else say "FAILED, true+false=" + to_str(true+false)
+}
+
+fn sub_test() {
+    say "*** operator- test ***"
+    if (1 - 2 == -1) say "PASSED, 1-2=" + to_str(1-2)
+    else say "FAILED, 1-2=" + to_str(1-2)
+}
+
+fn mult_test() {
+    say "*** operator* test ***"
+    if (1 * 2 == 2) say "PASSED, 1*2=" + to_str(1*2)
+    else say "FAILED, 1*2=" + to_str(1*2)
+}
+
+fn div_test() {
+    say "*** operator/ test ***"
+    if (1 / 2 == 0.5) say "PASSED, 1/2=" + to_str(1/2)
+    else say "FAILED, 1/2=" + to_str(1/2)
+}
+
+fn mod_test() {
+   say "*** operator% test ***"
+   if (1 % 2 == 1) say "PASSED, 1%2=" + to_str(1%2)
+   else say "FAILED, 1%2=" + to_str(1%2)
+}
+
+fn subscript_test() {
+   say "*** operator[]test ***"
+   let a = [100, 200, 300, "four-hundred"]
+   if (a[2] == 300) say "PASSED, let a = [100, 200, 300, 'four-hundred']; a[2]=" + to_str(a[2])
+   else say "FAILED,let a = [100, 200, 300, 'four-hundred']; 1%2=" + to_str(a[2])
+}
+
+fn equality_test() {
+    say "*** operator== test ***"
+    if (1 == 1) say "PASSED, 1==1 =" + to_str(1==1)
+    else say "FAILED, 1==1 =" + to_str(1==1)
+
+    if ("five" == "five") say "PASSED, 'five'=='five' =" + to_str("five" == "five")
+    else say "FAILED, 'five'=='five' =" + to_str("five" == "five")
+    
+    if (1 == true) say "PASSED, 1==true =" + to_str(1 == true)
+    else say "FAILED, 1==true =" + to_str(1==true)
+
+    if (false == false) say "PASSED, false==false =" + to_str(false==false)
+    else say "FAILED, false==false =" + to_str(false==false)
+}

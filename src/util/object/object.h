@@ -70,7 +70,7 @@ class String : public Object {
 		explicit String(const std::string& val) : val_(val) {};
 		std::string str() const;
 		size_t size() const;
-		bool compare(const String* other) const;
+		bool compare(const String& other) const;
 	private:
 		std::string val_;
 };
@@ -99,7 +99,7 @@ class Array : public Object {
 		void put(size_t i, std::shared_ptr<Object> obj);
 		void push_back(std::shared_ptr<Object> obj);
 		size_t size() const;
-		bool compare(const Array* other) const;
+		bool compare(const Array& other) const;
 	private:
 		std::vector<std::shared_ptr<Object>> objects_;
 };

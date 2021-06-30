@@ -2,10 +2,8 @@
 #include <stdexcept>
 
 Tok::Tok(Token::type type, std::string lexeme, int line)
-    : type_(type), lexeme_(std::move(lexeme)), line_(line)
-{
-    literal_ = 0.0;
-}
+    : type_(type), lexeme_(std::move(lexeme)), line_(line), literal_(0.0)
+{}
 
 Tok::Tok(Token::type type, std::string lexeme, int line,
     std::variant<double, std::string> literal)
@@ -14,7 +12,7 @@ Tok::Tok(Token::type type, std::string lexeme, int line,
 {}
 
 Tok::Tok(Token::type type, std::string lexeme)
-    : type_(type), lexeme_(lexeme), line_(0) {};
+    : type_(type), lexeme_(std::move(lexeme)), line_(0) {};
 
 Tok::Tok() {}
 

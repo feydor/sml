@@ -15,7 +15,7 @@ namespace Parser {
         int curr = 0;
 
         public:
-        parser(std::vector<Tok> tokens)
+        explicit parser(std::vector<Tok> tokens)
             : tokens(std::move(tokens)) {};
         std::vector<Ast::Stmt*> scan_program();
 

@@ -39,8 +39,8 @@ namespace ANSI {
 		enum mod_t { COLOR, FORMAT } type;
 
 		public:
-		Modifier(Color::Code col) : col_code(col), type(COLOR) {};
-		Modifier(Format::Code fmt) : fmt_code(fmt), type(FORMAT) {};
+		explicit Modifier(Color::Code col) : col_code(col), type(COLOR) {};
+		explicit Modifier(Format::Code fmt) : fmt_code(fmt), type(FORMAT) {};
 
 		static bool istty() {
 			return isatty(fileno(stdin));

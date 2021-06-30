@@ -265,8 +265,8 @@ parser::call()
         auto fn_expr = new Ast::FnExpr(name);
         int argc = 0;
         while (!match(Token::RIGHT_PAREN)) {
-            auto expr = expression();
-            fn_expr->add_arg(expr);
+            auto param = expression();
+            fn_expr->add_arg(param);
             argc++;
 
             //if (argc >= 128)
@@ -295,7 +295,7 @@ parser::primary()
     if (match(Token::STRING))
         return new Ast::Literal(new Obj::String(prev().get_str()));
     if (match(Token::IDENTIFIER)) {
-        Ast::Expr* expr = new Ast::Var(prev().to_str());
+        expr = new Ast::Var(prev().to_str());
         if (match(Token::LEFT_BRACKET)) {
             Tok op = prev();
             Ast::Expr* right = primary();

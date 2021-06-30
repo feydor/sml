@@ -7,8 +7,8 @@
 namespace Smol {
 	class SyntaxError : public std::exception {
 		public:
-		SyntaxError(std::string msg, std::string expected,
-			std::string found, int nline)
+		SyntaxError(const std::string& msg, const std::string& expected,
+			const std::string& found, int nline)
 			: msg_(msg), expected_(expected), found_(found), nline_(nline) {};
 		void print() const throw();
 

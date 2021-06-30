@@ -82,16 +82,17 @@ namespace Ast {
     // Literal expression: val: string, num, bool, nil, arr, hash
     class Literal : public Expr {
         public:
-            Literal(Obj::Object* val) : val_(std::move(val)) {};
+            explicit Literal(Obj::Object* val) : val_(val) {};
             Obj::Object* eval() override;
             std::string to_str() const override;
+            ~Literal() override;
         private:
             Obj::Object* val_;
     };
 
     class Var : public Expr {
         public:
-            Var(std::string name) : name_(std::move(name)) {};
+            explicit Var(std::string name) : name_(std::move(name)) {};
             Obj::Object* eval() override;
             std::string to_str() const override;
         private:
@@ -100,7 +101,7 @@ namespace Ast {
 
     class FnExpr : public Expr {
         public:
-            FnExpr(std::string name) : name_(std::move(name)) {};
+            explicit FnExpr(std::string name) : name_(std::move(name)) {};
             ~FnExpr() override;
             Obj::Object* eval() override;
             std::string to_str() const override;
@@ -112,7 +113,7 @@ namespace Ast {
 
     class Arr : public Expr {
         public:
-            Arr(std::vector<Expr*> exprs) : exprs_(std::move(exprs)) {};
+            explicit Arr(std::vector<Expr*> exprs) : exprs_(std::move(exprs)) {};
             ~Arr() override;
             Obj::Object* eval() override;
             std::string to_str() const override;

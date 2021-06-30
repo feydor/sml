@@ -16,8 +16,8 @@ class FFInterface {
 
 class UserFn : public FFInterface {
 	public:
-	UserFn(std::string name)
-		: name_(name) {};
+	explicit UserFn(std::string name)
+		: name_(std::move(name)) {};
 	void set_body(Ast::Stmt* body);
 	void add_argname(std::string name);
 	std::string name() override;
@@ -27,7 +27,7 @@ class UserFn : public FFInterface {
 	private:
 	std::string name_;
 	std::vector<std::string> argnames_;
-	Ast::Stmt* body_;
+	Ast::Stmt* body_ = nullptr;
 };
 
 #endif

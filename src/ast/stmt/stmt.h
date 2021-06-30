@@ -16,7 +16,7 @@ namespace Ast {
 
     class ExprStmt : public Stmt {
         public:
-        ExprStmt(Ast::Expr *expr)
+        explicit ExprStmt(Ast::Expr *expr)
             : expr_(expr) {};
         void exec() override;
         ~ExprStmt() override;
@@ -27,7 +27,7 @@ namespace Ast {
 
     class SayStmt : public Stmt {
         public:
-        SayStmt(Ast::Expr* expr)
+        explicit SayStmt(Ast::Expr* expr)
             : expr_(expr) {};
         void exec() override;
         ~SayStmt() override;
@@ -65,7 +65,7 @@ namespace Ast {
 
     class AsgmtStmt : public Stmt {
         public:
-        AsgmtStmt(std::string name, Ast::Expr* expr)
+        AsgmtStmt(const std::string& name, Ast::Expr* expr)
             : name_(name), expr_(expr) {};
         void exec() override;
         ~AsgmtStmt() override;
@@ -89,7 +89,7 @@ namespace Ast {
 
     class RetStmt : public Stmt {
         public:
-        RetStmt(Ast::Expr* expr)
+        explicit RetStmt(Ast::Expr* expr)
             : expr_(expr) {};
         void exec() override;
         ~RetStmt() override;

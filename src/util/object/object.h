@@ -54,7 +54,7 @@ class Number : public Object {
 		std::string to_str() const override;
 		bool is_truthy() const override;
 
-		Number(double val) : val_(val) {};
+		explicit Number(double val) : val_(val) {};
 		double num() const;
 	private:
 		double val_;
@@ -67,7 +67,7 @@ class String : public Object {
 		std::string to_str() const override;
 		bool is_truthy() const override;
 
-		String(std::string val) : val_(val) {};
+		explicit String(const std::string& val) : val_(val) {};
 		std::string str() const;
 		size_t size() const;
 		bool compare(const String* other) const;
@@ -81,7 +81,7 @@ class Bool : public Object {
 		std::string to_str() const override;
 		bool is_truthy() const override;
 
-		Bool(bool val) : val_(val) {};
+		explicit Bool(bool val) : val_(val) {};
 		bool bol() const;
 	private:
 		bool val_;
@@ -94,7 +94,7 @@ class Array : public Object {
 		bool is_truthy() const override;
 		~Array() override;
 
-		Array(std::vector<Object*> objects) : objects_(objects) {};
+		explicit Array(const std::vector<Object*>& objects) : objects_(objects) {};
 		Object* get(size_t i) const;
 		void put(size_t i, Object* obj);
 		void push_back(Object* obj);

@@ -17,7 +17,7 @@ class lexer {
     int line = 1; // curr line of src file
 
     public:
-    lexer(std::string const& src);
+    explicit lexer(std::string const& src);
     std::vector<Tok> scan_tokens();
 
     private:

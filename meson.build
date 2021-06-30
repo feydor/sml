@@ -5,6 +5,8 @@ project(
   default_options : ['warning_level=3', 'cpp_std=c++17']
 )
 
+# for address sanitizer add 'cpp_link_args=-fsanitize=address,undefined' to default_options
+
 # gather subsystem sources and headers into vars
 subdir('src')
 

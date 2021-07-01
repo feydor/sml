@@ -11,7 +11,12 @@ namespace Obj {
 	std::string
 	Array::to_str() const
 	{
-		return get(0)->to_str();
+		std::string out("[");
+		for (const auto& obj : objects_)
+			out += "" + obj->to_str() + " ";
+		out.pop_back();
+		out += "]";
+		return out;
 	}
 
 	bool
@@ -49,7 +54,7 @@ namespace Obj {
 	{
 		if (size() != other.size()) return false;
 		for (size_t i = 0; i < size(); ++i)
-			if (get(i) != other.get(i))
+			if (get(i)->to_str() != other.get(i)->to_str())
 				return false;
 		return true;
 	}

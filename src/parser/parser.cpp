@@ -161,8 +161,11 @@ parser::statement()
     }
 
     // if none of the above, then expression statement
+    return new Ast::ExprStmt(expression());
+    /*
     throw Smol::SyntaxError("expected a statement", "a statement",
         peek().to_str(), prev().line());
+    */
 }
 
 Ast::Expr*

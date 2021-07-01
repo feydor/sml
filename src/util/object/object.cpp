@@ -1,6 +1,5 @@
 #include "object.h"
 #include <cmath>  // for std::fmod
-#include <iostream>
 
 namespace Obj {
 	

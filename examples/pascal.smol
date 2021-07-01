@@ -10,4 +10,4 @@ fn pascal_calc(row, i) {
     ret pascal_calc(row - 1, i - 1) + pascal_calc(row - 1, i);
 }
 
-pascal(15)
+pascal(16)

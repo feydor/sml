@@ -15,7 +15,7 @@ class Number;
 class Object {
 	public:
 		virtual Object_t type() const = 0;
-		virtual std::string to_str() const = 0;
+		virtual std::string to_str() const = 0; // used to compare Arrays' contents
 		virtual bool is_truthy() const = 0;
 		virtual ~Object() = default;
 

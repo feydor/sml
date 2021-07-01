@@ -10,9 +10,17 @@ say "testing array declarations and foreach looping"
 #let c[100] = {1, 2}
 
 # fixed, implicit size of 5, can be mixed-type
-let d = [1, 2, 3, 4, 5, "six"]
-for (let i = 0; i < 6; i++)
-    say d[i]
+[1, 2]
+[1, 2]
+
+if ([1, 2] == [1, 2]) say "PASSED, [1, 2] == [1, 2]"
+else say "FAILED, [1, 2] != [1, 2]"
+
+say to_str(["one", false, 65656])
+
+#let d = [1, 2, 3, 4, 5, "six"]
+#for (let i = 0; i < 6; i++)
+#    say d[i]
 
 # foreach loop
 #for (i in d)

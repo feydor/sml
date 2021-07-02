@@ -132,6 +132,8 @@ parser::statement()
 
         if (match(Token::EQUAL))
             return new Ast::AsgmtStmt(var, expression());
+        else if (match(Token::LEFT_BRACKET))
+            return array_decl(var);
         else
             return new Ast::AsgmtStmt(var, new Ast::Literal(std::make_shared<Obj::Number>(0.0))); // NIL
     }
@@ -363,6 +365,27 @@ parser::inc_decrement(const std::string &var, const Tok &op)
     return new Ast::AsgmtStmt(var,
         new Ast::Binary(new Ast::Var(var), op, new Ast::Literal(std::make_shared<Obj::Number>(1.0)))
     );
+}
+
+/* array declaration with a size and optional initializer ie let a[100] = {100} */
+Ast::Stmt*
+parser::array_decl(const std::string& varname)
+{
+    consume(Token::NUMBER, "a number", "an unexpected token");
+    auto size = prev().get_num();
+    consume(Token::RIGHT_BRACKET, "]", "unexpected character");
+
+    std::vector<std::shared_ptr<Obj::Object>> values;
+    auto val = 0.0;
+    if (match(Token::EQUAL)) {
+        consume(Token::LEFT_BRACE, "{", "unexpected character");
+        consume(Token::NUMBER, "a number", "an unexpected token");
+        val = prev().get_num();
+        consume(Token::RIGHT_BRACE, "}", "unexpected character");
+    }
+
+    values.resize(size, std::make_shared<Obj::Number>(val));
+    return new Ast::AsgmtStmt(varname, new Ast::Literal(std::make_shared<Obj::Array>(values)));
 }
 
 /**

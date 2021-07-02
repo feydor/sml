@@ -20,26 +20,26 @@ class Object {
 		virtual ~Object() = default;
 
 		// Binary operators
-		std::shared_ptr<Object> operator+(const Object& other) const;
-		std::shared_ptr<Object> operator-(const Object& other) const;
-		std::shared_ptr<Object> operator*(const Object& other) const;
-		std::shared_ptr<Object> operator/(const Object& other) const;
-		std::shared_ptr<Object> operator%(const Object& other) const;
+		std::unique_ptr<Object> operator+(const Object& other) const;
+		std::unique_ptr<Object> operator-(const Object& other) const;
+		std::unique_ptr<Object> operator*(const Object& other) const;
+		std::unique_ptr<Object> operator/(const Object& other) const;
+		std::unique_ptr<Object> operator%(const Object& other) const;
 		std::shared_ptr<Object> operator[](const Object& other) const;
 
 		// Conditional operators
-		std::shared_ptr<Object> operator&&(const Object& other) const;
-		std::shared_ptr<Object> operator||(const Object& other) const;
-		std::shared_ptr<Object> operator==(const Object& other) const;
-		std::shared_ptr<Object> operator!=(const Object& other) const;
-		std::shared_ptr<Object> operator<(const Object& other) const;
-		std::shared_ptr<Object> operator<=(const Object& other) const;
-		std::shared_ptr<Object> operator>(const Object& other) const;
-		std::shared_ptr<Object> operator>=(const Object& other) const;
+		std::unique_ptr<Object> operator&&(const Object& other) const;
+		std::unique_ptr<Object> operator||(const Object& other) const;
+		std::unique_ptr<Object> operator==(const Object& other) const;
+		std::unique_ptr<Object> operator!=(const Object& other) const;
+		std::unique_ptr<Object> operator<(const Object& other) const;
+		std::unique_ptr<Object> operator<=(const Object& other) const;
+		std::unique_ptr<Object> operator>(const Object& other) const;
+		std::unique_ptr<Object> operator>=(const Object& other) const;
 
 		// Unary operators
-		std::shared_ptr<Object> operator-() const;
-		std::shared_ptr<Object> operator!() const;
+		std::unique_ptr<Object> operator-() const;
+		std::unique_ptr<Object> operator!() const;
 
 		// utility
 		std::string type_str() const;

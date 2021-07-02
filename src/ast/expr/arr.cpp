@@ -10,7 +10,7 @@ namespace Ast {
 		std::vector<std::shared_ptr<Obj::Object>> arr;
 		for (auto& expr : exprs_)
 			arr.push_back(expr->eval());
-		return std::make_shared<Obj::Array>(arr);
+		return std::make_unique<Obj::Array>(arr);
 	}
 
 	Arr::~Arr()

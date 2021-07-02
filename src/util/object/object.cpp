@@ -4,67 +4,67 @@
 namespace Obj {
 	
 	// Binary operators
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator+(const Object& other) const
 	{
 		const Object* a = this;
 		const Object* b = &other;
 		if (type() == Object_t::NUM) {
 			if (other.type() == Object_t::NUM)
-				return std::make_shared<Number>(((Number*)a)->num() + ((Number*)b)->num());
+				return std::make_unique<Number>(((Number*)a)->num() + ((Number*)b)->num());
 			else if (other.type() == Object_t::STR)
-				return std::make_shared<String>(((Number*)a)->to_str() + ((String*)b)->str());
+				return std::make_unique<String>(((Number*)a)->to_str() + ((String*)b)->str());
 		}
 		else if (type() == Object_t::STR) {
 			if (other.type() == Object_t::STR)
-				return std::make_shared<String>(((String*)a)->str() + ((String*)b)->str());
+				return std::make_unique<String>(((String*)a)->str() + ((String*)b)->str());
 			else if (other.type() == Object_t::NUM)
-				return std::make_shared<String>(((String*)a)->str() + ((Number*)b)->to_str());
+				return std::make_unique<String>(((String*)a)->str() + ((Number*)b)->to_str());
 		}
 		else if (type() == Object_t::BOOL) {
 			if (other.type() == Object_t::BOOL)
-				return std::make_shared<Bool>(((Bool*)a)->bol() && ((Bool*)b)->bol());
+				return std::make_unique<Bool>(((Bool*)a)->bol() && ((Bool*)b)->bol());
 		}
 		throw type_error("Cannot add", type(), other.type());
 	}
 
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator-(const Object& other) const
 	{
 		const Object* a = this;
 		const Object* b = &other;
 		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_shared<Number>(((Number*)a)->num() - ((Number*)b)->num());
+			return std::make_unique<Number>(((Number*)a)->num() - ((Number*)b)->num());
 		throw type_error("Cannot subtract", type(), other.type());
 	}
 
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator*(const Object& other) const
 	{
 		const Object* a = this;
 		const Object* b = &other;
 		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_shared<Number>(((Number*)a)->num() * ((Number*)b)->num());
+			return std::make_unique<Number>(((Number*)a)->num() * ((Number*)b)->num());
 		throw type_error("Cannot multiply", type(), other.type());
 	}
 
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator/(const Object& other) const
 	{
 		const Object* a = this;
 		const Object* b = &other;
 		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_shared<Number>(((Number*)a)->num() / ((Number*)b)->num());
+			return std::make_unique<Number>(((Number*)a)->num() / ((Number*)b)->num());
 		throw type_error("Cannot divide", type(), other.type());
 	}
 
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator%(const Object& other) const
 	{
 		const Object* a = this;
 		const Object* b = &other;
 		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_shared<Number>(std::fmod(((Number*)a)->num(), ((Number*)b)->num()));
+			return std::make_unique<Number>(std::fmod(((Number*)a)->num(), ((Number*)b)->num()));
 		throw type_error("Cannot mod", type(), other.type());
 	}
 
@@ -79,7 +79,7 @@ namespace Obj {
 	}
 
 	// Conditional operators
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator==(const Object& other) const
 	{
 		const Object* a = this;
@@ -88,119 +88,119 @@ namespace Obj {
 			auto a = dynamic_cast<const Number*>(this);
 			if (other.type() == Object_t::NUM) {
 				auto b = dynamic_cast<const Number*>(&other);
-				return std::make_shared<Bool>(a->num() == b->num());
+				return std::make_unique<Bool>(a->num() == b->num());
 			}
 			else if (other.type() == Object_t::BOOL) {
 				auto b = dynamic_cast<const Bool*>(&other);
-				return std::make_shared<Bool>(a->is_truthy() == b->bol());
+				return std::make_unique<Bool>(a->is_truthy() == b->bol());
 			}
 		} else if (type() == Object_t::BOOL) {
 			if (other.type() == Object_t::BOOL)
-				return std::make_shared<Bool>(((Bool*)a)->bol() == ((Bool*)b)->bol());
+				return std::make_unique<Bool>(((Bool*)a)->bol() == ((Bool*)b)->bol());
 			else if (other.type() == Object_t::NUM)
-				return std::make_shared<Bool>(((Bool*)a)->bol() == ((Number*)b)->is_truthy());
+				return std::make_unique<Bool>(((Bool*)a)->bol() == ((Number*)b)->is_truthy());
 		} else if (type() == Object_t::STR) {
 			if (other.type() == Object_t::STR)
-				return std::make_shared<Bool>(((String*)a)->compare(*(String*)b));
+				return std::make_unique<Bool>(((String*)a)->compare(*(String*)b));
 		} else if (type() == Object_t::ARR) {
 			if (other.type() == Object_t::ARR)
-				return std::make_shared<Bool>(((Array*)a)->compare(*(Array*)b));
+				return std::make_unique<Bool>(((Array*)a)->compare(*(Array*)b));
 		}
 		throw type_error("Cannot compare(==)", type(), other.type());
 	}
 
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator!=(const Object& other) const
 	{
 		const Object* a = this;
 		const Object* b = &other;
 		if (type() == Object_t::NUM) {
 			if (other.type() == Object_t::NUM)
-				return std::make_shared<Bool>(((Number*)a)->num() != ((Number*)b)->num());
+				return std::make_unique<Bool>(((Number*)a)->num() != ((Number*)b)->num());
 			else if (other.type() == Object_t::BOOL)
-				return std::make_shared<Bool>(((Number*)a)->is_truthy() != ((Bool*)b)->bol());
+				return std::make_unique<Bool>(((Number*)a)->is_truthy() != ((Bool*)b)->bol());
 		} else if (type() == Object_t::BOOL) {
 			if (other.type() == Object_t::BOOL)
-				return std::make_shared<Bool>(((Bool*)a)->bol() != ((Bool*)b)->bol());
+				return std::make_unique<Bool>(((Bool*)a)->bol() != ((Bool*)b)->bol());
 			else if (other.type() == Object_t::NUM)
-				return std::make_shared<Bool>(((Bool*)a)->bol() != ((Number*)b)->is_truthy());
+				return std::make_unique<Bool>(((Bool*)a)->bol() != ((Number*)b)->is_truthy());
 		} else if (type() == Object_t::STR) {
 			if (other.type() == Object_t::STR)
-				return std::make_shared<Bool>(((String*)a)->compare(*(String*)b));
+				return std::make_unique<Bool>(((String*)a)->compare(*(String*)b));
 		} else if (type() == Object_t::ARR) {
 			if (other.type() == Object_t::ARR)
-				return std::make_shared<Bool>(((Array*)a)->compare(*(Array*)b));
+				return std::make_unique<Bool>(((Array*)a)->compare(*(Array*)b));
 		}
 
 		throw type_error("Cannot compare(!=)", type(), other.type());
 	}
 
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator&&(const Object& other) const
 	{
-		return std::make_shared<Bool>(this->is_truthy() && other.is_truthy());
+		return std::make_unique<Bool>(this->is_truthy() && other.is_truthy());
 	}
 
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator||(const Object& other) const
 	{
-		return std::make_shared<Bool>(this->is_truthy() || other.is_truthy());
+		return std::make_unique<Bool>(this->is_truthy() || other.is_truthy());
 	}
 
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator<(const Object& other) const
 	{
 		const Object* a = this;
 		const Object* b = &other;
 		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_shared<Bool>(((Number*)a)->num() < ((Number*)b)->num());
+			return std::make_unique<Bool>(((Number*)a)->num() < ((Number*)b)->num());
 		throw type_error("Cannot compare(<)", type(), other.type());
 	}
 
 	// TODO: make this operator work with strings and arrays... maybe
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator<=(const Object& other) const
 	{
 		const Object* a = this;
 		const Object* b = &other;
 		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_shared<Bool>(((Number*)a)->num() <= ((Number*)b)->num());
+			return std::make_unique<Bool>(((Number*)a)->num() <= ((Number*)b)->num());
 		throw type_error("Cannot compare(<=)", type(), other.type());
 	}
 
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator>(const Object& other) const
 	{
 		const Object* a = this;
 		const Object* b = &other;
 		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_shared<Bool>(((Number*)a)->num() > ((Number*)b)->num());
+			return std::make_unique<Bool>(((Number*)a)->num() > ((Number*)b)->num());
 		throw type_error("Cannot compare(>)", type(), other.type());
 	}
 
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator>=(const Object& other) const
 	{
 		const Object* a = this;
 		const Object* b = &other;
 		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_shared<Bool>(((Number*)a)->num() >= ((Number*)b)->num());
+			return std::make_unique<Bool>(((Number*)a)->num() >= ((Number*)b)->num());
 		throw type_error("Cannot compare(>=)", type(), other.type());
 	}
 
 	// Unary operators
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator-() const
 	{
 		if (type() == Object_t::NUM)
-			return std::make_shared<Number>(-((Number*)this)->num());
+			return std::make_unique<Number>(-((Number*)this)->num());
 		throw type_error("Cannot make negative", type());
 	}
 
-	std::shared_ptr<Object>
+	std::unique_ptr<Object>
 	Object::operator!() const
 	{
-		return std::make_shared<Bool>(!this->is_truthy());
+		return std::make_unique<Bool>(!this->is_truthy());
 	}
 
 	// utility functions

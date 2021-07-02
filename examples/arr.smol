@@ -1,13 +1,13 @@
 # NOTE: Just a wishlist for now
 say "testing array declarations and foreach looping"
 
-# fixed, implicitly initialize all to NIL
-#let a[10]
+# fixed, implicitly initialize all to 0
+let a[10]
+say a
 
-# fixed, initialize all to zero
-#let b[100] = {0}
-# or, initialize first two elements and the rest are NIL
-#let c[100] = {1, 2}
+# fixed, initialize all to 100
+#let b[100] = {100}
+#say b
 
 # fixed, implicit size of 5, can be mixed-type
 [1, 2]

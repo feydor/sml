@@ -36,6 +36,7 @@ namespace Parser {
         Ast::Stmt* statement_or_block();
         Ast::Stmt* block();
         Ast::Stmt* inc_decrement(const std::string &var, const Tok &op);
+        Ast::Stmt* array_decl(const std::string& varname);
 
         template <class ...Ts> bool match(Ts... args);
         void consume(const Token::type& tok, const std::string& expected, const std::string& msg);

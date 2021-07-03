@@ -3,5 +3,6 @@
 
 // TODO: Automate searching and adding lib function header here
 #include "tostr.h"
+#include "fopen.h"
 
 #endif

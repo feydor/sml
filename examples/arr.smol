@@ -6,25 +6,21 @@ let a[10]
 say a
 
 # fixed, initialize all to 100
-#let b[100] = {100}
-#say b
+let b[100] = {100}
+say b
+# [1, 2] # uncommenting this causes say b[1, 2] which is an error
 
 # fixed, implicit size of 5, can be mixed-type
-[1, 2]
-[1, 2]
 
 if ([1, 2] == [1, 2]) say "PASSED, [1, 2] == [1, 2]"
 else say "FAILED, [1, 2] != [1, 2]"
 
 say to_str(["one", false, 65656])
 
+[1, 2]
+[1, 2]
+
 #let d = [1, 2, 3, 4, 5, "six"]
 #for (let i = 0; i < 6; i++)
 #    say d[i]
-
-# foreach loop
-#for (i in d)
-#	say i
-
-
 

@@ -4,10 +4,12 @@
 #include <vector>
 #include <memory>
 #include <stdexcept>
+#include <fstream>
+#include <unordered_map>
 
 namespace Obj {
 enum class Object_t {
-	NUM, STR, BOOL, NIL, ARR, HASH,
+	NUM, STR, BOOL, NIL, ARR, HASH, FILE,
 };
 
 class Number;
@@ -94,7 +96,8 @@ class Array : public Object {
 		bool is_truthy() const override;
 		~Array() override;
 
-		explicit Array(const std::vector<std::shared_ptr<Object>>& objects) : objects_(objects) {};
+		explicit Array(const std::vector<std::shared_ptr<Object>>& objects)
+			: objects_(objects) {};
 		std::shared_ptr<Object> get(size_t i) const;
 		void put(size_t i, std::shared_ptr<Object> obj);
 		void push_back(std::shared_ptr<Object> obj);
@@ -102,6 +105,30 @@ class Array : public Object {
 		bool compare(const Array& other) const;
 	private:
 		std::vector<std::shared_ptr<Object>> objects_;
+};
+
+class File : public Object {
+	public:
+		Object_t type() const override;
+		std::string to_str() const override;
+		bool is_truthy() const override;
+
+		explicit File(const std::string& fname, const std::string& modes_str);
+		std::uintmax_t size() const;
+		std::string read() const;
+		//std::vector<std::string> get_lines() const;
+		bool is_open() const;
+		void close();
+	private:
+		std::ifstream file_;
+		std::ios_base::openmode mode_;
+		std::string fname_;
+		std::uintmax_t size_;
+		bool is_open_ = false;
+
+		void parse_modes(const std::string& modes_str);
+		bool mode_set(std::unordered_map<char, bool>& mode_select, const char mode);
+		void set_mode(const std::ios_base::openmode& mode);
 };
 
 }

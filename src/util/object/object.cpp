@@ -220,6 +220,7 @@ namespace Obj {
 			case Object_t::ARR: return "Array";
 			case Object_t::HASH: return "Hash";
 			case Object_t::NIL: return "Nil";
+			case Object_t::FILE: return "File";
 		}
 	}
 

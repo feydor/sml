@@ -17,6 +17,7 @@ lexer::lexer(std::string const& src) : src(src)
     this->keywords.emplace("or", Token::OR);
     this->keywords.emplace("say", Token::SAY);
     this->keywords.emplace("ret", Token::RETURN);
+    this->keywords.emplace("return", Token::RETURN);
     this->keywords.emplace("true", Token::TRUE);
     this->keywords.emplace("let", Token::LET);
     this->keywords.emplace("while", Token::WHILE);
@@ -92,7 +93,6 @@ lexer::scan_tokens()
                 // ignore whitespace
                 break;
             case '\n':
-                // add_token(EOL);
                 this->line++;
                 break;
             case '"': str(); break;

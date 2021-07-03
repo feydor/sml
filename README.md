@@ -44,5 +44,7 @@ pascal(15) # 1 14 91 364 1001 2002 3003 3432 3003 2002 1001 364 91 14 1
         - object/ - the SMOL primitive definition.
     - smol.cpp - the main entry point for (wip) REPL and file execution.
 ## TODO
+- error: identifier followed by a left bracket, even separated by newlines, glob together as a single array subscript expression. I.E. say b \n\n\n\n\n [1, 2] := say b[1, 2]
+    - fix: some sort of line ending character, likely a newline.
 - wishlist: builtin functions such as getc(), putc(), fopen(), etc.
 - wishlist: brainfsck interpreter in SMOL.

@@ -1,5 +1,6 @@
 #ifndef SMOL_OBJECT_H
 #define SMOL_OBJECT_H
+//#include "ffi.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -7,19 +8,23 @@
 #include <fstream>
 #include <unordered_map>
 
+class FFInterface;
+
 namespace Obj {
 enum class Object_t {
 	NUM, STR, BOOL, NIL, ARR, HASH, FILE,
 };
-
 class Number;
+class Array;
 
-class Object {
+class Object : public std::enable_shared_from_this<Object> {
 	public:
 		virtual Object_t type() const = 0;
 		virtual std::string to_str() const = 0; // used to compare Arrays' contents
 		virtual bool is_truthy() const = 0;
 		virtual ~Object() = default;
+		bool has_method(const std::string& name) const;
+		std::shared_ptr<Object> invoke_method(const Array* call) const;
 
 		// Binary operators
 		std::unique_ptr<Object> operator+(const Object& other) const;
@@ -28,6 +33,7 @@ class Object {
 		std::unique_ptr<Object> operator/(const Object& other) const;
 		std::unique_ptr<Object> operator%(const Object& other) const;
 		std::shared_ptr<Object> operator[](const Object& other) const;
+		std::shared_ptr<Object> dot_operator(const Object& right) const;
 
 		// Conditional operators
 		std::unique_ptr<Object> operator&&(const Object& other) const;
@@ -48,6 +54,11 @@ class Object {
 		static std::string type_str(Object_t type);
 		std::runtime_error type_error(const std::string& msg, Object_t, Object_t) const;
 		std::runtime_error type_error(const std::string& msg, Object_t) const;
+		std::runtime_error notamethod(const std::string& name) const;
+		std::unordered_map<std::string, FFInterface*> methods() const;
+
+	protected:
+		std::unordered_map<std::string, FFInterface*> methods_;
 };
 
 class Number : public Object {
@@ -69,7 +80,7 @@ class String : public Object {
 		std::string to_str() const override;
 		bool is_truthy() const override;
 
-		explicit String(const std::string& val) : val_(val) {};
+		explicit String(const std::string& val);
 		std::string str() const;
 		size_t size() const;
 		bool compare(const String& other) const;
@@ -103,6 +114,7 @@ class Array : public Object {
 		void push_back(std::shared_ptr<Object> obj);
 		size_t size() const;
 		bool compare(const Array& other) const;
+		std::shared_ptr<Object> begin() const;
 	private:
 		std::vector<std::shared_ptr<Object>> objects_;
 };

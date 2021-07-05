@@ -111,6 +111,18 @@ namespace Ast {
             std::string name_;
     };
 
+    class MethodExpr : public Expr {
+        public:
+            explicit MethodExpr(std::string name) : name_(std::move(name)) {};
+            ~MethodExpr() override;
+            std::shared_ptr<Obj::Object> eval() override;
+            std::string to_str() const override;
+            void add_arg(Expr* expr);
+        private:
+            std::vector<Expr*> args_;
+            std::string name_;
+    };
+
     class Arr : public Expr {
         public:
             explicit Arr(std::vector<Expr*> exprs) : exprs_(std::move(exprs)) {};

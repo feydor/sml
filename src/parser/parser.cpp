@@ -1,7 +1,5 @@
 /* parser.cpp - Recursive descent parser - See GRAMMER.txt for overview */
 #include "parser.h"
-#include "smol_error.h"
-#include "fntable.h"
 #include <tuple>
 #include <iostream>
 
@@ -29,19 +27,7 @@ parser::statement()
 {
     // parse user-defined fn and add to FnTable
     if (match(Token::FN)) {
-        consume(Token::IDENTIFIER, "an identifier", "unexpected token");
-        std::string ident = std::string(prev().to_str());
-        consume(Token::LEFT_PAREN, "(", "unexpected character");
-
-        UserFn* userfn = new UserFn(ident);
-        while (!match(Token::RIGHT_PAREN)) {
-            consume(Token::IDENTIFIER, "an identifier", "unexpected token");
-            userfn->add_argname(prev().to_str());
-            match(Token::COMMA);
-        }
-
-        userfn->set_body(statement_or_block());
-        FnTable::set_fn(userfn);
+        FnTable::set_fn(userfn());
         return nullptr; // return empty statement, trash it
     }
 
@@ -263,23 +249,29 @@ parser::unary()
 Ast::Expr*
 parser::call()
 {
-    Ast::Expr* expr = primary();
+    Ast::Expr* expr = member_access();
     std::string name(prev().to_str()); // TODO: Make sure this is an identifier only
 
     if (match(Token::LEFT_PAREN)) {
         auto fn_expr = new Ast::FnExpr(name);
-        int argc = 0;
-        while (!match(Token::RIGHT_PAREN)) {
-            auto param = expression();
-            fn_expr->add_arg(param);
-            argc++;
-
-            //if (argc >= 128)
-            //    ; // TODO: show an error
-
-            match(Token::COMMA);
-        }
+        add_exprs_as_args<Ast::FnExpr>(fn_expr);
         return fn_expr;
+    }
+    return expr;
+}
+
+Ast::Expr*
+parser::member_access()
+{
+    Ast::Expr* expr = primary();
+    // std::string object_name(prev().to_str());
+    while(match(Token::DOT)) {
+        Tok op = prev();
+        consume(Token::IDENTIFIER, "an identifier", "unexpected token");
+        auto method = new Ast::MethodExpr(prev().to_str());
+        if (match(Token::LEFT_PAREN))
+            add_exprs_as_args<Ast::MethodExpr>(method);
+        expr = new Ast::Binary(expr, op, method);
     }
     return expr;
 }
@@ -317,11 +309,8 @@ parser::primary()
         while (!match(Token::RIGHT_BRACKET)) {
             exprs.push_back(expression());
             match(Token::COMMA);
-            argc++;
-            /*
-            if (argc > 255)
-                throw some error
-            */
+            if (++argc >= MAXFNARGS)
+                throw too_many_args();
         }
         return new Ast::Arr(exprs);
     }
@@ -386,6 +375,38 @@ parser::array_decl(const std::string& varname)
 
     values.resize(size, std::make_shared<Obj::Number>(val));
     return new Ast::AsgmtStmt(varname, new Ast::Literal(std::make_shared<Obj::Array>(values)));
+}
+
+FFInterface*
+parser::userfn()
+{
+    consume(Token::IDENTIFIER, "an identifier", "unexpected token");
+    std::string ident = std::string(prev().to_str());
+    consume(Token::LEFT_PAREN, "(", "unexpected character");
+
+    UserFn* userfn = new UserFn(ident);
+    while (!match(Token::RIGHT_PAREN)) {
+        consume(Token::IDENTIFIER, "an identifier", "unexpected token");
+        userfn->add_argname(prev().to_str());
+        match(Token::COMMA);
+    }
+
+    userfn->set_body(statement_or_block());
+    return userfn;
+}
+
+template <typename T>
+void
+parser::add_exprs_as_args(T* fnexpr)
+{
+    int argc = 0;
+    while (!match(Token::RIGHT_PAREN)) {
+        auto param = expression();
+        fnexpr->add_arg(param);
+        if (++argc >= MAXFNARGS)
+            throw too_many_args();
+        match(Token::COMMA);
+    }
 }
 
 /**
@@ -468,6 +489,13 @@ bool
 parser::at_end()
 {
     return peek().type() == Token::_EOF;
+}
+
+Smol::SyntaxError
+parser::too_many_args()
+{
+    return Smol::SyntaxError("too many arguments", "<= " + std::to_string(MAXFNARGS),
+        peek().to_str(), prev().line());
 }
 
 }

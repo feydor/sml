@@ -5,7 +5,6 @@
 
 
 namespace Obj {
-
 	Object_t
 	Number::type() const
 	{

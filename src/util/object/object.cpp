@@ -1,5 +1,7 @@
 #include "object.h"
+#include "ffi.h"
 #include <cmath>  // for std::fmod
+#include <iostream>
 
 namespace Obj {
 	
@@ -76,6 +78,19 @@ namespace Obj {
 		if (type() == Object_t::ARR && other.type() == Object_t::NUM)
 			return ((Array*)a)->get(((Number*)b)->num());
 		throw type_error("Cannot subscript", type(), other.type());
+	}
+
+	std::shared_ptr<Object>
+	Object::dot_operator(const Object& right) const
+	{
+		if (right.type() == Object_t::ARR) {
+			auto membercall = dynamic_cast<const Array*>(&right);
+			if (has_method(membercall->begin()->to_str()))
+				return invoke_method(membercall);
+			else
+				throw notamethod(membercall->begin()->to_str());
+		}
+		throw type_error("Invalid member/method call", type(), right.type());
 	}
 
 	// Conditional operators
@@ -224,6 +239,31 @@ namespace Obj {
 		}
 	}
 
+	bool
+	Object::has_method(const std::string& name) const
+	{
+		return methods_.find(name) != methods_.end();
+	}
+
+	std::shared_ptr<Object>
+	Object::invoke_method(const Array* methodcall) const
+	{
+		auto name = methodcall->begin()->to_str();
+		auto method = methods_.find(name)->second;
+		std::vector<std::shared_ptr<Object>> args;
+		args.push_back(std::const_pointer_cast<Object>(shared_from_this()));
+		for (size_t i = 0; i < methodcall->size(); ++i)
+			args.push_back(methodcall->get(i));
+		/*
+		for (const auto& obj : methodcall)
+			args.push_back(obj->to_str());
+			*/
+		args.erase(args.begin()); // NOTE: inefficient for large numbers of args
+		for (const auto& arg : args)
+			std::cout << arg->to_str() << std::endl;
+		return method->invoke(args);
+	}
+
 	// binary error
 	std::runtime_error
 	Object::type_error(const std::string& msg, Object_t t1, Object_t t2) const
@@ -238,6 +278,13 @@ namespace Obj {
 	{
 		return std::runtime_error("error: " + msg + " '" +
 			Object::type_str(t1) + "'.");
+	}
+
+	std::runtime_error
+	Object::notamethod(const std::string& name) const
+	{
+		return std::runtime_error("error: '" + name + "' is not a member of "
+			+ this->to_str() + "'.");
 	}
 
 }

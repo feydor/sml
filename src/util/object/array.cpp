@@ -59,6 +59,12 @@ namespace Obj {
 		return true;
 	}
 
+	std::shared_ptr<Object>
+	Array::begin() const
+	{
+		return objects_[0];
+	}
+
 	Array::~Array()
 	{
 		/*

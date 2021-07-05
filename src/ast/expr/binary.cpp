@@ -16,6 +16,7 @@ Binary::eval()
         case Token::STAR: return *left * *right;
         case Token::PERCENT: return *left % *right;
         case Token::LEFT_BRACKET: return (*left)[*right];
+        case Token::DOT: return left->dot_operator(*right);
         default:
             throw std::runtime_error("Operator '" + op_.to_str() + "' is unimplemented.");
     }

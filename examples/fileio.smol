@@ -2,10 +2,13 @@
 let file = fopen("smol.cpp", "i")
 say file
 
-if (!file.is_open())
-    say "file failed to open"
-if (file)
-    say "file is open"
+let str = "b"
+say str.size()
+
+#if (!file.is_open())
+#    say "file failed to open"
+#if (file)
+#    say "file is open"
 #let contents = file.read()
 #let size = file.size()
 

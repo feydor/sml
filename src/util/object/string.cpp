@@ -1,6 +1,11 @@
 #include "object.h"
+#include "libstr.h"
 
 namespace Obj {
+	String::String(const std::string& val) : val_(val)
+	{
+		methods_.emplace("size", new Lib::String::size());
+	};
 
 	Object_t
 	String::type() const

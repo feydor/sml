@@ -24,7 +24,7 @@ exe = executable(
   'smol', 
   src,
   include_directories: inc,
-  install : true
+  install : true,
 )
 
 test('basic', exe)

@@ -20,6 +20,7 @@ namespace Lib {
 		std::shared_ptr<Obj::Object>
 		size::invoke(std::vector<std::shared_ptr<Obj::Object>> args)
 		{
+			check_nargs(args, 1);
 			auto this_str = std::dynamic_pointer_cast<Obj::String>(args[0]);
 			return std::make_shared<Obj::Number>(this_str->size());
 		}

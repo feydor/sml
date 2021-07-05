@@ -9,23 +9,32 @@ namespace Obj {
 	std::unique_ptr<Object>
 	Object::operator+(const Object& other) const
 	{
-		const Object* a = this;
-		const Object* b = &other;
 		if (type() == Object_t::NUM) {
-			if (other.type() == Object_t::NUM)
-				return std::make_unique<Number>(((Number*)a)->num() + ((Number*)b)->num());
-			else if (other.type() == Object_t::STR)
-				return std::make_unique<String>(((Number*)a)->to_str() + ((String*)b)->str());
+			auto a = dynamic_cast<const Number*>(this);
+			if (other.type() == Object_t::NUM) {
+				auto b = dynamic_cast<const Number*>(&other);
+				return std::make_unique<Number>(a->num() + b->num());
+			}
+			else if (other.type() == Object_t::STR) {
+				auto b = dynamic_cast<const String*>(&other);
+				return std::make_unique<String>(a->to_str() + b->str());
+			}
 		}
 		else if (type() == Object_t::STR) {
-			if (other.type() == Object_t::STR)
-				return std::make_unique<String>(((String*)a)->str() + ((String*)b)->str());
-			else if (other.type() == Object_t::NUM)
-				return std::make_unique<String>(((String*)a)->str() + ((Number*)b)->to_str());
+			auto a = dynamic_cast<const String*>(this);
+			if (other.type() == Object_t::STR) {
+				auto b = dynamic_cast<const String*>(&other);
+				return std::make_unique<String>(a->str() + b->str());
+			}
+			else if (other.type() == Object_t::NUM) {
+				auto b = dynamic_cast<const Number*>(&other);
+				return std::make_unique<String>(a->str() + b->to_str());
+			}
 		}
-		else if (type() == Object_t::BOOL) {
-			if (other.type() == Object_t::BOOL)
-				return std::make_unique<Bool>(((Bool*)a)->bol() && ((Bool*)b)->bol());
+		else if (type() == Object_t::BOOL && other.type() == Object_t::BOOL) {
+			auto a = dynamic_cast<const Bool*>(this);
+			auto b = dynamic_cast<const Bool*>(&other);
+			return std::make_unique<Bool>(a->bol() && b->bol());
 		}
 		throw type_error("Cannot add", type(), other.type());
 	}
@@ -33,50 +42,55 @@ namespace Obj {
 	std::unique_ptr<Object>
 	Object::operator-(const Object& other) const
 	{
-		const Object* a = this;
-		const Object* b = &other;
-		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_unique<Number>(((Number*)a)->num() - ((Number*)b)->num());
+		if (type() == Object_t::NUM && other.type() == Object_t::NUM) {
+			auto a = dynamic_cast<const Number*>(this);
+			auto b = dynamic_cast<const Number*>(&other);
+			return std::make_unique<Number>(a->num() - b->num());
+		}
 		throw type_error("Cannot subtract", type(), other.type());
 	}
 
 	std::unique_ptr<Object>
 	Object::operator*(const Object& other) const
 	{
-		const Object* a = this;
-		const Object* b = &other;
-		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_unique<Number>(((Number*)a)->num() * ((Number*)b)->num());
+		if (type() == Object_t::NUM && other.type() == Object_t::NUM) {
+			auto a = dynamic_cast<const Number*>(this);
+			auto b = dynamic_cast<const Number*>(&other);
+			return std::make_unique<Number>(a->num() * b->num());
+		}
 		throw type_error("Cannot multiply", type(), other.type());
 	}
 
 	std::unique_ptr<Object>
 	Object::operator/(const Object& other) const
 	{
-		const Object* a = this;
-		const Object* b = &other;
-		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_unique<Number>(((Number*)a)->num() / ((Number*)b)->num());
+		if (type() == Object_t::NUM && other.type() == Object_t::NUM) {
+			auto a = dynamic_cast<const Number*>(this);
+			auto b = dynamic_cast<const Number*>(&other);
+			return std::make_unique<Number>(a->num() / b->num());
+		}
 		throw type_error("Cannot divide", type(), other.type());
 	}
 
 	std::unique_ptr<Object>
 	Object::operator%(const Object& other) const
 	{
-		const Object* a = this;
-		const Object* b = &other;
-		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_unique<Number>(std::fmod(((Number*)a)->num(), ((Number*)b)->num()));
+		if (type() == Object_t::NUM && other.type() == Object_t::NUM) {
+			auto a = dynamic_cast<const Number*>(this);
+			auto b = dynamic_cast<const Number*>(&other);
+			return std::make_unique<Number>(std::fmod(a->num(), b->num()));
+		}
 		throw type_error("Cannot mod", type(), other.type());
 	}
 
 	std::shared_ptr<Object>
 	Object::operator[](const Object& other) const
 	{
-		const Object* a = this;
-		const Object* b = &other;
-		if (type() == Object_t::ARR && other.type() == Object_t::NUM)
-			return ((Array*)a)->get(((Number*)b)->num());
+		if (type() == Object_t::ARR && other.type() == Object_t::NUM) {
+			auto a = dynamic_cast<const Array*>(this);
+			auto b = dynamic_cast<const Number*>(&other);
+			return a->get(b->num());
+		}
 		throw type_error("Cannot subscript", type(), other.type());
 	}
 
@@ -97,8 +111,6 @@ namespace Obj {
 	std::unique_ptr<Object>
 	Object::operator==(const Object& other) const
 	{
-		const Object* a = this;
-		const Object* b = &other;
 		if (type() == Object_t::NUM) {
 			auto a = dynamic_cast<const Number*>(this);
 			if (other.type() == Object_t::NUM) {
@@ -110,16 +122,23 @@ namespace Obj {
 				return std::make_unique<Bool>(a->is_truthy() == b->bol());
 			}
 		} else if (type() == Object_t::BOOL) {
-			if (other.type() == Object_t::BOOL)
-				return std::make_unique<Bool>(((Bool*)a)->bol() == ((Bool*)b)->bol());
-			else if (other.type() == Object_t::NUM)
-				return std::make_unique<Bool>(((Bool*)a)->bol() == ((Number*)b)->is_truthy());
-		} else if (type() == Object_t::STR) {
-			if (other.type() == Object_t::STR)
-				return std::make_unique<Bool>(((String*)a)->compare(*(String*)b));
-		} else if (type() == Object_t::ARR) {
-			if (other.type() == Object_t::ARR)
-				return std::make_unique<Bool>(((Array*)a)->compare(*(Array*)b));
+			auto a = dynamic_cast<const Bool*>(this);
+			if (other.type() == Object_t::BOOL) {
+				auto b = dynamic_cast<const Bool*>(&other);
+				return std::make_unique<Bool>(a->bol() == b->bol());
+			}
+			else if (other.type() == Object_t::NUM) {
+				auto b = dynamic_cast<const Number*>(&other);
+				return std::make_unique<Bool>(a->bol() == b->is_truthy());
+			}
+		} else if (type() == Object_t::STR && other.type() == Object_t::STR) {
+			auto a = dynamic_cast<const String*>(this);
+			auto b = dynamic_cast<const String*>(&other);
+			return std::make_unique<Bool>(a->compare(*b));
+		} else if (type() == Object_t::ARR && other.type() == Object_t::ARR) {
+			auto a = dynamic_cast<const Array*>(this);
+			auto b = dynamic_cast<const Array*>(&other);
+			return std::make_unique<Bool>(a->compare(*b));
 		}
 		throw type_error("Cannot compare(==)", type(), other.type());
 	}
@@ -127,26 +146,35 @@ namespace Obj {
 	std::unique_ptr<Object>
 	Object::operator!=(const Object& other) const
 	{
-		const Object* a = this;
-		const Object* b = &other;
 		if (type() == Object_t::NUM) {
-			if (other.type() == Object_t::NUM)
-				return std::make_unique<Bool>(((Number*)a)->num() != ((Number*)b)->num());
-			else if (other.type() == Object_t::BOOL)
-				return std::make_unique<Bool>(((Number*)a)->is_truthy() != ((Bool*)b)->bol());
+			auto a = dynamic_cast<const Number*>(this);
+			if (other.type() == Object_t::NUM) {
+				auto b = dynamic_cast<const Number*>(&other);
+				return std::make_unique<Bool>(a->num() != b->num());
+			}
+			else if (other.type() == Object_t::BOOL) {
+				auto b = dynamic_cast<const Bool*>(&other);
+				return std::make_unique<Bool>(a->is_truthy() != b->bol());
+			}
 		} else if (type() == Object_t::BOOL) {
-			if (other.type() == Object_t::BOOL)
-				return std::make_unique<Bool>(((Bool*)a)->bol() != ((Bool*)b)->bol());
-			else if (other.type() == Object_t::NUM)
-				return std::make_unique<Bool>(((Bool*)a)->bol() != ((Number*)b)->is_truthy());
-		} else if (type() == Object_t::STR) {
-			if (other.type() == Object_t::STR)
-				return std::make_unique<Bool>(((String*)a)->compare(*(String*)b));
-		} else if (type() == Object_t::ARR) {
-			if (other.type() == Object_t::ARR)
-				return std::make_unique<Bool>(((Array*)a)->compare(*(Array*)b));
+			auto a = dynamic_cast<const Bool*>(this);
+			if (other.type() == Object_t::BOOL) {
+				auto b = dynamic_cast<const Bool*>(&other);
+				return std::make_unique<Bool>(a->bol() != b->bol());
+			}
+			else if (other.type() == Object_t::NUM) {
+				auto b = dynamic_cast<const Number*>(&other);
+				return std::make_unique<Bool>(a->bol() != b->is_truthy());
+			}
+		} else if (type() == Object_t::STR && other.type() == Object_t::STR) {
+			auto a = dynamic_cast<const String*>(this);
+			auto b = dynamic_cast<const String*>(&other);
+			return std::make_unique<Bool>(a->compare(*b));
+		} else if (type() == Object_t::ARR && other.type() == Object_t::ARR) {
+			auto a = dynamic_cast<const String*>(this);
+			auto b = dynamic_cast<const String*>(&other);
+			return std::make_unique<Bool>(a->compare(*b));
 		}
-
 		throw type_error("Cannot compare(!=)", type(), other.type());
 	}
 
@@ -165,10 +193,11 @@ namespace Obj {
 	std::unique_ptr<Object>
 	Object::operator<(const Object& other) const
 	{
-		const Object* a = this;
-		const Object* b = &other;
-		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_unique<Bool>(((Number*)a)->num() < ((Number*)b)->num());
+		if (type() == Object_t::NUM && other.type() == Object_t::NUM) {
+			auto a = dynamic_cast<const Number*>(this);
+			auto b = dynamic_cast<const Number*>(&other);
+			return std::make_unique<Bool>(a->num() < b->num());
+		}
 		throw type_error("Cannot compare(<)", type(), other.type());
 	}
 
@@ -176,30 +205,33 @@ namespace Obj {
 	std::unique_ptr<Object>
 	Object::operator<=(const Object& other) const
 	{
-		const Object* a = this;
-		const Object* b = &other;
-		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_unique<Bool>(((Number*)a)->num() <= ((Number*)b)->num());
+		if (type() == Object_t::NUM && other.type() == Object_t::NUM) {
+			auto a = dynamic_cast<const Number*>(this);
+			auto b = dynamic_cast<const Number*>(&other);
+			return std::make_unique<Bool>(a->num() <= b->num());
+		}
 		throw type_error("Cannot compare(<=)", type(), other.type());
 	}
 
 	std::unique_ptr<Object>
 	Object::operator>(const Object& other) const
 	{
-		const Object* a = this;
-		const Object* b = &other;
-		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_unique<Bool>(((Number*)a)->num() > ((Number*)b)->num());
+		if (type() == Object_t::NUM && other.type() == Object_t::NUM) {
+			auto a = dynamic_cast<const Number*>(this);
+			auto b = dynamic_cast<const Number*>(&other);
+			return std::make_unique<Bool>(a->num() > b->num());
+		}
 		throw type_error("Cannot compare(>)", type(), other.type());
 	}
 
 	std::unique_ptr<Object>
 	Object::operator>=(const Object& other) const
 	{
-		const Object* a = this;
-		const Object* b = &other;
-		if (type() == Object_t::NUM && other.type() == Object_t::NUM)
-			return std::make_unique<Bool>(((Number*)a)->num() >= ((Number*)b)->num());
+		if (type() == Object_t::NUM && other.type() == Object_t::NUM) {
+			auto a = dynamic_cast<const Number*>(this);
+			auto b = dynamic_cast<const Number*>(&other);
+			return std::make_unique<Bool>(a->num() >= b->num());
+		}
 		throw type_error("Cannot compare(>=)", type(), other.type());
 	}
 
@@ -208,7 +240,7 @@ namespace Obj {
 	Object::operator-() const
 	{
 		if (type() == Object_t::NUM)
-			return std::make_unique<Number>(-((Number*)this)->num());
+			return std::make_unique<Number>(-(dynamic_cast<const Number*>(this))->num());
 		throw type_error("Cannot make negative", type());
 	}
 
@@ -254,10 +286,6 @@ namespace Obj {
 		args.push_back(std::const_pointer_cast<Object>(shared_from_this()));
 		for (size_t i = 0; i < methodcall->size(); ++i)
 			args.push_back(methodcall->get(i));
-		/*
-		for (const auto& obj : methodcall)
-			args.push_back(obj->to_str());
-			*/
 		args.erase(args.begin()+1); // delete methodname, inefficient for large numbers of args
 		return method->invoke(args);
 	}

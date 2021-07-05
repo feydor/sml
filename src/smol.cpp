@@ -22,7 +22,7 @@
 bool SMOL::had_error = false;
 bool SMOL::is_repl = false;
 bool SMOL::benchmark = false;
-std::string SMOL::fname("");
+std::string SMOL::fname;
 
 int main(int argc, char **argv) 
 {

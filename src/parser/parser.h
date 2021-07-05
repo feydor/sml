@@ -18,8 +18,8 @@ namespace Parser {
         static constexpr int MAXFNARGS = 255;
 
         public:
-        explicit parser(std::vector<Tok> tokens)
-            : tokens(std::move(tokens)) {};
+        explicit parser(std::vector<Tok>& tokens)
+            : tokens(tokens) {};
         std::vector<Ast::Stmt*> scan_program();
 
         private:

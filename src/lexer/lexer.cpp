@@ -111,7 +111,7 @@ lexer::scan_tokens()
     }
 
     this->tokens.emplace_back(Token::_EOF, "", this->line);
-    return std::move(this->tokens);
+    return this->tokens;
 }
 
 /* consume the current character */

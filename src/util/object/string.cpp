@@ -5,6 +5,7 @@ namespace Obj {
 	String::String(const std::string& val) : val_(val)
 	{
 		methods_.emplace("size", new Lib::String::size());
+		methods_.emplace("at", new Lib::String::at());
 	};
 
 	Object_t

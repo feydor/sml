@@ -1,0 +1,35 @@
+src/ast/expr/arr.cpp:12:8: style: Consider using std::transform algorithm instead of a raw loop. [useStlAlgorithm]
+   arr.push_back(expr->eval());
+       ^
+src/ast/expr/fn.cpp:14:18: style: Consider using std::transform algorithm instead of a raw loop. [useStlAlgorithm]
+            args.push_back(arg->eval());
+                 ^
+src/ast/expr/fn.cpp:30:17: style: Consider using std::accumulate algorithm instead of a raw loop. [useStlAlgorithm]
+            res += arg->to_str() + ", ";
+                ^
+src/ast/expr/method.cpp:30:17: style: Consider using std::accumulate algorithm instead of a raw loop. [useStlAlgorithm]
+            res += arg->to_str() + ", ";
+                ^
+src/env/env.cpp:60:9: style: Consider using std::accumulate algorithm instead of a raw loop. [useStlAlgorithm]
+    out += var.first + " = " + var.second->to_str() + "\n";
+        ^
+src/env/fntable.cpp:37:13: style: Consider using std::accumulate algorithm instead of a raw loop. [useStlAlgorithm]
+        out += fn_pair.first + "\n";
+            ^
+src/parser/parser.cpp:422:30: style: Consider using std::any_of algorithm instead of a raw loop. [useStlAlgorithm]
+        if (peek_type(type)) {
+                             ^
+src/util/object/array.cpp:16:8: style: Consider using std::accumulate algorithm instead of a raw loop. [useStlAlgorithm]
+   out += "" + obj->to_str() + " ";
+       ^
+src/util/object/array.cpp:35:0: style: The function 'put' is never used. [unusedFunction]
+
+^
+src/util/object/file.cpp:77:0: style: The function 'read' is never used. [unusedFunction]
+
+^
+src/lexer/token.cpp:69:0: style: The function 'type_to_string' is never used. [unusedFunction]
+
+^
+nofile:0:0: information: Cppcheck cannot find all the include files (use --check-config for details) [missingInclude]
+

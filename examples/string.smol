@@ -1,0 +1,9 @@
+say "****** testing String methods ******"
+let str = "a string with 27 characters"
+say (str.size() == 27)
+    ? "PASSED, str is a " + str
+    : "FAILED, str.size() == " + str.size()
+
+say (str.at(2) == "s")
+    ? "PASSED, str.at(2) == " + str.at(2)
+    : "FAILED, str.at(2) == " + str.at(2)

@@ -1,13 +1,12 @@
 #include "expr.h"
+#include <iostream>
 
 namespace Ast {
     std::shared_ptr<Obj::Object>
     MethodExpr::eval()
     {
         // eval the args and push into array,
-        // then, either
-        // 1. turn into a string like name;arg1;arg2;arg3... or
-        // 2. use Object::Array like [name, arg1, arg2, arg3, ...]
+        // then use Object::Array like [name, arg1, arg2, arg3, ...]
         std::vector<std::shared_ptr<Obj::Object>> methodcall = {};
         methodcall.push_back(std::make_shared<Obj::String>(name_));
         for (const auto& arg : args_)

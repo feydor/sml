@@ -2,7 +2,8 @@
 let file = fopen("smol.cpp", "i")
 say file
 
-let str = "b"
+let str = "a string with 27 characters"
+say str
 say str.size()
 
 #if (!file.is_open())

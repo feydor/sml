@@ -258,9 +258,7 @@ namespace Obj {
 		for (const auto& obj : methodcall)
 			args.push_back(obj->to_str());
 			*/
-		args.erase(args.begin()); // NOTE: inefficient for large numbers of args
-		for (const auto& arg : args)
-			std::cout << arg->to_str() << std::endl;
+		args.erase(args.begin()+1); // delete methodname, inefficient for large numbers of args
 		return method->invoke(args);
 	}
 

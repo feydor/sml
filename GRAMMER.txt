@@ -27,8 +27,11 @@
 - additive       -> multiplicative (("-") | "+") multiplicative)*;
 - multiplicative -> unary (("/" | "*" | "%") unary)*;
 - unary          -> ("!" | "-") unary | primary;
-- primary        -> value | fn | var | ("expression")";
-- value          -> NUMBER | STRING | "true" | "false" | "nil";
+- call           -> member_access ("(" args* ")")?
+- member_access  -> primary ("." IDENTIFIER ("(" args* ")")?)*
+- primary        -> value | fn | var | subscript_access | ("expression")";
+- value          -> NUMBER | STRING | ARRAY | "true" | "false" | "nil";
 - fn             -> IDENTIFIER "(" (expression ",")* ")";
 - var            -> IDENTIFIER;
+- subscript_access -> var "[" IDENTIFIER "]"
 

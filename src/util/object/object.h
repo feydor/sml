@@ -129,6 +129,7 @@ class File : public Object {
 		std::uintmax_t size() const;
 		std::string read() const;
 		//std::vector<std::string> get_lines() const;
+		std::string filename() const;
 		bool is_open() const;
 		void close();
 	private:

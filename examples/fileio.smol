@@ -1,15 +1,14 @@
+say "****** testing File methods and library functions ******"
+let file = fopen("src/smol.cpp", "i")
 
-let file = fopen("smol.cpp", "i")
-say file
+if (!file.is_open())
+    say "FAILED, file failed to open"
+else
+    say "PASSED, file path is: " + file.name
 
-let str = "a string with 27 characters"
-say str
-say str.size()
-
-#if (!file.is_open())
-#    say "file failed to open"
-#if (file)
-#    say "file is open"
+# or as an alternative to file.is_open()
+if (file)
+    say "PASSED, file is open"
 #let contents = file.read()
 #let size = file.size()
 

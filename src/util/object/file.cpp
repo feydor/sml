@@ -1,9 +1,9 @@
 #include "object.h"
+#include "libfile.h"
 #include <sstream>
 #include <filesystem>
 
 namespace Obj {
-
 	File::File(const std::string& fname, const std::string& modes_str)
 		: fname_(fname)
 	{
@@ -13,6 +13,9 @@ namespace Obj {
 			is_open_ = true;
 			size_ = std::filesystem::file_size(fname);
 		}
+
+		methods_.emplace("is_open", new Lib::File::is_open());
+		methods_.emplace("name", new Lib::File::name_());
 	};
 
 	void
@@ -45,6 +48,12 @@ namespace Obj {
 
 	std::string
 	File::to_str() const
+	{
+		return "<type File>";
+	}
+
+	std::string
+	File::filename() const
 	{
 		return fname_;
 	}

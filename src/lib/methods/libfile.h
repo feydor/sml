@@ -1,0 +1,25 @@
+#ifndef SMOL_LIBFILE_H
+#define SMOL_LIBFILE_H
+#include "ffi.h"
+
+namespace Lib {
+	namespace File {
+		// method: is_open
+		// prototype: is_open() -> bool
+		class is_open : public FFInterface {
+			public:
+			std::string name() override;
+			std::shared_ptr<Obj::Object> invoke(std::vector<std::shared_ptr<Obj::Object>> args) override;
+		};
+
+		// method: name
+		// prototype: name() -> string
+		class name_ : public FFInterface {
+			public:
+			std::string name() override;
+			std::shared_ptr<Obj::Object> invoke(std::vector<std::shared_ptr<Obj::Object>> args) override;
+		};
+	}
+}
+
+#endif

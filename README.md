@@ -1,5 +1,5 @@
 # SMOL
-A (wip) dynamic language and interpreter, recursive descent parser, AST (abstract syntax tree) walking evaluator. Derivative, kluged up and a first half-serious attempt: *'to err is human, to forgive divine.'*
+A (wip) dynamic language and interpreter with recursive descent parser, AST (abstract syntax tree) walking evaluator, and some object-oriented features (primitives have built-in methods). Derivative, kluged up and a first half-serious attempt.
 
 ## Language definition
 See [GRAMMER.txt](GRAMMER.txt)
@@ -22,10 +22,9 @@ fn pascal(row) {
 }
 
 # just a basic tree recursion I did in SICP js once
-# really slow, about 310 ms on my machine (using option -b when running)
+# really slow, about 310 ms on my machine (use option -b when running)
 fn pascal_calc(row, i) {
-    if (i == 0 or i == row - 1)
-        ret 1;
+    if (i == 0 or i == row - 1) ret 1;
     ret pascal_calc(row - 1, i - 1) + pascal_calc(row - 1, i);
 }
 
@@ -41,7 +40,7 @@ pascal(15) # 1 14 91 364 1001 2002 3003 3432 3003 2002 1001 364 91 14 1
     - lib/ - the foreign function interface (FFI) for user-defined functions and the (wip) prelude.
     - parser/ - creates ASTs recursively.
     - util/ - error handling, (wip) ANSI terminal support.
-        - object/ - the SMOL primitive definition.
+        - object/ - the SMOL primitive types.
     - smol.cpp - the main entry point for (wip) REPL and file execution.
 ## TODO
 - error: identifier followed by a left bracket, even separated by newlines, glob together as a single array subscript expression. I.E. say b \n\n\n\n\n [1, 2] := say b[1, 2]

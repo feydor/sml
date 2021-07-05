@@ -17,17 +17,32 @@ namespace Lib {
 		}
 
 		std::string
-		name_::name()
+		fname::name()
 		{
-			return "name";
+			return "fname";
 		}
 
 		std::shared_ptr<Obj::Object>
-		name_::invoke(std::vector<std::shared_ptr<Obj::Object>> args)
+		fname::invoke(std::vector<std::shared_ptr<Obj::Object>> args)
 		{
 			check_nargs(args, 1);
 			auto this_file = std::dynamic_pointer_cast<Obj::File>(args[0]);
 			return std::make_shared<Obj::String>(this_file->filename());
+		}
+
+		std::string
+		read::name()
+		{
+			return "read";
+		}
+
+		std::shared_ptr<Obj::Object>
+		read::invoke(std::vector<std::shared_ptr<Obj::Object>> args)
+		{
+			check_nargs(args, 1);
+			auto this_file = std::dynamic_pointer_cast<Obj::File>(args[0]);
+
+			return std::make_shared<Obj::String>(this_file->read());
 		}
 	}
 }

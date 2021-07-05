@@ -1,24 +1,23 @@
 say "testing basic function recursion:"
 let res = fact(25)
 if (res == 15511210043330985984000000)
-    say "fact(25) = " + to_str(res)
+    say "PASSED, fact(25) = " + to_str(res)
 else
     say "FAILED, fact(7) != " + to_str(res)
 
 res = fib(22)
 if (res == 17711)
-    say "And the 22nd number in the fibonacci sequence is: " + to_str(res)
+    say "PASSED, the 22nd number in the fibonacci sequence is: " + to_str(res)
 else
     say "FAILED, fib(22) != " + to_str(res)
 
 # naive factorial of n
 fn fact(n) {
-    ret (n == 1) ? 1 : n * fact(n-1);
+    ret (n == 1) ? 1 : n * fact(n-1)
 }
 
 # nth row of the fibonacci sequence
 fn fib(n) {
-    if (n <= 1)
-        ret n;
-    ret fib(n-2) + fib(n-1);
+    if (n <= 1) ret n
+    ret fib(n-2) + fib(n-1)
 }

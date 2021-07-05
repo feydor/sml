@@ -13,8 +13,16 @@ namespace Lib {
 		};
 
 		// method: name
-		// prototype: name() -> string
-		class name_ : public FFInterface {
+		// prototype: fname() -> string
+		class fname : public FFInterface {
+			public:
+			std::string name() override;
+			std::shared_ptr<Obj::Object> invoke(std::vector<std::shared_ptr<Obj::Object>> args) override;
+		};
+
+		// method: read
+		// prototype: read() -> string
+		class read : public FFInterface {
 			public:
 			std::string name() override;
 			std::shared_ptr<Obj::Object> invoke(std::vector<std::shared_ptr<Obj::Object>> args) override;

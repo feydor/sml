@@ -145,6 +145,7 @@ void SMOL::eval(std::string const &src)
     Env::set_var(std::string("PI"), std::make_unique<Obj::Number>(3.14159265359));
     FnTable::set_fn(new Lib::to_str());
     FnTable::set_fn(new Lib::fopen());
+    FnTable::set_fn(new Lib::smol_exit());
 
     std::chrono::system_clock::time_point t1, t2;
     if (SMOL::benchmark) {

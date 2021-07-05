@@ -1,5 +1,5 @@
 fn fact(n) {
-    ret (n < 2) ? 1 : n * fact(n-1);
+    ret (n < 2) ? 1 : n * fact(n-1)
 }
 
 fn inf() {

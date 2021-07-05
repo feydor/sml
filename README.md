@@ -24,8 +24,8 @@ fn pascal(row) {
 # just a basic tree recursion I did in SICP js once
 # really slow, about 310 ms on my machine (use option -b when running)
 fn pascal_calc(row, i) {
-    if (i == 0 or i == row - 1) ret 1;
-    ret pascal_calc(row - 1, i - 1) + pascal_calc(row - 1, i);
+    if (i == 0 or i == row - 1) ret 1
+    ret pascal_calc(row - 1, i - 1) + pascal_calc(row - 1, i)
 }
 
 pascal(15) # 1 14 91 364 1001 2002 3003 3432 3003 2002 1001 364 91 14 1

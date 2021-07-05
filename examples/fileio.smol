@@ -1,16 +1,23 @@
 say "****** testing File methods and library functions ******"
-let file = fopen("src/smol.cpp", "i")
+#let path = "src/lib/methods/libfile.h"
+let path = "examples/fileio.smol"
+let file = fopen(path, "i")
 
-if (!file.is_open())
+if (!file.is_open()) {
     say "FAILED, file failed to open"
-else
-    say "PASSED, file path is: " + file.name
+    exit(-1)
+} else
+    say "PASSED, file path is: " + file.fname
 
 # or as an alternative to file.is_open()
 if (file)
     say "PASSED, file is open"
-#let contents = file.read()
-#let size = file.size()
 
-#for (let i = 0; i < size; i++)
-#    say contents[i]
+say "And now to print this file..."
+let contents = file.read()
+say contents
+
+# the result of file.read() is a string; it can be read character-wise using String's methods
+#for (let i = 0; i < contents.len; i++)
+#    say contents.at(i)
+

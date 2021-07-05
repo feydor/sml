@@ -15,7 +15,8 @@ namespace Obj {
 		}
 
 		methods_.emplace("is_open", new Lib::File::is_open());
-		methods_.emplace("name", new Lib::File::name_());
+		methods_.emplace("fname", new Lib::File::fname());
+		methods_.emplace("read", new Lib::File::read());
 	};
 
 	void
@@ -69,18 +70,6 @@ namespace Obj {
 	{
 		return is_open_;
 	}
-
-	/*
-	std::vector<std::string>
-	File::get_lines() const
-	{
-		if (!file_.is_open()) throw std::ifstream::failure("file is not open.");
-		std::string curr;
-		std::vector<std::string> lines;
-		while (std::getline(file_, curr)) lines.push_back(curr);
-		return lines;
-	}
-	*/
 
 	std::string
 	File::read() const

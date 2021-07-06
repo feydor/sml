@@ -13,7 +13,7 @@ namespace Lib {
 		{
 			check_nargs(args, 1);
 			auto this_file = std::dynamic_pointer_cast<Obj::File>(args[0]);
-			return std::make_shared<Obj::Bool>(this_file->is_open());
+			return std::make_unique<Obj::Bool>(this_file->is_open());
 		}
 
 		std::string
@@ -27,7 +27,7 @@ namespace Lib {
 		{
 			check_nargs(args, 1);
 			auto this_file = std::dynamic_pointer_cast<Obj::File>(args[0]);
-			return std::make_shared<Obj::String>(this_file->filename());
+			return std::make_unique<Obj::String>(this_file->filename());
 		}
 
 		std::string
@@ -41,8 +41,7 @@ namespace Lib {
 		{
 			check_nargs(args, 1);
 			auto this_file = std::dynamic_pointer_cast<Obj::File>(args[0]);
-
-			return std::make_shared<Obj::String>(this_file->read());
+			return std::make_unique<Obj::String>(this_file->read());
 		}
 	}
 }

@@ -1,0 +1,60 @@
+# bfis - a brainfuck interpretor in SMOL
+let MAXCODESIZE = 30000
+let arr[30000]
+let ptr = 0
+let stack[30000]
+let sp = 0
+let jmptbl[30000]
+
+let path = "bfic/hw.b"
+let file = fopen(path, "i")
+
+if (!file) printerr_and_exit("error opening the file")
+let code = file.read()
+
+# first round parse for loop locations
+for (let cp = 0; cp < code.len; cp++) {
+    if (code[cp] == "[") {
+        stack.put(sp, cp)
+        sp++
+    } elif (code[cp] == "]") {
+        if (sp == 0) printerr_and_exit("Unmatched '[' at byte: " + cp)
+        else {
+            sp--
+            jmptbl.put(cp, stack[sp])
+            jmptbl.put(stack[sp], cp)
+        }
+    }
+}
+if (sp > 0) printerr_and_exit("Unmatched '[' at byte:")
+
+# second round parse for eval
+for (let cpp = 0; cpp < code.len; cpp++) {
+    let c = code[cpp]
+    if (c == "+") {
+        let temp = arr[ptr]
+        temp++
+        arr.put(ptr, temp)
+    }
+    elif (c == "-") {
+        let temp = arr[ptr]
+        temp--
+        arr.put(ptr, temp)
+    }
+    elif (c == ">") ptr++
+    elif (c == "<") ptr--
+    elif (c == "[") {
+        if (arr[ptr] == 0) cpp = jmptbl[cpp]
+    }
+    elif (c == "]") {
+        if (arr[ptr]) cpp = jmptbl[cpp]
+    }
+    elif (c == ".") say ascii(arr[ptr])
+    elif (c == ",") say ", not implemented yet"
+    elif (c == "#") for(let i=0;i<36;i++) say arr[i]
+}
+
+fn printerr_and_exit(msg) {
+    say msg
+    exit(1)
+}

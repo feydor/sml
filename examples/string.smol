@@ -8,5 +8,9 @@ say (str.at(2) == "s")
     ? "PASSED, str.at(2) == " + str.at(2)
     : "FAILED, str.at(2) == " + str.at(2)
 
+say (str[2] == "s")
+    ? "PASSED, str[2] == " + str[2]
+    : "FAILED, str[2] == " + str[2]
+
 # methods on string literal works too
 say "a string literal with 35 characters".len()

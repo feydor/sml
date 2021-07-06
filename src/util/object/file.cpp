@@ -5,11 +5,10 @@
 
 namespace Obj {
 	File::File(const std::string& fname, const std::string& modes_str)
-		: fname_(fname)
+		: file_(new std::ifstream(fname)), fname_(fname)
 	{
 		parse_modes(modes_str);
-		file_.open(fname, mode_);
-		if (file_.is_open()) {
+		if (file_->is_open()) {
 			is_open_ = true;
 			size_ = std::filesystem::file_size(fname);
 		}
@@ -18,6 +17,11 @@ namespace Obj {
 		methods_.emplace("fname", new Lib::File::fname());
 		methods_.emplace("read", new Lib::File::read());
 	};
+
+	File::~File()
+	{
+		delete file_;
+	}
 
 	void
 	File::parse_modes(const std::string& modes_str) {
@@ -75,14 +79,8 @@ namespace Obj {
 	File::read() const
 	{
 		std::stringstream buf;
-		buf << file_.rdbuf();
+		buf << file_->rdbuf();
 		return buf.str();
-	}
-
-	void
-	File::close()
-	{
-		file_.close();
 	}
 
 	bool

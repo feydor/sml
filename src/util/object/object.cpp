@@ -91,6 +91,11 @@ namespace Obj {
 			auto b = dynamic_cast<const Number*>(&other);
 			return a->get(b->num());
 		}
+		else if (type() == Object_t::STR && other.type() == Object_t::NUM) {
+			auto a = dynamic_cast<const String*>(this);
+			auto b = dynamic_cast<const Number*>(&other);
+			return a->get(b->num());
+		}
 		throw type_error("Cannot subscript", type(), other.type());
 	}
 

@@ -131,8 +131,26 @@ parser::statement()
         }
     }
 
-    if (match(Token::IDENTIFIER)) {
+    if (peek_type(Token::IDENTIFIER)) {
         // var redefinition (asgmt_stmt) or expr_stmt TODO: (var or fn?)
+        if (peek_next_type(Token::EQUAL)) {
+            match(Token::IDENTIFIER);
+            std::string var = prev().to_str();
+            match(Token::EQUAL);
+            return new Ast::AsgmtStmt(var, expression());
+        } else if (peek_next_type(Token::PLUS_PLUS) || peek_next_type(Token::MINUS_MINUS)) {
+            match(Token::IDENTIFIER);
+            std::string var = prev().to_str();
+            match(Token::PLUS_PLUS, Token::MINUS_MINUS);
+            return inc_decrement(var, prev().first_subtok());
+        }
+        else
+            return new Ast::ExprStmt(expression());
+    }
+
+    /*
+    if (match(Token::IDENTIFIER)) {
+
         std::string var = prev().to_str();
         if (match(Token::EQUAL))
             return new Ast::AsgmtStmt(var, expression());
@@ -147,6 +165,7 @@ parser::statement()
         else // expr_stmt, a standalone identifier whose evaluation is discarded
             return new Ast::ExprStmt(new Ast::Var(var));
     }
+    */
 
     // if none of the above, then expression statement
     return new Ast::ExprStmt(expression());

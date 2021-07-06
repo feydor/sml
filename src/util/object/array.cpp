@@ -1,6 +1,12 @@
 #include "object.h"
+#include "libarr.h"
 
 namespace Obj {
+	Array::Array(const std::vector<std::shared_ptr<Object>>& objects)
+		: objects_(objects)
+	{
+		methods_.emplace("put", new Lib::Array::put());
+	};
 
 	Object_t
 	Array::type() const

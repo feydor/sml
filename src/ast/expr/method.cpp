@@ -7,7 +7,7 @@ namespace Ast {
         // eval the args and push into array,
         // then use Object::Array like [name, arg1, arg2, arg3, ...]
         std::vector<std::shared_ptr<Obj::Object>> methodcall = {};
-        methodcall.push_back(std::make_shared<Obj::String>(name_));
+        methodcall.push_back(std::make_unique<Obj::String>(name_));
         for (const auto& arg : args_)
             methodcall.push_back(arg->eval());
         return std::make_unique<Obj::Array>(methodcall);

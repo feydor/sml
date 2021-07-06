@@ -32,6 +32,13 @@ namespace Obj {
 		return val_;
 	}
 
+	std::shared_ptr<Object>
+	String::get(size_t i) const
+	{
+		std::string char_to_str(1, val_[i]);
+		return std::make_shared<String>(char_to_str);
+	}
+
 	size_t
 	String::size() const
 	{

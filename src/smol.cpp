@@ -146,6 +146,7 @@ void SMOL::eval(std::string const &src)
     FnTable::set_fn(new Lib::to_str());
     FnTable::set_fn(new Lib::fopen());
     FnTable::set_fn(new Lib::smol_exit());
+    FnTable::set_fn(new Lib::ascii());
 
     std::chrono::system_clock::time_point t1, t2;
     if (SMOL::benchmark) {

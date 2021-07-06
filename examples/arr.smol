@@ -7,7 +7,10 @@ say a
 
 # fixed, initialize all to 100
 let b[100] = {100}
-say b
+say "ABOUT TO USE PUTTTTTTT"
+let i = 0
+b.put(i, 999)
+say b[i]
 # [1, 2] # uncommenting this causes say b[1, 2] which is an error
 
 # fixed, implicit size of 5, can be mixed-type

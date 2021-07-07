@@ -7,7 +7,6 @@ say a
 
 # fixed, initialize all to 100
 let b[100] = {100}
-say "ABOUT TO USE PUTTTTTTT"
 let i = 0
 b.put(i, 999)
 say b[i]

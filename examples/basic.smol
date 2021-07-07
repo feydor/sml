@@ -1,10 +1,10 @@
-run_tests()
+run_tests();
 
 # main tests case
 fn run_tests() {
-    say "****** BEGIN basic test cases ******"
-    math_test()
-    var_decl_test()
+    say "****** BEGIN basic test cases ******";
+    math_test();
+    var_decl_test() # commas are unnecessary
     var_redef_test()
     logical_branching_test()
     ternary_test()

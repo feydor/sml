@@ -2,7 +2,7 @@
 A (wip) dynamic language and interpreter with recursive descent parser, AST (abstract syntax tree) walking evaluator, and some object-oriented features (primitives have built-in methods). Derivative, kluged up and a first half-serious attempt.
 
 ## Language definition
-See [GRAMMER.txt](GRAMMER.txt)
+See [GRAMMER.txt](GRAMMER.txt).
 ## Build
 1. Install meson and ninja (https://mesonbuild.com/).
 2. On linux and macos (not tested) run the following: 
@@ -30,6 +30,7 @@ fn pascal_calc(row, i) {
 
 pascal(15) # 1 14 91 364 1001 2002 3003 3432 3003 2002 1001 364 91 14 1
 ```
+see more at [examples](examples/).
 ## Project structure
 - src/
     - ast/

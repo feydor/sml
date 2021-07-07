@@ -38,7 +38,7 @@ parser::statement()
         if (match(Token::SEMICOLON))
             return new Ast::RetStmt(def);
         expr = expression();
-        match(Token::SEMICOLON);
+        match(Token::SEMICOLON); // optional
         return new Ast::RetStmt(expr);
     }
 
@@ -127,7 +127,9 @@ parser::statement()
     // fn_expr
     if (peek_type(Token::IDENTIFIER)) {
         if (peek_next_type(Token::LEFT_PAREN)) {
-            return new Ast::ExprStmt(call());
+            auto fncall = new Ast::ExprStmt(call());
+            match(Token::SEMICOLON);
+            return fncall;
         }
     }
 
@@ -138,6 +140,14 @@ parser::statement()
             std::string var = prev().to_str();
             match(Token::EQUAL);
             return new Ast::AsgmtStmt(var, expression());
+        } else if (peek_next_type(Token::PLUS_EQUAL) || peek_next_type(Token::MINUS_EQUAL)) {
+            match(Token::IDENTIFIER);
+            std::string var = prev().to_str();
+            match(Token::PLUS_EQUAL, Token::MINUS_EQUAL);
+            return new Ast::AsgmtStmt(var,
+                new Ast::Binary(new Ast::Var(var),
+                    prev().first_subtok(), expression())
+            );
         } else if (peek_next_type(Token::PLUS_PLUS) || peek_next_type(Token::MINUS_MINUS)) {
             match(Token::IDENTIFIER);
             std::string var = prev().to_str();
@@ -148,37 +158,19 @@ parser::statement()
             return new Ast::ExprStmt(expression());
     }
 
-    /*
-    if (match(Token::IDENTIFIER)) {
-
-        std::string var = prev().to_str();
-        if (match(Token::EQUAL))
-            return new Ast::AsgmtStmt(var, expression());
-        else if (match(Token::PLUS_EQUAL, Token::MINUS_EQUAL, Token::STAR_EQUAL,
-            Token::SLASH_EQUAL, Token::PERCENT_EQUAL))
-            return new Ast::AsgmtStmt(var,
-                new Ast::Binary(new Ast::Var(var),
-                    prev().first_subtok(), expression())
-            );
-        else if (match(Token::PLUS_PLUS, Token::MINUS_MINUS))
-            return inc_decrement(var, prev().first_subtok());
-        else // expr_stmt, a standalone identifier whose evaluation is discarded
-            return new Ast::ExprStmt(new Ast::Var(var));
-    }
-    */
-
     // if none of the above, then expression statement
-    return new Ast::ExprStmt(expression());
-    /*
-    throw Smol::SyntaxError("expected a statement", "a statement",
-        peek().to_str(), prev().line());
-    */
+    match(Token::SEMICOLON); // optional semicolon
+    auto exprstmt = new Ast::ExprStmt(expression());
+    match(Token::SEMICOLON); // optional semicolon
+    return exprstmt;
 }
 
 Ast::Expr*
 parser::expression()
 {
-    return ternary();
+    auto expr = ternary();
+    match(Token::SEMICOLON); // optional semicolon for all expressions
+    return expr;
 }
 
 Ast::Expr*
@@ -393,6 +385,7 @@ parser::array_decl(const std::string& varname)
     }
 
     values.resize(size, std::make_shared<Obj::Number>(val));
+    match(Token::SEMICOLON); // optional semicolon
     return new Ast::AsgmtStmt(varname, new Ast::Literal(std::make_shared<Obj::Array>(values)));
 }
 

@@ -18,7 +18,7 @@
                  statement | elif_stmt)?;
 - asgmt_stmt  -> "let" IDENTIFIER "="? expression : "["? array_decl : NIL;
 - while_stmt  -> "while" "(" expression ")" statement*;
-- for_stmt    -> "for" "(" (asgmt_stmt)? ";" (cond)? ";" (
+- for_stmt    -> "for" "(" (asgmt_stmt)? ";"? (cond)? ";"? (
                  expression)? ")" statement*;
 - var_redef   -> IDENTIFIER ("=" | "+=" | "-=") expression;
 - var_incdec  -> IDENTIFIER ("++" | "--");

@@ -48,6 +48,8 @@ class Object : public std::enable_shared_from_this<Object> {
 		// Unary operators
 		std::unique_ptr<Object> operator-() const;
 		std::unique_ptr<Object> operator!() const;
+		std::unique_ptr<Object> operator++(int);
+		std::unique_ptr<Object> operator--(int);
 
 		// utility
 		std::string type_str() const;
@@ -69,6 +71,8 @@ class Number : public Object {
 
 		explicit Number(double val) : val_(val) {};
 		double num() const;
+		std::shared_ptr<Object> operator++();
+		std::shared_ptr<Object> operator--();
 	private:
 		double val_;
 		int ndigits(double n) const;

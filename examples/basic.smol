@@ -119,3 +119,4 @@ fn arr_init_test() {
     else
         say "FAILED, d[5] = " + d[6]
 }
+

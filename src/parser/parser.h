@@ -35,6 +35,7 @@ namespace Parser {
         Ast::Expr* unary();
         Ast::Expr* call();
         Ast::Expr* member_access();
+        Ast::Expr* postfix();
         Ast::Expr* primary();
 
         Ast::Stmt* statement_or_block();

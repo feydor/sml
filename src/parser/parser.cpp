@@ -86,11 +86,11 @@ parser::statement()
 
         if (!peek_type(Token::SEMICOLON))
             asgmt = statement();
-        consume(Token::SEMICOLON, ";", "unexpected character");
+        match(Token::SEMICOLON);
 
         if (!peek_type(Token::SEMICOLON))
             cond = expression();
-        consume(Token::SEMICOLON, ";", "unexpected character");
+        match(Token::SEMICOLON);
 
         if (!peek_type(Token::RIGHT_PAREN))
             control = statement();
@@ -148,7 +148,8 @@ parser::statement()
                 new Ast::Binary(new Ast::Var(var),
                     prev().first_subtok(), expression())
             );
-        } else if (peek_next_type(Token::PLUS_PLUS) || peek_next_type(Token::MINUS_MINUS)) {
+        }
+        else if (peek_next_type(Token::PLUS_PLUS) || peek_next_type(Token::MINUS_MINUS)) {
             match(Token::IDENTIFIER);
             std::string var = prev().to_str();
             match(Token::PLUS_PLUS, Token::MINUS_MINUS);
@@ -274,7 +275,7 @@ parser::call()
 Ast::Expr*
 parser::member_access()
 {
-    Ast::Expr* expr = primary();
+    Ast::Expr* expr = postfix();
     // std::string object_name(prev().to_str());
     while(match(Token::DOT)) {
         Tok op = prev();
@@ -283,6 +284,17 @@ parser::member_access()
         if (match(Token::LEFT_PAREN))
             add_exprs_as_args<Ast::MethodExpr>(method);
         expr = new Ast::Binary(expr, op, method);
+    }
+    return expr;
+}
+
+Ast::Expr*
+parser::postfix()
+{
+    Ast::Expr* expr = primary();
+    while (match(Token::PLUS_PLUS, Token::MINUS_MINUS)) {
+        Tok op = prev();
+        expr = new Ast::Unary(op, expr);
     }
     return expr;
 }

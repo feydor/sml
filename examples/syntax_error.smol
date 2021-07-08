@@ -1,6 +1,7 @@
 say "testing deliberate syntax errors:"
 fn error(a) {
-    for (i = 0);
+    for (i) say i
 }
 
-say error("WALRUS")
+#say error("WALRUS")
+

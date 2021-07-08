@@ -32,6 +32,22 @@ namespace Obj {
 		return val_;
 	}
 
+	// prefix increment
+	std::shared_ptr<Object>
+	Number::operator++()
+	{
+		++this->val_;
+		return shared_from_this();
+	}
+
+	// prefix decrement
+	std::shared_ptr<Object>
+	Number::operator--()
+	{
+		--this->val_;
+		return shared_from_this();
+	}
+
 	// gets the number of significant digits post-decimal
 	int
 	Number::ndigits(double n) const

@@ -10,6 +10,7 @@ fn run_tests() {
     mod_test()
     subscript_test()
     equality_test()
+    postfix_test()
     say "****** END operator test cases ******"
 }
 
@@ -74,4 +75,22 @@ fn equality_test() {
 
     if (false == false) say "PASSED, false==false =" + to_str(false==false)
     else say "FAILED, false==false =" + to_str(false==false)
+}
+
+fn postfix_test() {
+    say "*** operator++ (postfix) test ***"
+    let i = 1
+    if (i++ == 1) say "PASSED, i++ evaluates to " + to_str(i-1)
+    else say "FAILED, i++ == 1 =" + to_str(i == 1) + ", i=" + i
+
+    if (i == 2) say "PASSED, i==2 =" + to_str(i == 2)
+    else say "FAILED, i==2 =" + to_str(i == 2) + ", i" + i
+
+    say "*** operator-- (postfix) test ***"
+    let j = 1
+    if (j-- == 1) say "PASSED, j-- evaluates to " + to_str(j+1)
+    else say "FAILED, j-- == 1 =" + to_str(j == 1) + ", j=" + j
+
+    if (j == 0) say "PASSED, j==0 =" + to_str(j == 0)
+    else say "FAILED, j==0 =" + to_str(j == 0) + ", j" + j
 }

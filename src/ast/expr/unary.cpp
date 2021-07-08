@@ -11,6 +11,8 @@ Unary::eval()
 
         case Token::MINUS: return -*x;
         case Token::BANG: return !*x;
+        case Token::PLUS_PLUS: return (*x)++;
+        case Token::MINUS_MINUS: return (*x)--;
         default:
             throw std::runtime_error("Unary: Unexpected operator. " + op_.to_str());
     }

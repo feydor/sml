@@ -255,6 +255,30 @@ namespace Obj {
 		return std::make_unique<Bool>(!this->is_truthy());
 	}
 
+	// postfix increment
+	std::unique_ptr<Object>
+	Object::operator++(int)
+	{
+		if (type() == Object_t::NUM) {
+			Number temp = *dynamic_cast<const Number*>(this);
+			++*dynamic_cast<Number*>(this);
+			return std::make_unique<Number>(temp.num());
+		}
+		throw type_error("Cannot postfix increment (++)", type());
+	}
+
+	// postfix decrement
+	std::unique_ptr<Object>
+	Object::operator--(int)
+	{
+		if (type() == Object_t::NUM) {
+			Number temp = *dynamic_cast<const Number*>(this);
+			--*dynamic_cast<Number*>(this);
+			return std::make_unique<Number>(temp.num());
+		}
+		throw type_error("Cannot postfix decrement (--)", type());
+	}
+
 	// utility functions
 	std::string
 	Object::type_str() const

@@ -29,8 +29,8 @@ for (let cp = 0; cp < code.len; cp++) {
 if (sp > 0) printerr_and_exit("Unmatched '[' at byte:")
 
 # second round parse for eval
-for (let cpp = 0; cpp < code.len; cpp++) {
-    let c = code[cpp]
+for (let i = 0; i < code.len; i++) {
+    let c = code[i]
     if (c == "+") {
         let temp = arr[ptr]
         temp++
@@ -44,14 +44,14 @@ for (let cpp = 0; cpp < code.len; cpp++) {
     elif (c == ">") ptr++
     elif (c == "<") ptr--
     elif (c == "[") {
-        if (arr[ptr] == 0) cpp = jmptbl[cpp]
+        if (arr[ptr] == 0) i = jmptbl[i]
     }
     elif (c == "]") {
-        if (arr[ptr]) cpp = jmptbl[cpp]
+        if (arr[ptr] != 0) i = jmptbl[i]
     }
     elif (c == ".") say ascii(arr[ptr])
     elif (c == ",") say ", not implemented yet"
-    elif (c == "#") for(let i=0;i<36;i++) say arr[i]
+    elif (c == "#") for(let j=0;j<36;j++) say arr[j]
 }
 
 fn printerr_and_exit(msg) {

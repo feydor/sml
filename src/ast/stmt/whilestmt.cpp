@@ -4,6 +4,8 @@
 #include <iostream>
 
 namespace Ast {
+    WhileStmt::WhileStmt(std::unique_ptr<Ast::Expr> cond, std::unique_ptr<Ast::Stmt> body)
+        : cond_(std::move(cond)), body_(std::move(body)) {};
 
     void
     WhileStmt::exec()
@@ -16,8 +18,8 @@ namespace Ast {
 
     WhileStmt::~WhileStmt()
     {
-        delete cond_;
-        delete body_;
+        // delete cond_;
+        // delete body_;
     }
 
 }

@@ -5,10 +5,13 @@
 #include "fntable.h"
 #include <iostream>
 
+UserFn::UserFn(std::string name)
+	: name_(name) {};
+
 void
-UserFn::set_body(Ast::Stmt* body)
+UserFn::set_body(std::unique_ptr<Ast::Stmt> body)
 {
-	body_ = body;
+	body_ = std::move(body);
 }
 
 void
@@ -49,6 +52,6 @@ UserFn::invoke(std::vector<std::shared_ptr<Obj::Object>> args)
 
 UserFn::~UserFn()
 {
-	delete body_;
+	// delete body_;
 }
 

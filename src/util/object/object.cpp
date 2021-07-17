@@ -310,13 +310,13 @@ namespace Obj {
 	Object::invoke_method(const Array* methodcall) const
 	{
 		auto name = methodcall->begin()->to_str();
-		auto method = methods_.find(name)->second;
+		// auto method = methods_.find(name)->second;
 		std::vector<std::shared_ptr<Object>> args;
 		args.push_back(std::const_pointer_cast<Object>(shared_from_this()));
 		for (size_t i = 0; i < methodcall->size(); ++i)
 			args.push_back(methodcall->get(i));
 		args.erase(args.begin()+1); // delete methodname, inefficient for large numbers of args
-		return method->invoke(args);
+		return methods_.find(name)->second->invoke(args);
 	}
 
 	// binary error

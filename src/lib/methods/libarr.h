@@ -1,6 +1,7 @@
 #ifndef SMOL_LIBARR_H
 #define SMOL_LIBARR_H
 #include "ffi.h"
+#include "object.h"
 
 namespace Lib {
 	namespace Array {

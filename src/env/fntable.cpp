@@ -2,22 +2,22 @@
 #include <iostream>
 
 auto FnTable::fn_table =
-    std::unordered_map<std::string, FFInterface*>();
+    std::unordered_map<std::string, std::shared_ptr<FFInterface>>();
 
 void
-FnTable::set_fn(FFInterface* fn)
+FnTable::set_fn(std::shared_ptr<FFInterface> fn)
 {
     fn_table[fn->name()] = fn;
 }
 
 bool
-FnTable::exists(std::string name)
+FnTable::exists(const std::string& name)
 {
     return fn_table.find(name) != fn_table.end();
 }
 
-FFInterface*
-FnTable::get_fn(std::string name)
+std::shared_ptr<FFInterface>
+FnTable::get_fn(const std::string& name)
 {
     if (exists(name))
         return fn_table[name];
@@ -37,11 +37,4 @@ FnTable::to_str()
         out += fn_pair.first + "\n";
     }
     return out;
-}
-
-void
-FnTable::free_fns()
-{
-    for (auto& fn : fn_table)
-        delete fn.second;
 }

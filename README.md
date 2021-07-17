@@ -47,5 +47,7 @@ see more at [examples](examples/).
 - error: identifier followed by a left bracket, even separated by newlines, glob together as a single array subscript expression. I.E. say b \n\n\n\n\n [1, 2] := say b[1, 2]
     - fix: some sort of line ending character, likely a newline.
 - error: array subscripting is always an r-value, handle cases where it is an l-value
+- error: this doesn't work ((c = 123 - 123) == 0)
+    - fix: make assignment an expression that evaluates to the identifier's value post-op
 - wishlist: builtin functions such as getc(), putc(), fopen(), etc.
 - wishlist: brainfsck interpreter in SMOL.

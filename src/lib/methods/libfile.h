@@ -1,6 +1,7 @@
 #ifndef SMOL_LIBFILE_H
 #define SMOL_LIBFILE_H
 #include "ffi.h"
+#include "object.h"
 
 namespace Lib {
 	namespace File {

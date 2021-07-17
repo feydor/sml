@@ -11,6 +11,6 @@ namespace Lib {
 	fopen::invoke(std::vector<std::shared_ptr<Obj::Object>> args)
 	{
 		check_nargs(args, 2);
-		return std::make_unique<Obj::File>(args[0]->to_str(), args[1]->to_str());
+		return std::make_shared<Obj::File>(args[0]->to_str(), args[1]->to_str());
 	}
 }

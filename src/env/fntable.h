@@ -8,14 +8,13 @@
 // and their values, if defined
 class FnTable {
     public:
-    static void set_fn(FFInterface* fn);
-    static FFInterface* get_fn(std::string name);
-    static bool exists(std::string name);
+    static void set_fn(std::shared_ptr<FFInterface> fn);
+    static std::shared_ptr<FFInterface> get_fn(const std::string& name);
+    static bool exists(const std::string& name);
     static std::string to_str();
-    static void free_fns();
 
     private:
-    static std::unordered_map<std::string, FFInterface*> fn_table;
+    static std::unordered_map<std::string, std::shared_ptr<FFInterface>> fn_table;
 };
 
 #endif

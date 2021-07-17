@@ -1,6 +1,7 @@
 #ifndef SMOL_EXIT_H
 #define SMOL_EXIT_H
 #include "ffi.h"
+#include "object.h"
 
 namespace Lib {
 	class smol_exit : public FFInterface {

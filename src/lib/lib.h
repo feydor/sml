@@ -5,6 +5,7 @@
 #include "tostr.h"
 #include "fopen.h"
 #include "exit.h"
+#include "getchar.h"
 #include "ascii.h"
 
 #endif

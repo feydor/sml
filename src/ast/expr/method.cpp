@@ -7,16 +7,16 @@ namespace Ast {
         // eval the args and push into array,
         // then use Object::Array like [name, arg1, arg2, arg3, ...]
         std::vector<std::shared_ptr<Obj::Object>> methodcall = {};
-        methodcall.push_back(std::make_unique<Obj::String>(name_));
+        methodcall.push_back(std::make_shared<Obj::String>(name_));
         for (const auto& arg : args_)
             methodcall.push_back(arg->eval());
-        return std::make_unique<Obj::Array>(methodcall);
+        return std::make_shared<Obj::Array>(methodcall);
     }
 
     void
-    MethodExpr::add_arg(Expr* arg)
+    MethodExpr::add_arg(std::unique_ptr<Expr> arg)
     {
-        args_.push_back(arg);
+        args_.push_back(std::move(arg));
     }
 
     std::string
@@ -30,7 +30,9 @@ namespace Ast {
 
     MethodExpr::~MethodExpr()
     {
+        /*
         for (auto& arg : args_)
             delete arg;
+        */
     }
 }

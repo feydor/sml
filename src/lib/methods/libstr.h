@@ -1,6 +1,7 @@
 #ifndef SMOL_LIBSTR_H
 #define SMOL_LIBSTR_H
 #include "ffi.h"
+#include "object.h"
 
 namespace Lib {
 	namespace String {

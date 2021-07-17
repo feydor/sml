@@ -2,6 +2,9 @@
 #include <iostream>
 
 namespace Ast {
+	SayStmt::SayStmt(std::unique_ptr<Ast::Expr> expr)
+        : expr_(std::move(expr)) {};
+
 	void
 	SayStmt::exec()
 	{
@@ -22,6 +25,6 @@ namespace Ast {
 
 	SayStmt::~SayStmt()
 	{
-		delete expr_;
+		// delete expr_;
 	}
 }

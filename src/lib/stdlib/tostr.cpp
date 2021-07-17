@@ -11,6 +11,6 @@ namespace Lib {
 	to_str::invoke(std::vector<std::shared_ptr<Obj::Object>> args)
 	{
 		check_nargs(args, 1);
-		return std::make_unique<Obj::String>(args[0]->to_str());
+		return std::make_shared<Obj::String>(args[0]->to_str());
 	}
 }

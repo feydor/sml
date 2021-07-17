@@ -24,8 +24,10 @@ Binary::eval()
 
 Binary::~Binary()
 {
+    /*
     delete left_;
     delete right_;
+    */
 }
 
 std::string

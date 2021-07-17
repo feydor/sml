@@ -2,6 +2,8 @@
 #include <iostream>
 
 namespace Ast {
+	IfStmt::IfStmt(std::unique_ptr<Ast::Expr> cond, std::unique_ptr<Ast::Stmt> body)
+        : cond_(std::move(cond)), body_(std::move(body)) {};
 
 	void
 	IfStmt::exec()
@@ -14,16 +16,16 @@ namespace Ast {
 	}
 
     void
-    IfStmt::add_else(Stmt* els)
+    IfStmt::add_else(std::unique_ptr<Ast::Stmt> els)
     {
-    	elses_.push_back(els);
+    	elses_.push_back(std::move(els));
     }
 
 	IfStmt::~IfStmt()
 	{
-		delete cond_;
-		delete body_;
-		for (auto& els : elses_)
-			delete els;
+		// delete cond_;
+		// delete body_;
+		/*for (auto& els : elses_)
+			delete els;*/
 	}
 }

@@ -6,96 +6,90 @@
 #include <memory>
 
 namespace Ast {
-    class Expr;
+    // class Expr;
 
     class Stmt {
         public:
-        virtual void exec() = 0;
-        virtual ~Stmt() = default;
+            virtual void exec() = 0;
+            virtual ~Stmt() = default;
     };
 
     class ExprStmt : public Stmt {
         public:
-        explicit ExprStmt(Ast::Expr *expr)
-            : expr_(expr) {};
-        void exec() override;
-        ~ExprStmt() override;
+            explicit ExprStmt(std::unique_ptr<Ast::Expr> expr);
+            void exec() override;
+            ~ExprStmt() override;
 
         private:
-        Ast::Expr* expr_;
+            std::unique_ptr<Ast::Expr> expr_;
     };
 
     class SayStmt : public Stmt {
         public:
-        explicit SayStmt(Ast::Expr* expr)
-            : expr_(expr) {};
-        void exec() override;
-        ~SayStmt() override;
+            explicit SayStmt(std::unique_ptr<Ast::Expr> expr);
+            void exec() override;
+            ~SayStmt() override;
 
         private:
-        Ast::Expr* expr_;
+            std::unique_ptr<Ast::Expr> expr_;
     };
 
      class BlockStmt : public Stmt {
         public:
-        BlockStmt() {};
-        void exec() override;
-        ~BlockStmt() override;
+            BlockStmt() {};
+            void exec() override;
+            ~BlockStmt() override;
 
-        // TODO: friend with parser
-        void add_stmt(Stmt *stmt);
+            // TODO: friend with parser
+            void add_stmt(std::unique_ptr<Ast::Stmt> stmt);
 
         private:
-        std::vector<Stmt *> stmts_;
+            std::vector<std::unique_ptr<Ast::Stmt>> stmts_;
     };
 
     class IfStmt : public Stmt {
         public:
-        IfStmt(Ast::Expr* cond, Stmt* body)
-            : cond_(cond), body_(body) {};
-        void exec() override;
-        ~IfStmt() override;
-        void add_else(Stmt* els);
+            IfStmt(std::unique_ptr<Ast::Expr> cond, std::unique_ptr<Ast::Stmt> body);
+            void exec() override;
+            ~IfStmt() override;
+            void add_else(std::unique_ptr<Ast::Stmt> els);
 
         private:
-        Ast::Expr* cond_;
-        Stmt* body_;
-        std::vector<Stmt *> elses_;
+            std::unique_ptr<Ast::Expr> cond_;
+            std::unique_ptr<Ast::Stmt> body_;
+            std::vector<std::unique_ptr<Ast::Stmt>> elses_;
     };
 
     class AsgmtStmt : public Stmt {
         public:
-        AsgmtStmt(const std::string& name, Ast::Expr* expr)
-            : name_(name), expr_(expr) {};
-        void exec() override;
-        ~AsgmtStmt() override;
+            AsgmtStmt(const std::string& name, std::unique_ptr<Ast::Expr> expr);
+            void exec() override;
+            ~AsgmtStmt() override;
 
         private:
-        std::string name_;
-        Ast::Expr* expr_;
+            std::string name_;
+            std::unique_ptr<Ast::Expr> expr_;
     };
 
     class WhileStmt : public Stmt {
         public:
-        WhileStmt(Ast::Expr* cond, Stmt* body)
-            : cond_(cond), body_(body) {};
-        void exec() override;
-        ~WhileStmt() override;
+            WhileStmt(std::unique_ptr<Ast::Expr> cond, std::unique_ptr<Ast::Stmt> body);
+            void exec() override;
+            ~WhileStmt() override;
 
         private:
-        Ast::Expr* cond_;
-        Stmt* body_;
+            std::unique_ptr<Ast::Expr> cond_;
+            std::unique_ptr<Ast::Stmt> body_;
     };
 
     class RetStmt : public Stmt {
         public:
-        explicit RetStmt(Ast::Expr* expr)
-            : expr_(expr) {};
-        void exec() override;
-        ~RetStmt() override;
+            explicit RetStmt(std::unique_ptr<Ast::Expr> expr);
+            void exec() override;
+            ~RetStmt() override;
 
         private:
-        Ast::Expr* expr_;
+            std::unique_ptr<Ast::Expr> expr_;
     };
 }
 

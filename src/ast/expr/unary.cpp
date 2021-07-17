@@ -5,6 +5,7 @@ namespace Ast {
 std::shared_ptr<Obj::Object>
 Unary::eval()
 {
+    // right is deleted here
     auto x = right_->eval();
 
     switch (op_.type()) {
@@ -22,7 +23,7 @@ Unary::eval()
 
 Unary::~Unary()
 {
-    delete right_;
+    // delete right_;
 }
 
 std::string

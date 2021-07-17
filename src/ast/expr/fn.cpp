@@ -13,13 +13,13 @@ namespace Ast {
         for (const auto& arg : args_)
             args.push_back(arg->eval());
 
-        return FnTable::get_fn(name_)->invoke(args);
+        return FnTable::get_fn(name_)->invoke(std::move(args));
     }
 
     void
-    FnExpr::add_arg(Expr* arg)
+    FnExpr::add_arg(std::unique_ptr<Expr> arg)
     {
-        args_.push_back(arg);
+        args_.push_back(std::move(arg));
     }
 
     std::string
@@ -33,7 +33,9 @@ namespace Ast {
 
     FnExpr::~FnExpr()
     {
+        /*
         for (auto& arg : args_)
             delete arg;
+        */
     }
 }

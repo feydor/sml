@@ -12,6 +12,4 @@ namespace Ast {
     {
         return val_->to_str();
     }
-
-    Literal::~Literal() {}
 }

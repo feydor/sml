@@ -1,6 +1,6 @@
 #ifndef SMOL_OBJECT_H
 #define SMOL_OBJECT_H
-//#include "ffi.h"
+#include "ffi.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -8,7 +8,7 @@
 #include <fstream>
 #include <unordered_map>
 
-class FFInterface;
+// class FFInterface;
 
 namespace Obj {
 enum class Object_t {
@@ -57,10 +57,10 @@ class Object : public std::enable_shared_from_this<Object> {
 		std::runtime_error type_error(const std::string& msg, Object_t, Object_t) const;
 		std::runtime_error type_error(const std::string& msg, Object_t) const;
 		std::runtime_error notamethod(const std::string& name) const;
-		std::unordered_map<std::string, FFInterface*> methods() const;
+		std::unordered_map<std::string, std::shared_ptr<FFInterface>> methods() const;
 
 	protected:
-		std::unordered_map<std::string, FFInterface*> methods_;
+		std::unordered_map<std::string, std::shared_ptr<FFInterface>> methods_;
 };
 
 class Number : public Object {
@@ -133,7 +133,6 @@ class File : public Object {
 		~File() override;
 		std::uintmax_t size() const;
 		std::string read() const;
-		//std::vector<std::string> get_lines() const;
 		std::string filename() const;
 		bool is_open() const;
 	private:

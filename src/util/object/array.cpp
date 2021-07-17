@@ -5,7 +5,7 @@ namespace Obj {
 	Array::Array(const std::vector<std::shared_ptr<Object>>& objects)
 		: objects_(objects)
 	{
-		methods_.emplace("put", new Lib::Array::put());
+		methods_.insert(std::make_pair("put", std::make_shared<Lib::Array::put>()));
 	};
 
 	Object_t
@@ -40,13 +40,13 @@ namespace Obj {
 	void
 	Array::put(size_t i, std::shared_ptr<Object> obj)
 	{
-		objects_[i] = obj;
+		objects_[i] = std::move(obj);
 	}
 
 	void
 	Array::push_back(std::shared_ptr<Object> obj)
 	{
-		objects_.push_back(obj);
+		objects_.push_back(std::move(obj));
 	}
 
 	size_t

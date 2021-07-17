@@ -1,6 +1,7 @@
 #ifndef SMOL_TOSTR_H
 #define SMOL_TOSTR_H
 #include "ffi.h"
+#include "object.h"
 
 namespace Lib {
 	class to_str : public FFInterface {

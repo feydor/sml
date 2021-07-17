@@ -1,6 +1,7 @@
 #ifndef SMOL_ASCII_H
 #define SMOL_ASCII_H
 #include "ffi.h"
+#include "object.h"
 
 namespace Lib {
 	class ascii : public FFInterface {

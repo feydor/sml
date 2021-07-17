@@ -132,9 +132,8 @@ void SMOL::eval(std::string const &src)
     std::vector<Tok> tokens = lexer.scan_tokens();
 
     Parser::parser parser(tokens);
-    std::vector<Ast::Stmt *> stmts;
     try {
-        stmts = parser.scan_program();
+        parser.scan_program(); // parser holds ownership of all statements
     } catch (Smol::SyntaxError& e) {
         e.print();
         exit(1);
@@ -143,20 +142,20 @@ void SMOL::eval(std::string const &src)
     // set prelude constants and library functions
     // TODO: Move to prelude.h
     Env::set_var(std::string("PI"), std::make_unique<Obj::Number>(3.14159265359));
-    FnTable::set_fn(new Lib::to_str());
-    FnTable::set_fn(new Lib::fopen());
-    FnTable::set_fn(new Lib::smol_exit());
-    FnTable::set_fn(new Lib::ascii());
+    FnTable::set_fn(std::make_unique<Lib::to_str>());
+    FnTable::set_fn(std::make_unique<Lib::fopen>());
+    FnTable::set_fn(std::make_unique<Lib::smol_exit>());
+    FnTable::set_fn(std::make_unique<Lib::smol_getchar>());
+    FnTable::set_fn(std::make_unique<Lib::ascii>());
 
     std::chrono::system_clock::time_point t1, t2;
     if (SMOL::benchmark) {
         t1 = std::chrono::high_resolution_clock::now();
     }
 
-    for (auto& stmt : stmts) {
+    for (const auto& stmt : parser.view_ast()) {
         try {
             stmt->exec();
-            delete stmt;
         } catch (const std::runtime_error& e) {
             std::cout << e.what() << std::endl;
         } catch (Obj::Object& ret_outside_fn) {
@@ -170,6 +169,4 @@ void SMOL::eval(std::string const &src)
         std::chrono::duration<double, std::milli> ms_double = t2 - t1;
         std::cout << "Duration: " << ms_double.count() << "ms\n";
     }
-
-    FnTable::free_fns();
 }

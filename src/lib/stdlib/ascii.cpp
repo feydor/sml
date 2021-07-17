@@ -14,7 +14,7 @@ namespace Lib {
 		check_nargs(args, 1);
 		auto num = std::dynamic_pointer_cast<Obj::Number>(args[0])->num();
 		std::string char_to_string(1, num);
-		return std::make_unique<Obj::String>(char_to_string);
+		return std::make_shared<Obj::String>(char_to_string);
 	}
 
 	std::string

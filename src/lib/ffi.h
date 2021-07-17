@@ -1,10 +1,16 @@
 /* ffi.h - foreign function interface (FFI) base and built-in subclasses */
 #ifndef SMOL_FFI_H
 #define SMOL_FFI_H
-#include "object.h"
-#include "stmt.h"
+// #include "object.h"
+// #include "stmt.h"
 #include <string>
 #include <vector>
+#include <memory>
+
+namespace Obj {
+	class Object;
+}
+namespace Ast { class Stmt; }
 
 class FFInterface {
 	public:
@@ -16,9 +22,8 @@ class FFInterface {
 
 class UserFn : public FFInterface {
 	public:
-	explicit UserFn(std::string name)
-		: name_(std::move(name)) {};
-	void set_body(Ast::Stmt* body);
+	explicit UserFn(std::string name);
+	void set_body(std::unique_ptr<Ast::Stmt> body);
 	void add_argname(std::string name);
 	std::string name() override;
 	std::shared_ptr<Obj::Object> invoke(std::vector<std::shared_ptr<Obj::Object>> args) override;
@@ -27,7 +32,7 @@ class UserFn : public FFInterface {
 	private:
 	std::string name_;
 	std::vector<std::string> argnames_;
-	Ast::Stmt* body_ = nullptr;
+	std::unique_ptr<Ast::Stmt> body_;
 };
 
 #endif

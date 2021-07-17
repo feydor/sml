@@ -2,6 +2,9 @@
 
 
 namespace Ast{
+	RetStmt::RetStmt(std::unique_ptr<Ast::Expr> expr)
+        : expr_(std::move(expr)) {};
+
 	void
 	RetStmt::exec()
 	{
@@ -10,6 +13,6 @@ namespace Ast{
 
 	RetStmt::~RetStmt()
 	{
-		delete expr_;
+		// delete expr_;
 	}
 }

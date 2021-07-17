@@ -6,6 +6,7 @@ namespace Ast {
 std::shared_ptr<Obj::Object>
 Cond::eval()
 {
+	// left and right are deleted here
 	auto left = left_->eval();
 	auto right = right_->eval();
 
@@ -24,8 +25,10 @@ Cond::eval()
 
 Cond::~Cond()
 {
+	/*
 	delete left_;
 	delete right_;
+	*/
 }
 
 std::string

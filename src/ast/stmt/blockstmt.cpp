@@ -14,14 +14,15 @@ namespace Ast {
 
     BlockStmt::~BlockStmt()
     {
+        /*
         for (auto& stmt : stmts_)
-            delete stmt;
+            delete stmt;*/
     }
 
     void
-    BlockStmt::add_stmt(Stmt *stmt)
+    BlockStmt::add_stmt(std::unique_ptr<Stmt> stmt)
     {
-        stmts_.push_back(stmt);
+        stmts_.push_back(std::move(stmt));
     }
 
 }

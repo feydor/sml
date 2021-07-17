@@ -10,8 +10,10 @@ namespace Ast {
 
     Asgmt::~Asgmt()
     {
+        /*
         delete left_;
         delete right_;
+        */
     }
 
     std::string

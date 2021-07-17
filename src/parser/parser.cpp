@@ -4,25 +4,25 @@
 #include <iostream>
 
 namespace Parser {
-std::vector<Ast::Stmt *>
-parser::scan_program()
+
+const std::vector<std::unique_ptr<Ast::Stmt>>&
+parser::view_ast() const
 {
-    return program();
+    return ast;
 }
 
 // entry point to building AST (abstract syntax tree)
-std::vector<Ast::Stmt *>
-parser::program()
+void
+parser::scan_program()
 {
     while (!at_end()) {
         auto stmt = statement();
         if (stmt != nullptr) // ignore null statements, which are empty statements
-            stmts.push_back(stmt);
+            ast.push_back(std::move(stmt));
     }
-    return stmts;
 }
 
-Ast::Stmt *
+std::unique_ptr<Ast::Stmt>
 parser::statement()
 {
     // parse user-defined fn and add to FnTable
@@ -33,29 +33,24 @@ parser::statement()
 
     if (match(Token::RETURN)) {
         // two types: ret; (implicit return NIL) or ret ident;
-        Ast::Literal* def = new Ast::Literal(std::make_shared<Obj::Number>(0.0));
-        Ast::Expr* expr = nullptr;
+        auto default_ret = std::make_unique<Ast::Literal>(std::make_unique<Obj::Number>(0.0));
         if (match(Token::SEMICOLON))
-            return new Ast::RetStmt(def);
-        expr = expression();
+            return std::make_unique<Ast::RetStmt>(std::move(default_ret));
+        auto expr = expression();
         match(Token::SEMICOLON); // optional
-        return new Ast::RetStmt(expr);
+        return std::make_unique<Ast::RetStmt>(std::move(expr));
     }
 
     if (match(Token::SAY))
-        return new Ast::SayStmt(expression());
+        return std::make_unique<Ast::SayStmt>(expression());
 
     if (match(Token::IF, Token::ELSE_IF)) {
-        Ast::Expr* cond = nullptr;
-        Ast::Stmt* body = nullptr;
-        Ast::IfStmt* ifstmt = nullptr;
-
         consume(Token::LEFT_PAREN, "(", "unexpected character");
-        cond = expression();
+        auto cond = expression();
         consume(Token::RIGHT_PAREN, ")", "unexpected character");
-        body = statement_or_block();
+        auto body = statement_or_block();
 
-        ifstmt = new Ast::IfStmt(cond, body);
+        auto ifstmt = std::make_unique<Ast::IfStmt>(std::move(cond), std::move(body));
 
         if (match(Token::ELSE))
             ifstmt->add_else(statement_or_block());
@@ -65,22 +60,17 @@ parser::statement()
     }
 
     if (match(Token::WHILE)) {
-        Ast::Expr* cond = nullptr;
-        Ast::Stmt* body = nullptr;
-
         consume(Token::LEFT_PAREN, "(", "unexpected character");
-        cond = expression();
+        auto cond = expression();
         consume(Token::RIGHT_PAREN, ")", "unexpected character");
-        body = statement_or_block();
-        return new Ast::WhileStmt(cond, body);
+        auto body = statement_or_block();
+        return std::make_unique<Ast::WhileStmt>(std::move(cond), std::move(body));
     }
 
     if (match(Token::FOR)) {
-        Ast::Stmt* asgmt = nullptr;
-        Ast::Expr* cond = nullptr;
-        Ast::Stmt* control = nullptr;
-        Ast::Stmt* body = nullptr;
-        Ast::BlockStmt* final_body = nullptr;
+        std::unique_ptr<Ast::Stmt> asgmt;
+        std::unique_ptr<Ast::Expr> cond;
+        std::unique_ptr<Ast::Stmt> control;
 
         consume(Token::LEFT_PAREN, "(", "unexpected character");
 
@@ -95,21 +85,21 @@ parser::statement()
         if (!peek_type(Token::RIGHT_PAREN))
             control = statement();
         consume(Token::RIGHT_PAREN, ")", "unexpected character");
-        body = statement_or_block();
+        auto body = statement_or_block();
 
         // desugar into while loop
-        final_body = new Ast::BlockStmt();
-        final_body->add_stmt(body);
+        auto final_body = std::make_unique<Ast::BlockStmt>();;
+        final_body->add_stmt(std::move(body));
         if (control)
-            final_body->add_stmt(control);
+            final_body->add_stmt(std::move(control));
 
         // if no cond, infinite loop
         if (!cond)
-            cond = new Ast::Literal(std::make_shared<Obj::Bool>(true));
+            cond = std::make_unique<Ast::Literal>(std::make_unique<Obj::Bool>(true));
 
         if (asgmt)
-            stmts.push_back(asgmt);
-        return new Ast::WhileStmt(cond, final_body);
+            ast.push_back(std::move(asgmt));
+        return std::make_unique<Ast::WhileStmt>(std::move(cond), std::move(final_body));
     }
 
     if (match(Token::LET)) {
@@ -117,17 +107,18 @@ parser::statement()
         std::string var = prev().to_str();
 
         if (match(Token::EQUAL))
-            return new Ast::AsgmtStmt(var, expression());
+            return std::make_unique<Ast::AsgmtStmt>(var, expression());
         else if (match(Token::LEFT_BRACKET))
             return array_decl(var);
         else
-            return new Ast::AsgmtStmt(var, new Ast::Literal(std::make_shared<Obj::Number>(0.0))); // NIL
+            return std::make_unique<Ast::AsgmtStmt>(var,
+                std::make_unique<Ast::Literal>(std::make_unique<Obj::Number>(0.0))); // NIL
     }
 
     // fn_expr
     if (peek_type(Token::IDENTIFIER)) {
         if (peek_next_type(Token::LEFT_PAREN)) {
-            auto fncall = new Ast::ExprStmt(call());
+            auto fncall = std::make_unique<Ast::ExprStmt>(call());
             match(Token::SEMICOLON);
             return fncall;
         }
@@ -139,13 +130,13 @@ parser::statement()
             match(Token::IDENTIFIER);
             std::string var = prev().to_str();
             match(Token::EQUAL);
-            return new Ast::AsgmtStmt(var, expression());
+            return std::make_unique<Ast::AsgmtStmt>(var, expression());
         } else if (peek_next_type(Token::PLUS_EQUAL) || peek_next_type(Token::MINUS_EQUAL)) {
             match(Token::IDENTIFIER);
             std::string var = prev().to_str();
             match(Token::PLUS_EQUAL, Token::MINUS_EQUAL);
-            return new Ast::AsgmtStmt(var,
-                new Ast::Binary(new Ast::Var(var),
+            return std::make_unique<Ast::AsgmtStmt>(var,
+                std::make_unique<Ast::Binary>(std::make_unique<Ast::Var>(var),
                     prev().first_subtok(), expression())
             );
         }
@@ -156,17 +147,17 @@ parser::statement()
             return inc_decrement(var, prev().first_subtok());
         }
         else
-            return new Ast::ExprStmt(expression());
+            return std::make_unique<Ast::ExprStmt>(expression());
     }
 
     // if none of the above, then expression statement
     match(Token::SEMICOLON); // optional semicolon
-    auto exprstmt = new Ast::ExprStmt(expression());
+    auto exprstmt = std::make_unique<Ast::ExprStmt>(expression());
     match(Token::SEMICOLON); // optional semicolon
     return exprstmt;
 }
 
-Ast::Expr*
+std::unique_ptr<Ast::Expr>
 parser::expression()
 {
     auto expr = ternary();
@@ -174,153 +165,158 @@ parser::expression()
     return expr;
 }
 
-Ast::Expr*
+std::unique_ptr<Ast::Expr>
 parser::ternary()
 {
-    Ast::Expr* expr = logical();
+    auto expr = logical();
     while (match(Token::QUESTION)) {
         Tok op = prev();
-        Ast::Expr* iftrue = expression();
+        auto iftrue = expression();
         consume(Token::COLON, ":", "unexpected token");
-        Ast::Expr* iffalse = expression();
-        expr = new Ast::Ternary(expr, op, iftrue, iffalse);
+        auto iffalse = expression();
+        expr = std::make_unique<Ast::Ternary>(
+            std::move(expr), op, std::move(iftrue), std::move(iffalse)
+        );
     }
     return expr;
 }
 
-Ast::Expr*
+std::unique_ptr<Ast::Expr>
 parser::logical()
 {
-    Ast::Expr* expr = equality();
+    auto expr = equality();
     while (match(Token::OR, Token::AND)) {
         Tok op = prev();
-        Ast::Expr* right = equality();
-        expr = new Ast::Cond(expr, op, right);
+        auto right = equality();
+        expr = std::make_unique<Ast::Cond>(std::move(expr), op, std::move(right));
     }
     return expr;
 }
 
-Ast::Expr*
+std::unique_ptr<Ast::Expr>
 parser::equality()
 {
-    Ast::Expr* expr = comparison();
+    auto expr = comparison();
     while (match(Token::BANG_EQUAL, Token::EQUAL_EQUAL)) {
         Tok op = prev();
-        Ast::Expr* right = comparison();
-        expr = new Ast::Cond(expr, op, right);
+        auto right = comparison();
+        expr = std::make_unique<Ast::Cond>(std::move(expr), op, std::move(right));
     }
     return expr;
 }
-Ast::Expr*
+
+std::unique_ptr<Ast::Expr>
 parser::comparison()
 {
-    Ast::Expr* expr = term();
+    auto expr = term();
     while (match(Token::GREATER, Token::GREATER_EQUAL,
         Token::LESS, Token::LESS_EQUAL)) {
         Tok op = prev();
-        Ast::Expr* right = term();
-        expr = new Ast::Cond(expr, op, right);
+        auto right = term();
+        expr = std::make_unique<Ast::Cond>(std::move(expr), op, std::move(right));
     }
     return expr;
 }
 
-Ast::Expr*
+std::unique_ptr<Ast::Expr>
 parser::term()
 {
-    Ast::Expr* expr = factor();
+    auto expr = factor();
     while (match(Token::MINUS, Token::PLUS)) {
         Tok op = prev();
-        Ast::Expr* right = factor();
-        expr = new Ast::Binary(expr, op, right);
-    }
-    return expr;
-}
-Ast::Expr*
-parser::factor()
-{
-    Ast::Expr* expr = unary();
-    while (match(Token::SLASH, Token::STAR, Token::PERCENT)) {
-        Tok op = prev();
-        Ast::Expr* right = unary();
-        expr =  new Ast::Binary(expr, op, right);
+        auto right = factor();
+        expr = std::make_unique<Ast::Binary>(std::move(expr), op, std::move(right));
     }
     return expr;
 }
 
-Ast::Expr*
+
+std::unique_ptr<Ast::Expr>
+parser::factor()
+{
+    auto expr = unary();
+    while (match(Token::SLASH, Token::STAR, Token::PERCENT)) {
+        Tok op = prev();
+        auto right = unary();
+        expr =  std::make_unique<Ast::Binary>(std::move(expr), op, std::move(right));
+    }
+    return expr;
+}
+
+std::unique_ptr<Ast::Expr>
 parser::unary()
 {
     if (match(Token::BANG, Token::MINUS)) {
         Tok op = prev();
-        Ast::Expr* right = unary();
-        return new Ast::Unary(op, right);
+        auto right = unary();
+        return std::make_unique<Ast::Unary>(op, std::move(right));
     }
     return call();
 }
 
-Ast::Expr*
+std::unique_ptr<Ast::Expr>
 parser::call()
 {
-    Ast::Expr* expr = member_access();
+    auto expr = member_access();
     std::string name(prev().to_str()); // TODO: Make sure this is an identifier only
 
     if (match(Token::LEFT_PAREN)) {
-        auto fn_expr = new Ast::FnExpr(name);
-        add_exprs_as_args<Ast::FnExpr>(fn_expr);
+        auto fn_expr = std::make_unique<Ast::FnExpr>(name);
+        add_exprs_as_args<Ast::FnExpr>(fn_expr.get());
         return fn_expr;
     }
     return expr;
 }
 
-Ast::Expr*
+std::unique_ptr<Ast::Expr>
 parser::member_access()
 {
-    Ast::Expr* expr = postfix();
+    auto expr = postfix();
     // std::string object_name(prev().to_str());
     while(match(Token::DOT)) {
         Tok op = prev();
         consume(Token::IDENTIFIER, "an identifier", "unexpected token");
-        auto method = new Ast::MethodExpr(prev().to_str());
+        auto method = std::make_unique<Ast::MethodExpr>(prev().to_str());
         if (match(Token::LEFT_PAREN))
-            add_exprs_as_args<Ast::MethodExpr>(method);
-        expr = new Ast::Binary(expr, op, method);
+            add_exprs_as_args<Ast::MethodExpr>(method.get());
+        expr = std::make_unique<Ast::Binary>(std::move(expr), op, std::move(method));
     }
     return expr;
 }
 
-Ast::Expr*
+std::unique_ptr<Ast::Expr>
 parser::postfix()
 {
-    Ast::Expr* expr = primary();
+    auto expr = primary();
     while (match(Token::PLUS_PLUS, Token::MINUS_MINUS)) {
         Tok op = prev();
-        expr = new Ast::Unary(op, expr);
+        expr = std::make_unique<Ast::Unary>(op, std::move(expr));
     }
     return expr;
 }
 
-Ast::Expr*
+std::unique_ptr<Ast::Expr>
 parser::primary()
 {
-    Ast::Expr* expr = nullptr;
+    std::unique_ptr<Ast::Expr> expr;
 
     if (match(Token::FALSE))
-        return new Ast::Literal(std::make_shared<Obj::Bool>(false));
+        return std::make_unique<Ast::Literal>(std::make_unique<Obj::Bool>(false));
     if (match(Token::TRUE))
-        return new Ast::Literal(std::make_shared<Obj::Bool>(true));
+        return std::make_unique<Ast::Literal>(std::make_unique<Obj::Bool>(true));
     if (match(Token::NIL))
-        return new Ast::Literal(std::make_shared<Obj::Number>(0.0));
+        return std::make_unique<Ast::Literal>(std::make_unique<Obj::Number>(0.0));
     if (match(Token::NUMBER))
-        return new Ast::Literal(std::make_shared<Obj::Number>(prev().get_num()));
+        return std::make_unique<Ast::Literal>(std::make_unique<Obj::Number>(prev().get_num()));
     if (match(Token::STRING))
-        return new Ast::Literal(std::make_shared<Obj::String>(prev().get_str()));
+        return std::make_unique<Ast::Literal>(std::make_unique<Obj::String>(prev().get_str()));
     if (match(Token::IDENTIFIER)) {
-        expr = new Ast::Var(prev().to_str());
+        expr = std::make_unique<Ast::Var>(prev().to_str());
         if (match(Token::LEFT_BRACKET)) {
             Tok op = prev();
-            Ast::Expr* right = primary();
+            auto right = primary();
             consume(Token::RIGHT_BRACKET, "]", "unexpected character");
-            expr = new Ast::Binary(expr, op, right);
+            expr = std::make_unique<Ast::Binary>(std::move(expr), op, std::move(right));
         }
         return expr;
     }
@@ -328,14 +324,14 @@ parser::primary()
     // array primitive
     if (match(Token::LEFT_BRACKET)) {
         int argc = 0;
-        std::vector<Ast::Expr*> exprs;
+        std::vector<std::unique_ptr<Ast::Expr>> exprs;
         while (!match(Token::RIGHT_BRACKET)) {
             exprs.push_back(expression());
             match(Token::COMMA);
             if (++argc >= MAXFNARGS)
                 throw too_many_args();
         }
-        return new Ast::Arr(exprs);
+        return std::make_unique<Ast::Arr>(std::move(exprs));
     }
 
     // expression in parens
@@ -349,10 +345,10 @@ parser::primary()
     return expr;
 }
 
-Ast::Stmt*
+std::unique_ptr<Ast::Stmt>
 parser::block()
 {
-    auto block = new Ast::BlockStmt();
+    auto block = std::make_unique<Ast::BlockStmt>();
     match(Token::LEFT_BRACE);
 
     while (!match(Token::RIGHT_BRACE))
@@ -361,7 +357,7 @@ parser::block()
     return block;
 }
 
-Ast::Stmt*
+std::unique_ptr<Ast::Stmt>
 parser::statement_or_block()
 {
     return peek().type() == Token::LEFT_BRACE
@@ -371,16 +367,18 @@ parser::statement_or_block()
 
 // syntactic sugar gen for post/pre incrementer/decrementer
 // x++ as x = x + 1 which evals to x+1
-Ast::Stmt*
+std::unique_ptr<Ast::Stmt>
 parser::inc_decrement(const std::string &var, const Tok &op)
 {
-    return new Ast::AsgmtStmt(var,
-        new Ast::Binary(new Ast::Var(var), op, new Ast::Literal(std::make_shared<Obj::Number>(1.0)))
+    return std::make_unique<Ast::AsgmtStmt>(var,
+        std::make_unique<Ast::Binary>(
+            std::make_unique<Ast::Var>(var), op, std::make_unique<Ast::Literal>(std::make_unique<Obj::Number>(1.0))
+        )
     );
 }
 
 /* array declaration with a size and optional initializer ie let a[100] = {100} */
-Ast::Stmt*
+std::unique_ptr<Ast::Stmt>
 parser::array_decl(const std::string& varname)
 {
     consume(Token::NUMBER, "a number", "an unexpected token");
@@ -395,20 +393,24 @@ parser::array_decl(const std::string& varname)
         val = prev().get_num();
         consume(Token::RIGHT_BRACE, "}", "unexpected character");
     }
-
-    values.resize(size, std::make_shared<Obj::Number>(val));
+    values.resize(size);
+    for (size_t i = 0; i < size; ++i)
+        values.push_back(std::make_shared<Obj::Number>(val));
+    
     match(Token::SEMICOLON); // optional semicolon
-    return new Ast::AsgmtStmt(varname, new Ast::Literal(std::make_shared<Obj::Array>(values)));
+    return std::make_unique<Ast::AsgmtStmt>(
+        varname, std::make_unique<Ast::Literal>(std::make_unique<Obj::Array>(std::move(values)))
+    );
 }
 
-FFInterface*
+std::unique_ptr<FFInterface>
 parser::userfn()
 {
     consume(Token::IDENTIFIER, "an identifier", "unexpected token");
-    std::string ident = std::string(prev().to_str());
+    auto ident = std::string(prev().to_str());
     consume(Token::LEFT_PAREN, "(", "unexpected character");
 
-    UserFn* userfn = new UserFn(ident);
+    auto userfn = std::make_unique<UserFn>(ident);
     while (!match(Token::RIGHT_PAREN)) {
         consume(Token::IDENTIFIER, "an identifier", "unexpected token");
         userfn->add_argname(prev().to_str());
@@ -419,14 +421,15 @@ parser::userfn()
     return userfn;
 }
 
+// calls add_arg on fnexpr until match on right parenthesis
+// does not claim ownership of pointer
 template <typename T>
 void
 parser::add_exprs_as_args(T* fnexpr)
 {
     int argc = 0;
     while (!match(Token::RIGHT_PAREN)) {
-        auto param = expression();
-        fnexpr->add_arg(param);
+        fnexpr->add_arg(expression());
         if (++argc >= MAXFNARGS)
             throw too_many_args();
         match(Token::COMMA);

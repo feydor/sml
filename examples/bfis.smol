@@ -6,7 +6,7 @@ let stack[30000]
 let sp = 0
 let jmptbl[30000]
 
-let path = "bfic/hw.b"
+let path = "bfic/life.b"
 let file = fopen(path, "i")
 
 if (!file) printerr_and_exit("error opening the file")
@@ -29,6 +29,7 @@ for (let cp = 0; cp < code.len; cp++) {
 if (sp > 0) printerr_and_exit("Unmatched '[' at byte:")
 
 # second round parse for eval
+let cin
 for (let i = 0; i < code.len; i++) {
     let c = code[i]
     if (c == "+") {
@@ -50,7 +51,14 @@ for (let i = 0; i < code.len; i++) {
         if (arr[ptr] != 0) i = jmptbl[i]
     }
     elif (c == ".") say ascii(arr[ptr])
-    elif (c == ",") say ", not implemented yet"
+    elif (c == ",") {
+        cin = getchar()
+        if (cin == "\n")
+            arr.put(ptr, 10)
+        else
+            arr.put(ptr, cin)
+
+    }
     elif (c == "#") for(let j=0;j<36;j++) say arr[j]
 }
 

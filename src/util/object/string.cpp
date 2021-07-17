@@ -4,8 +4,8 @@
 namespace Obj {
 	String::String(const std::string& val) : val_(val)
 	{
-		methods_.emplace("len", new Lib::String::len());
-		methods_.emplace("at", new Lib::String::at());
+		methods_.insert(std::make_pair("len", std::make_shared<Lib::String::len>()));
+		methods_.insert(std::make_pair("at", std::make_shared<Lib::String::at>()));
 	};
 
 	Object_t

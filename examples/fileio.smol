@@ -17,6 +17,10 @@ say "And now to print this file..."
 let contents = file.read()
 say contents
 
+say "input a character: "
+let c = getchar()
+say c
+
 # the result of file.read() is a string; it can be read character-wise using String's methods
 #for (let i = 0; i < contents.len; i++)
 #    say contents.at(i)

@@ -6,6 +6,7 @@ namespace Ast {
     std::shared_ptr<Obj::Object>
     Ternary::eval()
     {
+        // cond is deleted here
         auto cond = cond_->eval();
 
         switch (op_.type()) {
@@ -17,9 +18,11 @@ namespace Ast {
 
     Ternary::~Ternary()
     {
+        /*
         delete cond_;
         delete iftrue_;
         delete iffalse_;
+        */
     }
 
     std::string

@@ -44,7 +44,7 @@ namespace Env {
 			if (var_exists((*itr), name))
 				return (*itr).vars[name];
 		}
-		return std::make_unique<Obj::String>("<fn " + name + ">");
+		return std::make_shared<Obj::String>("<fn " + name + ">"); // TODO: who owns this?
 	}
 
 	std::string

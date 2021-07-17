@@ -394,13 +394,12 @@ parser::array_decl(const std::string& varname)
         val = prev().get_num();
         consume(Token::RIGHT_BRACE, "}", "unexpected character");
     }
-    values.resize(size);
     for (size_t i = 0; i < size; ++i)
         values.push_back(std::make_shared<Obj::Number>(val));
     
     match(Token::SEMICOLON); // optional semicolon
     return std::make_unique<Ast::AsgmtStmt>(
-        varname, std::make_unique<Ast::Literal>(std::make_unique<Obj::Array>(std::move(values)))
+        varname, std::make_unique<Ast::Literal>(std::make_unique<Obj::Array>(values))
     );
 }
 

@@ -1,5 +1,0 @@
-fn f(n) {
-    ret n
-}
-let x = 1 + 2
-say f(x)

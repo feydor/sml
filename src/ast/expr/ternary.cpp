@@ -1,7 +1,12 @@
 #include "expr.h"
-#include <iostream>
+#include "object.h"
 
 namespace Ast {
+
+    Ternary::Ternary(std::unique_ptr<Expr> cond, Tok op, std::unique_ptr<Expr> iftrue,
+        std::unique_ptr<Expr> iffalse)
+        : cond_(std::move(cond)), op_(op), iftrue_(std::move(iftrue)),
+            iffalse_(std::move(iffalse)) {};
 
     std::shared_ptr<Obj::Object>
     Ternary::eval()
@@ -14,15 +19,6 @@ namespace Ast {
             default:
                 throw std::runtime_error("Ternary: Unimplemented operator.");
         }
-    }
-
-    Ternary::~Ternary()
-    {
-        /*
-        delete cond_;
-        delete iftrue_;
-        delete iffalse_;
-        */
     }
 
     std::string

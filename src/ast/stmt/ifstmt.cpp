@@ -1,5 +1,6 @@
 #include "stmt.h"
-#include <iostream>
+#include "expr.h"
+#include "object.h"
 
 namespace Ast {
 	IfStmt::IfStmt(std::unique_ptr<Ast::Expr> cond, std::unique_ptr<Ast::Stmt> body)
@@ -20,12 +21,4 @@ namespace Ast {
     {
     	elses_.push_back(std::move(els));
     }
-
-	IfStmt::~IfStmt()
-	{
-		// delete cond_;
-		// delete body_;
-		/*for (auto& els : elses_)
-			delete els;*/
-	}
 }

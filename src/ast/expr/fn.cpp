@@ -1,7 +1,9 @@
 #include "expr.h"
 #include "fntable.h"
+#include "object.h"
 
 namespace Ast {
+    FnExpr::FnExpr(std::string name) : name_(name) {};
 
     std::shared_ptr<Obj::Object>
     FnExpr::eval()
@@ -29,13 +31,5 @@ namespace Ast {
         for (const auto& arg : args_)
             res += arg->to_str() + ", ";
         return res.substr(0, res.size() - 2) + ")";
-    }
-
-    FnExpr::~FnExpr()
-    {
-        /*
-        for (auto& arg : args_)
-            delete arg;
-        */
     }
 }

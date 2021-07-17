@@ -1,15 +1,11 @@
 /* ffi.h - foreign function interface (FFI) base and built-in subclasses */
 #ifndef SMOL_FFI_H
 #define SMOL_FFI_H
-// #include "object.h"
-// #include "stmt.h"
 #include <string>
 #include <vector>
 #include <memory>
 
-namespace Obj {
-	class Object;
-}
+namespace Obj { class Object; }
 namespace Ast { class Stmt; }
 
 class FFInterface {

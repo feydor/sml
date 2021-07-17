@@ -1,5 +1,6 @@
 /* parser.cpp - Recursive descent parser - See GRAMMER.txt for overview */
 #include "parser.h"
+#include "object.h"
 #include <tuple>
 #include <iostream>
 

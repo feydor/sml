@@ -1,5 +1,7 @@
 #include "stmt.h"
 #include "env.h"
+#include "expr.h"
+#include "object.h"
 
 namespace Ast {
 	AsgmtStmt::AsgmtStmt(const std::string& name, std::unique_ptr<Ast::Expr> expr)
@@ -9,10 +11,5 @@ namespace Ast {
 	AsgmtStmt::exec()
 	{
 		Env::set_var(name_, expr_->eval());
-	}
-
-	AsgmtStmt::~AsgmtStmt()
-	{
-		// delete expr_;
 	}
 }

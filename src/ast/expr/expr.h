@@ -1,15 +1,13 @@
 #ifndef SMOL_EXPR_H
 #define SMOL_EXPR_H
 #include "token.h"
-#include "object.h"
-//#include "stmt.h"
 #include <vector>
 #include <memory>
 
-// namespace Obj { class Object; }
+namespace Obj { class Object; }
 
 namespace Ast {
-    class Stmt;
+    class Stmt; // forward declaration
 
     class Expr {
         public:
@@ -20,9 +18,7 @@ namespace Ast {
 
     class Binary : public Expr {
         public:
-            Binary(std::unique_ptr<Expr> left, Tok op, std::unique_ptr<Expr> right)
-                : op_(op), left_(std::move(left)), right_(std::move(right)) {};
-            ~Binary() override;
+            Binary(std::unique_ptr<Expr> left, Tok op, std::unique_ptr<Expr> right);
             std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
         private:
@@ -33,8 +29,7 @@ namespace Ast {
 
     class Unary : public Expr {
         public:
-            Unary(Tok op, std::unique_ptr<Expr> right) : op_(op), right_(std::move(right)) {};
-            ~Unary() override;
+            Unary(Tok op, std::unique_ptr<Expr> right);
             std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
         private:
@@ -44,9 +39,8 @@ namespace Ast {
 
     class Ternary : public Expr {
         public:
-            Ternary(std::unique_ptr<Expr> cond, Tok op, std::unique_ptr<Expr> iftrue, std::unique_ptr<Expr> iffalse)
-                : cond_(std::move(cond)), op_(op), iftrue_(std::move(iftrue)), iffalse_(std::move(iffalse)) {};
-            ~Ternary() override;
+            Ternary(std::unique_ptr<Expr> cond, Tok op, std::unique_ptr<Expr> iftrue,
+                std::unique_ptr<Expr> iffalse);
             std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
         private:
@@ -59,9 +53,7 @@ namespace Ast {
     // Conditional expression: and, or, comparison
     class Cond : public Expr {
         public:
-            Cond(std::unique_ptr<Expr> left, Tok op, std::unique_ptr<Expr> right)
-                : left_(std::move(left)), op_(op), right_(std::move(right)) {};
-            ~Cond() override;
+            Cond(std::unique_ptr<Expr> left, Tok op, std::unique_ptr<Expr> right);
             std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
 
@@ -74,9 +66,7 @@ namespace Ast {
     // Assignment expression: a = b, evals to b
     class Asgmt : public Expr {
         public:
-            Asgmt(std::unique_ptr<Expr> left, std::unique_ptr<Expr> right)
-                : left_(std::move(left)), right_(std::move(right)) {};
-            ~Asgmt() override;
+            Asgmt(std::unique_ptr<Expr> left, std::unique_ptr<Expr> right);
             std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
         private:
@@ -87,7 +77,7 @@ namespace Ast {
     // Literal expression: val: string, num, bool, nil, arr, hash
     class Literal : public Expr {
         public:
-            explicit Literal(std::unique_ptr<Obj::Object> val) : val_(std::move(val)) {};
+            explicit Literal(std::unique_ptr<Obj::Object> val);
             std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
         private:
@@ -96,7 +86,7 @@ namespace Ast {
 
     class Var : public Expr {
         public:
-            explicit Var(std::string name) : name_(name) {};
+            explicit Var(std::string name);
             std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
         private:
@@ -105,8 +95,7 @@ namespace Ast {
 
     class FnExpr : public Expr {
         public:
-            explicit FnExpr(std::string name) : name_(name) {};
-            ~FnExpr() override;
+            explicit FnExpr(std::string name);
             std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
             void add_arg(std::unique_ptr<Expr> expr);
@@ -117,8 +106,7 @@ namespace Ast {
 
     class MethodExpr : public Expr {
         public:
-            explicit MethodExpr(std::string name) : name_(name) {};
-            ~MethodExpr() override;
+            explicit MethodExpr(std::string name);
             std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
             void add_arg(std::unique_ptr<Expr> expr);
@@ -129,8 +117,7 @@ namespace Ast {
 
     class Arr : public Expr {
         public:
-            explicit Arr(std::vector<std::unique_ptr<Expr>> exprs) : exprs_(std::move(exprs)) {};
-            ~Arr() override;
+            explicit Arr(std::vector<std::unique_ptr<Expr>> exprs);
             std::shared_ptr<Obj::Object> eval() override;
             std::string to_str() const override;
             void add_expr(std::unique_ptr<Expr> expr);

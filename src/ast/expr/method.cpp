@@ -1,6 +1,9 @@
 #include "expr.h"
+#include "object.h"
 
 namespace Ast {
+    MethodExpr::MethodExpr(std::string name) : name_(name) {};
+
     std::shared_ptr<Obj::Object>
     MethodExpr::eval()
     {
@@ -26,13 +29,5 @@ namespace Ast {
         for (const auto& arg : args_)
             res += arg->to_str() + ", ";
         return res.substr(0, res.size() - 2) + ")";
-    }
-
-    MethodExpr::~MethodExpr()
-    {
-        /*
-        for (auto& arg : args_)
-            delete arg;
-        */
     }
 }

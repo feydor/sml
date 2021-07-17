@@ -1,12 +1,11 @@
 #ifndef SMOL_STMT_H
 #define SMOL_STMT_H
-#include "expr.h"
 #include <string>
 #include <vector>
 #include <memory>
 
 namespace Ast {
-    // class Expr;
+    class Expr; // forward declaration
 
     class Stmt {
         public:
@@ -18,7 +17,6 @@ namespace Ast {
         public:
             explicit ExprStmt(std::unique_ptr<Ast::Expr> expr);
             void exec() override;
-            ~ExprStmt() override;
 
         private:
             std::unique_ptr<Ast::Expr> expr_;
@@ -28,7 +26,6 @@ namespace Ast {
         public:
             explicit SayStmt(std::unique_ptr<Ast::Expr> expr);
             void exec() override;
-            ~SayStmt() override;
 
         private:
             std::unique_ptr<Ast::Expr> expr_;
@@ -38,7 +35,6 @@ namespace Ast {
         public:
             BlockStmt() {};
             void exec() override;
-            ~BlockStmt() override;
 
             // TODO: friend with parser
             void add_stmt(std::unique_ptr<Ast::Stmt> stmt);
@@ -51,7 +47,6 @@ namespace Ast {
         public:
             IfStmt(std::unique_ptr<Ast::Expr> cond, std::unique_ptr<Ast::Stmt> body);
             void exec() override;
-            ~IfStmt() override;
             void add_else(std::unique_ptr<Ast::Stmt> els);
 
         private:
@@ -64,7 +59,6 @@ namespace Ast {
         public:
             AsgmtStmt(const std::string& name, std::unique_ptr<Ast::Expr> expr);
             void exec() override;
-            ~AsgmtStmt() override;
 
         private:
             std::string name_;
@@ -75,7 +69,6 @@ namespace Ast {
         public:
             WhileStmt(std::unique_ptr<Ast::Expr> cond, std::unique_ptr<Ast::Stmt> body);
             void exec() override;
-            ~WhileStmt() override;
 
         private:
             std::unique_ptr<Ast::Expr> cond_;
@@ -86,7 +79,6 @@ namespace Ast {
         public:
             explicit RetStmt(std::unique_ptr<Ast::Expr> expr);
             void exec() override;
-            ~RetStmt() override;
 
         private:
             std::unique_ptr<Ast::Expr> expr_;

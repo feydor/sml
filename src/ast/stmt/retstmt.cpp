@@ -1,5 +1,6 @@
 #include "stmt.h"
-
+#include "expr.h"
+#include "object.h"
 
 namespace Ast{
 	RetStmt::RetStmt(std::unique_ptr<Ast::Expr> expr)
@@ -9,10 +10,5 @@ namespace Ast{
 	RetStmt::exec()
 	{
 		throw expr_->eval();
-	}
-
-	RetStmt::~RetStmt()
-	{
-		// delete expr_;
 	}
 }

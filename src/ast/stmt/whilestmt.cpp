@@ -1,7 +1,7 @@
 #include "stmt.h"
-#include "expr.h"
 #include "env.h"
-#include <iostream>
+#include "expr.h"
+#include "object.h"
 
 namespace Ast {
     WhileStmt::WhileStmt(std::unique_ptr<Ast::Expr> cond, std::unique_ptr<Ast::Stmt> body)
@@ -14,12 +14,6 @@ namespace Ast {
         while (cond_->eval()->is_truthy())
             body_->exec();
         Env::pop();
-    }
-
-    WhileStmt::~WhileStmt()
-    {
-        // delete cond_;
-        // delete body_;
     }
 
 }

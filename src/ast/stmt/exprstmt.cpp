@@ -1,5 +1,6 @@
 #include "stmt.h"
-//#include <iostream>
+#include "expr.h"
+#include "object.h"
 
 namespace Ast {
 	ExprStmt::ExprStmt(std::unique_ptr<Ast::Expr> expr)
@@ -10,10 +11,5 @@ namespace Ast {
 	ExprStmt::exec()
 	{
 		expr_->eval(); // return of eval dies here
-	}
-
-	ExprStmt::~ExprStmt()
-	{
-		// delete expr_;
 	}
 }

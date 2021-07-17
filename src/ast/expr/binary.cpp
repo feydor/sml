@@ -1,7 +1,11 @@
 #include "expr.h"
+#include "object.h"
 #include <iostream>
 
 namespace Ast {
+
+Binary::Binary(std::unique_ptr<Expr> left, Tok op, std::unique_ptr<Expr> right)
+    : op_(op), left_(std::move(left)), right_(std::move(right)) {};
 
 std::shared_ptr<Obj::Object>
 Binary::eval()
@@ -20,14 +24,6 @@ Binary::eval()
         default:
             throw std::runtime_error("Operator '" + op_.to_str() + "' is unimplemented.");
     }
-}
-
-Binary::~Binary()
-{
-    /*
-    delete left_;
-    delete right_;
-    */
 }
 
 std::string

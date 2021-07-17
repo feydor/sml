@@ -1,8 +1,10 @@
 #ifndef SMOL_ENV_H
 #define SMOL_ENV_H
-#include "object.h"
 #include <string>
 #include <unordered_map>
+#include <memory>
+
+namespace Obj {class Object; }
 
 namespace Env {
 	void push_back();

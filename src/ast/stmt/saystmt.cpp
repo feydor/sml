@@ -1,4 +1,6 @@
 #include "stmt.h"
+#include "expr.h"
+#include "object.h"
 #include <iostream>
 
 namespace Ast {
@@ -21,10 +23,5 @@ namespace Ast {
 			}
 		}
 		std::cout << std::endl;
-	}
-
-	SayStmt::~SayStmt()
-	{
-		// delete expr_;
 	}
 }

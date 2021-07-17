@@ -1,6 +1,5 @@
 #ifndef SMOL_OBJECT_H
 #define SMOL_OBJECT_H
-#include "ffi.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -8,7 +7,7 @@
 #include <fstream>
 #include <unordered_map>
 
-// class FFInterface;
+class FFInterface;
 
 namespace Obj {
 enum class Object_t {

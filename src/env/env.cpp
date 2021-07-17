@@ -1,4 +1,5 @@
 #include "env.h"
+#include "object.h"
 #include <vector>
 #include <stdexcept>
 

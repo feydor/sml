@@ -1,6 +1,7 @@
 #include "stmt.h"
-#include "expr.h"
 #include "env.h"
+#include "expr.h"
+#include "object.h"
 
 namespace Ast {
 
@@ -10,13 +11,6 @@ namespace Ast {
         for (const auto& stmt : stmts_) {
             stmt->exec();
         }
-    }
-
-    BlockStmt::~BlockStmt()
-    {
-        /*
-        for (auto& stmt : stmts_)
-            delete stmt;*/
     }
 
     void

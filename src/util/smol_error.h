@@ -35,8 +35,8 @@ namespace Smol {
 
 	class LexerError : public SyntaxError {
 		public:
-		LexerError(const std::string &msg, int nline)
-			: SyntaxError{msg, "", "", nline} {};
+		LexerError(const std::string &msg, const std::string &found, int nline)
+			: SyntaxError{msg, "", found, nline} {};
 		
 		void print() const throw() override;
 	};

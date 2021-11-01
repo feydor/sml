@@ -62,10 +62,11 @@ namespace Smol {
 			": " << bold << this->msg << resetf << "\n" <<
 			secondary << "  --> " << resetc << SMOL::fname +
 			":" + std::to_string(this->nline) + "\n" <<
+			secondary << "Found " + add_quotemarks(this->found) + ".\n" <<
 			std::to_string(this->nline) + " |    "
 			<< resetc << get_line(this->nline) + "\n" <<
 			secondary << "  |\n" << resetc;
-		std::cout << err << "error" << resetc << ": " << bold << "aborting due to previous errors.\n" << resetf;
+		// std::cout << err << "error" << resetc << ": " << bold << "aborting due to previous errors.\n" << resetf;
 	}
 
 }

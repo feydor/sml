@@ -112,6 +112,9 @@ void SMOL::eval(std::string const &src)
     }
     std::cout << "\n";
 
+    for (auto err : lexer.get_errors())
+        err.print();
+
     /*
     Parser::parser parser(tokens);
     try {

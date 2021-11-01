@@ -21,6 +21,7 @@ class lexer {
     public:
     explicit lexer(std::string const& src);
     std::vector<Token> scan_tokens();
+    std::vector<Smol::LexerError> get_errors();
 
     private:
     char advance();
@@ -40,7 +41,7 @@ class lexer {
     static bool is_alpha(char c);
     static bool is_alphanumeric(char c);
 
-    void add_error(const std::string& msg, int line);
+    void add_error(const std::string& msg);
 };
 }
 

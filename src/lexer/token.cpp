@@ -34,7 +34,7 @@ Token::Token(TokenType::type type, const std::string &lexeme, int line, double n
     : type_(type), lexeme_(lexeme), line_(line), value_(nval) {}
 
 TokenType::type
-Token::type() const
+Token::get_type() const
 {
     return type_;
 }

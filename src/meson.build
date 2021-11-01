@@ -7,5 +7,7 @@ error_inc = include_directories('util')
 lexer_src = files(['lexer/lexer.cpp', 'lexer/token.cpp'])
 lexer_inc = include_directories('lexer')
 
+ast_inc = include_directories('ast')
+
 subsystems_src = [lexer_src, error_src]
-subsystems_inc = [lexer_inc, error_inc]
+subsystems_inc = [lexer_inc, error_inc, ast_inc]

@@ -24,6 +24,8 @@ lexer::scan_tokens()
 
         char c = advance();
         switch(c) {
+            case '(':
+                add_keyword(std::to_string(c), TokenType::LEFT_PAREN);
             case '#':
                 // comment goes until end of line; skip it
                 while (peek() != '\n' && !at_end())

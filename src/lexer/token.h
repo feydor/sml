@@ -16,6 +16,7 @@ namespace TokenType {
         IDENTIFIER = -4,
         STRING = -5,
         NUMBER = -6,
+        LEFT_PAREN = -7
     };
 }
 
@@ -31,7 +32,7 @@ class Token {
     static Token make_identifier(const std::string& identifier, int line);
     static Token make_keyword(TokenType::type keyword_type, const std::string& identifier, int line);
 
-    TokenType::type type() const;
+    TokenType::type get_type() const;
     std::string lexeme() const;
     int line() const;
     double get_num() const;

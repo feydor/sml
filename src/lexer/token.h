@@ -2,51 +2,50 @@
 #define TOKEN_H
 #include <string>
 #include <variant>
+#include <memory>
 
-namespace Token {
-enum type {
-    // single-character tokens
-    LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE, LEFT_BRACKET,
-    RIGHT_BRACKET, COMMA, DOT, PERCENT,
-    MINUS, PLUS, SEMICOLON, COLON, SLASH, STAR,
-    // one or two character tokens
-    BANG, BANG_EQUAL, EQUAL, EQUAL_EQUAL, GREATER, GREATER_EQUAL,
-    LESS, LESS_EQUAL, PLUS_EQUAL, MINUS_EQUAL, STAR_EQUAL, SLASH_EQUAL,
-    PERCENT_EQUAL, PLUS_PLUS, MINUS_MINUS, QUESTION,
-    // literals
-    IDENTIFIER, STRING, NUMBER,
-    // keywords
-    AND, ELSE, ELSE_IF, FALSE, FN, FOR, IF, NIL, OR, SAY, RETURN,
-    TRUE, LET, WHILE, _EOF, EOL,
-};
+namespace TokenType {
+    enum type {
+        _EOF = -1,
+
+        // commands
+        DEF = -2,
+        EXTERN = -3,
+
+        // primary
+        IDENTIFIER = -4,
+        STRING = -5,
+        NUMBER = -6,
+    };
 }
 
-class Tok {
-    Token::type type_;
+class Token {
+    TokenType::type type_;
     std::string lexeme_;
     int line_;
-    std::variant<double, std::string> literal_;
+    std::variant<double, std::string> value_;
 
     public:
-    Tok(Token::type type, std::string lexeme, int line);
-    Tok(Token::type type, std::string lexeme, int line,
-        std::variant<double, std::string> literal);
-    Tok();
+    static Token make_string_literal(const std::string &literal, int line);
+    static Token make_num_literal(double num, int line);
+    static Token make_identifier(const std::string& identifier, int line);
+    static Token make_keyword(TokenType::type keyword_type, const std::string& identifier, int line);
 
-    // for building a token outside of lexer
-    Tok(Token::type type, std::string lexeme);
-
-    Token::type type() const;
+    TokenType::type type() const;
     std::string lexeme() const;
     int line() const;
     double get_num() const;
-    std::string get_str() const;
+    std::string get_identifier() const;
     std::string to_str() const;
-    Tok first_subtok() const;
-    static std::string type_to_string(Token::type type);
+    static std::string type_to_string(TokenType::type type);
 
     private:
-    Token::type char_to_type(char c) const;
+    // identifiers and string literals
+    Token(TokenType::type type, const std::string &lexeme, int line);
+    
+    // numbers
+    Token(TokenType::type type, const std::string &lexeme, int line, double nval);
+    
 };
 
 #endif

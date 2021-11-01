@@ -1,10 +1,5 @@
 #include "lexer.h"
-#include "parser.h"
 #include "token.h"
-#include "env.h"
-#include "fntable.h"
-#include "ansi.h"
-#include "lib.h"
 #include "smol_error.h"
 #include "smol.h"
 #include <iostream>
@@ -87,24 +82,6 @@ void SMOL::run_prompt()
     }
 }
 
-void SMOL::error(int line, std::string const &msg)
-{
-    ANSI::Modifier err(Color::FG_RED);
-    ANSI::Modifier secondary(Color::FG_BLUE);
-    ANSI::Modifier bold(Format::BOLD);
-    ANSI::Modifier def(Color::FG_DEFAULT);
-    std::string fileloc("");
-
-    if (!SMOL::is_repl)
-        fileloc = SMOL::fname + ":" + std::to_string(line);
-
-    std::cout << err << "error" << def << ": " << bold <<
-        msg << "\n " << secondary << "--> " << def << fileloc
-        << std::endl;
-
-    SMOL::had_error = true;
-}
-
 void SMOL::print_usage()
 {
     std::cout << "Usage: " << PROJECT_NAME << " [OPTION] [FILE]" << std::endl;
@@ -129,8 +106,13 @@ void SMOL::print_version()
 void SMOL::eval(std::string const &src)
 {
     Lexer::lexer lexer(src);
-    std::vector<Tok> tokens = lexer.scan_tokens();
+    std::vector<Token> tokens = lexer.scan_tokens();
+    for (auto token : tokens) {
+        std::cout << "| " << token.to_str() << " |" << " ";
+    }
+    std::cout << "\n";
 
+    /*
     Parser::parser parser(tokens);
     try {
         parser.scan_program(); // parser holds ownership of all statements
@@ -169,4 +151,5 @@ void SMOL::eval(std::string const &src)
         std::chrono::duration<double, std::milli> ms_double = t2 - t1;
         std::cout << "Duration: " << ms_double.count() << "ms\n";
     }
+    */
 }

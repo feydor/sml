@@ -1,26 +1,12 @@
 #include <iostream>
 #include <memory>
 #include "lexer.h"
-#include "smol.h"
 
 namespace Lexer {
 lexer::lexer(std::string const& src) : src(src)
 {
-    this->keywords.emplace("and", Token::AND);
-    this->keywords.emplace("else", Token::ELSE);
-    this->keywords.emplace("elif", Token::ELSE_IF);
-    this->keywords.emplace("false", Token::FALSE);
-    this->keywords.emplace("for", Token::FOR);
-    this->keywords.emplace("fn", Token::FN);
-    this->keywords.emplace("if", Token::IF);
-    this->keywords.emplace("nil", Token::NIL);
-    this->keywords.emplace("or", Token::OR);
-    this->keywords.emplace("say", Token::SAY);
-    this->keywords.emplace("ret", Token::RETURN);
-    this->keywords.emplace("return", Token::RETURN);
-    this->keywords.emplace("true", Token::TRUE);
-    this->keywords.emplace("let", Token::LET);
-    this->keywords.emplace("while", Token::WHILE);
+    this->keywords.emplace("def", TokenType::DEF);
+    this->keywords.emplace("extern", TokenType::EXTERN);
 }
 
 /**
@@ -28,7 +14,7 @@ lexer::lexer(std::string const& src) : src(src)
  * this function detects and adds a token to the tokens vector
  * and returns it.
  */
-std::vector<Tok>
+std::vector<Token>
 lexer::scan_tokens()
 {
     // a lexeme is made by the substring of [start, curr-start)
@@ -38,49 +24,6 @@ lexer::scan_tokens()
 
         char c = advance();
         switch(c) {
-            case '(': add_token(Token::LEFT_PAREN); break;
-            case ')': add_token(Token::RIGHT_PAREN); break;
-            case '{': add_token(Token::LEFT_BRACE); break;
-            case '}': add_token(Token::RIGHT_BRACE); break;
-            case '[': add_token(Token::LEFT_BRACKET); break;
-            case ']': add_token(Token::RIGHT_BRACKET); break;
-            case ',': add_token(Token::COMMA); break;
-            case '.': add_token(Token::DOT); break;
-            case ';': add_token(Token::SEMICOLON); break;
-            case ':': add_token(Token::COLON); break;
-            case '?': add_token(Token::QUESTION); break;
-            case '-':
-                if (next_is('=')) add_token(Token::MINUS_EQUAL);
-                else if (next_is('-')) add_token(Token::MINUS_MINUS);
-                else add_token(Token::MINUS);
-                break;
-            case '+':
-                if (next_is('=')) add_token(Token::PLUS_EQUAL);
-                else if (next_is('+')) add_token(Token::PLUS_PLUS);
-                else add_token(Token::PLUS);
-                break;
-            case '*':
-                add_token(next_is('=') ? Token::STAR_EQUAL : Token::STAR);
-                break;
-            case '/':
-                add_token(next_is('=') ? Token::SLASH_EQUAL : Token::SLASH);
-                break;
-            case '%':
-                add_token(next_is('=') ? Token::PERCENT_EQUAL : Token::PERCENT);
-                break;
-            case '!':
-                add_token(next_is('=') ? Token::BANG_EQUAL : Token::BANG);
-                break;
-            case '=':
-                add_token(next_is('=') ? Token::EQUAL_EQUAL : Token::EQUAL);
-                break;
-            case '<':
-                add_token(next_is('=') ? Token::LESS_EQUAL : Token::LESS);
-                break;
-            case '>':
-                add_token(next_is('=')
-                        ? Token::GREATER_EQUAL : Token::GREATER);
-                break;
             case '#':
                 // comment goes until end of line; skip it
                 while (peek() != '\n' && !at_end())
@@ -95,7 +38,7 @@ lexer::scan_tokens()
             case '\n':
                 this->line++;
                 break;
-            case '"': str(); break;
+            // case '"': str(); break;
             default:
                 if (is_digit(c)) {
                     num();
@@ -104,13 +47,14 @@ lexer::scan_tokens()
                 } else {
                     // report unexpected characters
                     // TODO: combine these into a vector and report once
-                    SMOL::error(line, "Unexpected character.");
+                    add_error("Unexpected character.", this->line);
+                    // SMOL::error(line, "Unexpected character.");
                 }
                 break;
         }
     }
 
-    this->tokens.emplace_back(Token::_EOF, "", this->line);
+    this->tokens.emplace_back(Token::make_keyword(TokenType::_EOF, "EOF", this->line));
     return this->tokens;
 }
 
@@ -121,19 +65,41 @@ lexer::advance()
     return this->src.at(this->curr++);
 }
 
+// adds a string literal token to the Lexer's tokens
 void
-lexer::add_token(Token::type type)
-{
-    std::string lexeme(this->src.substr(this->start, this->curr - this->start));
-    this->tokens.emplace_back(type, lexeme, this->line);
+lexer::add_string_literal(const std::string &literal) {
+    this->tokens.emplace_back(Token::make_string_literal(literal, this->line));
 }
 
-/* with literal */
+// adds a number literal token to the Lexer's tokens
 void
-lexer::add_token(Token::type type, std::variant<double, std::string> const& literal)
+lexer::add_number_literal(double num) {
+    this->tokens.emplace_back(Token::make_num_literal(num, this->line));
+}
+
+void
+lexer::add_identifier(const std::string &identifier)
 {
-    std::string lexeme(this->src.substr(this->start, this->curr - this->start));
-    this->tokens.emplace_back(type, lexeme, this->line, literal);
+    this->tokens.emplace_back(Token::make_identifier(identifier, this->line));
+}
+
+// adds a keyword token to the Lexer's tokens
+void
+lexer::add_keyword(const std::string &keyword, TokenType::type type)
+{
+    this->tokens.emplace_back(Token::make_keyword(type, keyword, this->line));
+}
+
+// attempts to add lexeme as a keyword token
+// if not found in keywords, returns false otherwise true
+bool
+lexer::add_identifier_as_keyword(const std::string &lexeme) {
+    auto keyword_itr = this->keywords.find(lexeme);
+    if (keyword_itr == this->keywords.end())
+        return false;
+    
+    this->add_keyword(lexeme, keyword_itr->second);
+    return true;
 }
 
 /* look at current character without consumption */
@@ -147,7 +113,7 @@ lexer::peek()
 
 /* lookahead two characters */
 char
-lexer::peek_next()
+lexer::double_peek()
 {
     if (this->curr + 1 >= (int)src.length())
         return '\0';
@@ -168,7 +134,7 @@ lexer::next_is(char c)
 }
 
 /* handle string literals */
-void
+/*void
 lexer::str()
 {
     // consume characters until matching " mark
@@ -191,6 +157,7 @@ lexer::str()
     );
     add_token(Token::STRING, literal);
 }
+*/
 
 void
 lexer::num()
@@ -199,16 +166,15 @@ lexer::num()
     while (is_digit(peek()))
         advance();
 
-    // check for decimal and consume anymore consecutive digits
-    if (peek() == '.' && is_digit(peek_next())) {
+    // check for a single decimal and consume consecutive digits
+    if (peek() == '.' && is_digit(double_peek())) {
         advance();
         while (is_digit(peek()))
             advance();
     }
 
     double num = std::stod(this->src.substr(this->start, this->curr - this->start));
-    std::variant<double, std::string> literal(num);
-    add_token(Token::NUMBER, literal);
+    add_number_literal(num);
 }
 
 /* handle non-string letters */
@@ -220,8 +186,12 @@ lexer::identifier()
         advance();
 
     std::string lexeme(this->src.substr(this->start, this->curr - this->start));
-    auto itr = keywords.find(lexeme);
-    itr != keywords.end() ? add_token(itr->second) : add_token(Token::IDENTIFIER);
+    
+    // search for keywords
+    if (add_identifier_as_keyword(lexeme))
+        return;
+    else
+        add_identifier(lexeme);
 }
 
 bool
@@ -246,4 +216,11 @@ lexer::is_alphanumeric(char c)
 {
     return is_alpha(c) || is_digit(c);
 }
+
+void
+lexer::add_error(const std::string &msg, int line)
+{
+    this->errors.emplace_back(msg, line);
+}
+
 }

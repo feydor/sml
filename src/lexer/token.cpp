@@ -1,59 +1,72 @@
 #include "token.h"
 #include <stdexcept>
 
-Tok::Tok(Token::type type, std::string lexeme, int line)
-    : type_(type), lexeme_(std::move(lexeme)), line_(line), literal_(0.0)
-{}
+Token
+Token::make_string_literal(const std::string &literal, int line)
+{
+    return Token(TokenType::STRING, literal, line);
+}
 
-Tok::Tok(Token::type type, std::string lexeme, int line,
-    std::variant<double, std::string> literal)
-    : type_(type), lexeme_(std::move(lexeme)), line_(line),
-    literal_(std::move(literal))
-{}
+Token
+Token::make_num_literal(double num, int line)
+{
+    return Token(TokenType::NUMBER, std::to_string(num), line, num);
+}
 
-Tok::Tok(Token::type type, std::string lexeme)
-    : type_(type), lexeme_(std::move(lexeme)), line_(0) {};
+Token
+Token::make_identifier(const std::string& identifier, int line)
+{
+    return Token(TokenType::IDENTIFIER, identifier, line);
+}
 
-Tok::Tok() {}
+Token
+Token::make_keyword(TokenType::type keyword_type, const std::string& keyword, int line)
+{
+    return Token(keyword_type, keyword, line);
+}
 
-Token::type
-Tok::type() const
+// use for string literals and identifiers
+Token::Token(TokenType::type type, const std::string &lexeme, int line)
+    : type_(type), lexeme_(lexeme), line_(line), value_(lexeme) {}
+
+// used for numeral literals
+Token::Token(TokenType::type type, const std::string &lexeme, int line, double nval)
+    : type_(type), lexeme_(lexeme), line_(line), value_(nval) {}
+
+TokenType::type
+Token::type() const
 {
     return type_;
 }
 
 int
-Tok::line() const
+Token::line() const
 {
     return line_;
 }
 
 double
-Tok::get_num() const
+Token::get_num() const
 {
-    return std::get<double>(literal_);
+    return std::get<double>(value_);
 }
 
 std::string
-Tok::get_str() const
+Token::get_identifier() const
 {
-    return std::get<std::string>(literal_);
+    return std::get<std::string>(value_);
 }
 
 std::string
-Tok::to_str() const
+Token::to_str() const
 {
     return lexeme_;
 }
 
-Tok
-Tok::first_subtok() const
-{
-    return Tok(char_to_type(to_str()[0]), to_str());
-}
 
-Token::type
-Tok::char_to_type(char c) const
+/*
+TokenType::type
+Token::char_to_type(char c) const
 {
     switch (c) {
         case '+': return Token::PLUS;
@@ -66,7 +79,7 @@ Tok::char_to_type(char c) const
 }
 
 std::string
-Tok::type_to_string(Token::type type)
+Token::type_to_string(TokenType::type type)
 {
     switch (type) {
         case Token::LEFT_PAREN: return "(";
@@ -116,3 +129,4 @@ Tok::type_to_string(Token::type type)
         default: return "Not yet identifed.";
     }
 }
+*/

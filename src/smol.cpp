@@ -1,4 +1,5 @@
 #include "lexer.h"
+#include "parser.h"
 #include "token.h"
 #include "smol_error.h"
 #include "smol.h"
@@ -114,15 +115,18 @@ void SMOL::eval(std::string const &src)
 
     for (auto err : lexer.get_errors())
         err.print();
-
-    /*
-    Parser::parser parser(tokens);
+    
+    Parser parser(tokens);
+    
     try {
-        parser.scan_program(); // parser holds ownership of all statements
-    } catch (Smol::SyntaxError& e) {
+        parser.parse_syntax(); // parser holds ownership of all statements
+    } catch (Smol::ParserError& e) {
         e.print();
         exit(1);
+    } catch (const std::exception& e) {
+        std::cout << e.what() << std::endl;
     }
+    /*
 
     // set prelude constants and library functions
     // TODO: Move to prelude.h

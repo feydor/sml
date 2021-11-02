@@ -16,7 +16,17 @@ namespace TokenType {
         IDENTIFIER = -4,
         STRING = -5,
         NUMBER = -6,
-        LEFT_PAREN = -7
+
+        // operators
+        LESS_THAN,
+        PLUS,
+        MINUS,
+        STAR,
+
+        // SEPERATORS
+        LEFT_PAREN = -7,
+        RIGHT_PAREN = -8,
+        COMMA = -9
     };
 }
 
@@ -33,8 +43,8 @@ class Token {
     static Token make_keyword(TokenType::type keyword_type, const std::string& identifier, int line);
 
     TokenType::type get_type() const;
-    std::string lexeme() const;
-    int line() const;
+    std::string get_lexeme() const;
+    int get_line() const;
     double get_num() const;
     std::string get_identifier() const;
     std::string to_str() const;

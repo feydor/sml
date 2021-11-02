@@ -9,5 +9,8 @@ lexer_inc = include_directories('lexer')
 
 ast_inc = include_directories('ast')
 
-subsystems_src = [lexer_src, error_src]
-subsystems_inc = [lexer_inc, error_inc, ast_inc]
+parser_src = files(['parser/parser.cpp'])
+parser_inc = include_directories('parser')
+
+subsystems_src = [lexer_src, error_src, parser_src]
+subsystems_inc = [lexer_inc, error_inc, ast_inc, parser_inc]

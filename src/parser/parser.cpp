@@ -1,10 +1,55 @@
 #include "parser.h"
+#include <cassert>
 
 void
 Parser::parse_syntax()
 {
     while (!at_end())
-        ast.push_back(std::move(primary()));
+        ast.push_back(std::move(expression()));
+}
+
+// expression => primary binary_rhs
+std::unique_ptr<ExprAST>
+Parser::expression()
+{
+    auto LHS = primary();
+    if (!LHS)
+        return nullptr;
+    return binary_rhs(0, std::move(LHS));
+}
+
+// binary_rhs => ('+' primary)*
+std::unique_ptr<ExprAST>
+Parser::binary_rhs(int precedence, std::unique_ptr<ExprAST> LHS)
+{
+    // if this is a binary operator, find its precedence
+    assert(is_binary_op(peek()));
+    while (1) {
+        int tok_prec = token_precedence(peek());
+
+        // not a binary operator or same/lower precedence
+        if (tok_prec < precedence)
+            return LHS;
+        
+        auto binary_op_token = advance(); // consume operator
+        auto RHS = primary();
+        if (!RHS)
+            return nullptr;
+        
+        // determine associativity of next binary op
+        int next_prec = token_precedence(peek());
+        
+        // 
+        if (tok_prec < next_prec) {
+            RHS = binary_rhs(tok_prec + 1, std::move(RHS));
+            if (!RHS)
+                return nullptr;
+        }
+
+        // merge LHS into RHS to make complete binary expr
+        LHS = std::make_unique<BinaryExprAST>(binary_op_token.get_lexeme(), std::move(LHS),
+                                                                            std::move(RHS));
+    }
 }
 
 std::unique_ptr<ExprAST>
@@ -12,24 +57,75 @@ Parser::primary()
 {
     switch (peek().get_type()) {
         case TokenType::IDENTIFIER:
-            return identifier();
+            return std::move(identifier());
         case TokenType::NUMBER:
-            return number_expr();
-        case TokenType::STRING:
-            return string_expr();
+            return std::move(number_expr());
         case TokenType::LEFT_PAREN:
-            return paren_expr();
+            return std::move(paren_expr());
+        default:
+            throw throwable_error("Unknown token found",  "expression", peek().get_lexeme(),
+                                                                        peek().get_line());
     }
 }
 
+// identifier => identifier
+//            => identifier '(' expression* ')'
+std::unique_ptr<ExprAST>
+Parser::identifier()
+{
+    auto ident_token = advance();
+
+    // variable reference
+    if (peek().get_type() != TokenType::LEFT_PAREN)
+        return std::make_unique<VariableExprAST>(ident_token.get_identifier());
+    
+    // function call
+    advance(); // eat '('
+    std::vector<std::unique_ptr<ExprAST>> args;
+    while (peek().get_type() != TokenType::RIGHT_PAREN) {
+        if (auto arg = expression())
+            args.push_back(std::move(arg));
+        else
+            return nullptr;
+        
+        if (peek().get_type() != TokenType::COMMA) {
+            throw throwable_error("Unexpected character", ",",peek().get_identifier(),
+                peek().get_line());
+        }
+        advance();
+    }
+
+    advance(); // eat ')'
+
+    return std::make_unique<CallExprAST>(ident_token.get_identifier(), std::move(args));
+}
+
+// number_expr => number
 std::unique_ptr<ExprAST>
 Parser::number_expr()
 {
     auto num_token = peek();
     auto result = std::make_unique<NumberExprAST>(num_token.get_num());
     advance();
-    return std::move(result);
+    return result;
 }
+
+// paren_expr => '(' expression ')'
+std::unique_ptr<ExprAST>
+Parser::paren_expr()
+{
+    advance();
+    auto contents = expression();
+    if (!contents)
+        return nullptr; // TODO: Throw an exception: "Expression expected or not found"
+    
+    if (peek().get_type() != TokenType::RIGHT_PAREN)
+        throw throwable_error("Syntax error", ")", peek().get_lexeme(), peek().get_line());
+
+    advance();
+    return contents;
+}
+
 
 Token
 Parser::peek()
@@ -47,4 +143,27 @@ bool
 Parser::at_end()
 {
     return peek().get_type() == TokenType::_EOF;
+}
+
+// Returns the precedence of the pending binary token
+int
+Parser::token_precedence(Token token)
+{
+    int prec = this->binary_op_precedences[token.get_type()];
+    if (prec <= 0) return -1;
+    return prec;
+}
+
+// returns true if the token is a binary op in the Parser's table
+bool
+Parser::is_binary_op(Token token)
+{
+    return this->binary_op_precedences[token.get_type()] > 0;
+}
+
+Smol::ParserError
+Parser::throwable_error(const std::string &msg, const std::string &expected,
+        const std::string &found, int line)
+{
+    return Smol::ParserError(msg, expected, found, line);
 }

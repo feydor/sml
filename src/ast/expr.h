@@ -30,12 +30,12 @@ class VariableExprAST : public ExprAST {
 /// BinaryExprAST - Expression class for a binary operator.
 class BinaryExprAST : public ExprAST {
     public:
-        BinaryExprAST(char op, std::unique_ptr<ExprAST> LHS,
-                        std::unique_ptr<ExprAST> RHS)
+        BinaryExprAST(const std::string &op, std::unique_ptr<ExprAST> LHS,
+                                             std::unique_ptr<ExprAST> RHS)
             : op(op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
     
     private:
-    char op;
+    std::string op;
     std::unique_ptr<ExprAST> LHS, RHS;
 };
 

@@ -39,8 +39,14 @@ Token::get_type() const
     return type_;
 }
 
+std::string
+Token::get_lexeme() const
+{
+    return lexeme_;
+}
+
 int
-Token::line() const
+Token::get_line() const
 {
     return line_;
 }

@@ -3,9 +3,11 @@ A (wip) dynamic language and interpreter with recursive descent parser, AST (abs
 
 ## Language definition
 See [GRAMMER.txt](GRAMMER.txt).
+
 ## Build
-1. Install meson and ninja (https://mesonbuild.com/).
-2. On linux and macos (not tested) run the following: 
+1. Install meson and ninja (https://mesonbuild.com/).  
+2. Install the [dependencies](#Dependencies).  
+3. On linux and macos (not tested) run the following: 
 ```sh
 meson build
 ninja -C build
@@ -13,6 +15,7 @@ ninja -C build
 ```
 ## Examples
 The below code fragment is an example written in smol and demonstrates what is so far implemented:
+
 ```python
 # prints the nth row of Pascal's triangle... because why not?
 fn pascal(row) {
@@ -31,23 +34,15 @@ fn pascal_calc(row, i) {
 pascal(15) # 1 14 91 364 1001 2002 3003 3432 3003 2002 1001 364 91 14 1
 ```
 see more at [examples](examples/).
+
 ## Project structure
 - src/
     - ast/
-        - stmt/ - lines that do not produce values when executed.
         - expr/ - lines that produce values when evaluated.
-    - env/ - classes for identifier resolution and for storing return values from user-defined functions.
     - lexer/ - token definitions, smallest language constructs.
-    - lib/ - the foreign function interface (FFI) for user-defined functions and the (wip) prelude.
     - parser/ - creates ASTs recursively.
-    - util/ - error handling, (wip) ANSI terminal support.
-        - object/ - the SMOL primitive types.
-    - smol.cpp - the main entry point for (wip) REPL and file execution.
-## TODO
-- error: identifier followed by a left bracket, even separated by newlines, glob together as a single array subscript expression. I.E. say b \n\n\n\n\n [1, 2] := say b[1, 2]
-    - fix: some sort of line ending character, likely a newline.
-- error: array subscripting is always an r-value, handle cases where it is an l-value
-- error: this doesn't work ((c = 123 - 123) == 0)
-    - fix: make assignment an expression that evaluates to the identifier's value post-op
-- wishlist: builtin functions such as getc(), putc(), fopen(), etc.
-- wishlist: brainfsck interpreter in SMOL.
+    - util/ - error handling, ANSI terminal support.
+    - smol.cpp - the main entry point for REPL and file execution.
+
+## Dependencies
+LLVM, Cmake

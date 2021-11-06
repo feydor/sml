@@ -1,11 +1,86 @@
 #include "parser.h"
 #include <cassert>
+#include <iostream>
+
+namespace ASTPrinter {
+    std::string to_str(FunctionAST &fn_expr)
+    {
+        std::string out("");
+        out += fn_expr.get_name() + " ";
+        for (auto arg : fn_expr.get_args())
+            out += arg + " ";
+        return out;
+    }
+}
 
 void
 Parser::parse_syntax()
+{   
+    while (!at_end()) {
+        if (auto expr = parse())
+            ast.push_back(std::move(expr));
+    }
+}
+
+std::unique_ptr<FunctionAST>
+Parser::parse()
 {
-    while (!at_end())
-        ast.push_back(std::move(expression()));
+    switch(peek().get_type()) {
+        case TokenType::DEF: return function_definition();
+        default: return toplevel_expr();
+    }
+    return nullptr;
+}
+
+// function => 'def' prototype expression
+std::unique_ptr<FunctionAST>
+Parser::function_definition()
+{
+    advance(); // consume 'def'
+
+    auto proto = prototype();
+    if (!proto) return nullptr;
+
+    if (auto expr = expression())
+        return std::make_unique<FunctionAST>(std::move(proto), std::move(expr));
+    return nullptr;
+}
+
+// toplevelexpr => expression
+std::unique_ptr<FunctionAST>
+Parser::toplevel_expr()
+{
+    if (auto expr = expression()) {
+        auto anonymous_proto = std::make_unique<PrototypeAST>("", std::vector<std::string>());
+        return std::make_unique<FunctionAST>(std::move(anonymous_proto), std::move(expr));
+    }
+    return nullptr;
+}
+
+// prototype => identifier '(' identifier* ')'
+std::unique_ptr<PrototypeAST>
+Parser::prototype()
+{
+    auto ident_token = advance();
+
+    if (peek().get_type() != TokenType::LEFT_PAREN)
+        throw throwable_error("Syntax error in prototype", "(", peek().get_lexeme(),
+                                                                peek().get_line());
+    advance(); // consume '('
+    std::vector<std::string> arg_names;
+    while (peek().get_type() != TokenType::RIGHT_PAREN)
+        arg_names.push_back(advance().get_identifier());
+
+    advance(); // consume ')'
+    return std::make_unique<PrototypeAST>(ident_token.get_identifier(), std::move(arg_names));
+}
+
+// extern => 'extern' prototype
+std::unique_ptr<PrototypeAST>
+Parser::extern_definition()
+{
+    advance(); // consume 'extern'
+    return prototype();
 }
 
 // expression => primary binary_rhs
@@ -22,14 +97,15 @@ Parser::expression()
 std::unique_ptr<ExprAST>
 Parser::binary_rhs(int precedence, std::unique_ptr<ExprAST> LHS)
 {
-    // if this is a binary operator, find its precedence
-    assert(is_binary_op(peek()));
     while (1) {
         int tok_prec = token_precedence(peek());
 
         // not a binary operator or same/lower precedence
         if (tok_prec < precedence)
             return LHS;
+        
+        // if this is a binary operator, find its precedence
+        assert(is_binary_op(peek()));
         
         auto binary_op_token = advance(); // consume operator
         auto RHS = primary();
@@ -80,23 +156,17 @@ Parser::identifier()
         return std::make_unique<VariableExprAST>(ident_token.get_identifier());
     
     // function call
-    advance(); // eat '('
+    advance(); // consume '('
     std::vector<std::unique_ptr<ExprAST>> args;
     while (peek().get_type() != TokenType::RIGHT_PAREN) {
         if (auto arg = expression())
             args.push_back(std::move(arg));
         else
             return nullptr;
-        
-        if (peek().get_type() != TokenType::COMMA) {
-            throw throwable_error("Unexpected character", ",",peek().get_identifier(),
-                peek().get_line());
-        }
-        advance();
+        // advance(); // consume 'arg'
     }
 
-    advance(); // eat ')'
-
+    advance(); // consume ')'
     return std::make_unique<CallExprAST>(ident_token.get_identifier(), std::move(args));
 }
 
@@ -125,7 +195,6 @@ Parser::paren_expr()
     advance();
     return contents;
 }
-
 
 Token
 Parser::peek()

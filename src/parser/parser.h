@@ -6,6 +6,7 @@
 #include <exception>
 #include "token.h"
 #include "expr.h"
+#include "prototype.h"
 #include "smol_error.h"
 
 class ExprAST;
@@ -22,19 +23,25 @@ class Parser {
     }
 
     void parse_syntax();
+    void print_ast();
 
     private:
-    std::vector<std::unique_ptr<ExprAST>> ast;
+    std::vector<std::unique_ptr<FunctionAST>> ast;
     std::vector<Token> tokens;
     std::map<TokenType::type, int> binary_op_precedences;
     int curr_token = 0;
 
+    std::unique_ptr<FunctionAST> parse();
+    std::unique_ptr<FunctionAST> function_definition();
+    std::unique_ptr<FunctionAST> toplevel_expr();
     std::unique_ptr<ExprAST> expression();
     std::unique_ptr<ExprAST> binary_rhs(int precedence, std::unique_ptr<ExprAST> LHS);
     std::unique_ptr<ExprAST> primary();
     std::unique_ptr<ExprAST> identifier();
     std::unique_ptr<ExprAST> number_expr();
     std::unique_ptr<ExprAST> paren_expr();
+    std::unique_ptr<PrototypeAST> prototype();
+    std::unique_ptr<PrototypeAST> extern_definition();
 
     Token peek();
     Token advance();

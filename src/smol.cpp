@@ -109,7 +109,7 @@ void SMOL::eval(std::string const &src)
     Lexer::lexer lexer(src);
     std::vector<Token> tokens = lexer.scan_tokens();
     for (auto token : tokens) {
-        std::cout << "| " << token.to_str() << " |" << " ";
+        std::cout << "| " << token.type_to_string() << " |" << " ";
     }
     std::cout << "\n";
 

@@ -24,12 +24,12 @@ lexer::scan_tokens()
 
         char c = advance();
         switch(c) {
-            case '(': add_keyword(std::to_string(c), TokenType::LEFT_PAREN); break;
-            case ')': add_keyword(std::to_string(c), TokenType::RIGHT_PAREN); break;
-            case '<': add_keyword(std::to_string(c), TokenType::LESS_THAN); break;
-            case '+': add_keyword(std::to_string(c), TokenType::PLUS); break;
-            case '-': add_keyword(std::to_string(c), TokenType::MINUS); break;
-            case '*': add_keyword(std::to_string(c), TokenType::STAR); break;
+            case '(': add_keyword(std::string(1, c), TokenType::LEFT_PAREN); break;
+            case ')': add_keyword(std::string(1, c), TokenType::RIGHT_PAREN); break;
+            case '<': add_keyword(std::string(1, c), TokenType::LESS_THAN); break;
+            case '+': add_keyword(std::string(1, c), TokenType::PLUS); break;
+            case '-': add_keyword(std::string(1, c), TokenType::MINUS); break;
+            case '*': add_keyword(std::string(1, c), TokenType::STAR); break;
             case '#':
                 // comment goes until end of line; skip it
                 while (peek() != '\n' && !at_end())
@@ -54,7 +54,6 @@ lexer::scan_tokens()
                     // report unexpected characters
                     // TODO: combine these into a vector and report once
                     add_error("Unexpected character.");
-                    // SMOL::error(line, "Unexpected character.");
                 }
                 break;
         }

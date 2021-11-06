@@ -7,10 +7,11 @@ error_inc = include_directories('util')
 lexer_src = files(['lexer/lexer.cpp', 'lexer/token.cpp'])
 lexer_inc = include_directories('lexer')
 
+ast_src = files(['ast/function.cpp'])
 ast_inc = include_directories('ast')
 
 parser_src = files(['parser/parser.cpp'])
 parser_inc = include_directories('parser')
 
-subsystems_src = [lexer_src, error_src, parser_src]
+subsystems_src = [lexer_src, error_src, ast_src, parser_src]
 subsystems_inc = [lexer_inc, error_inc, ast_inc, parser_inc]

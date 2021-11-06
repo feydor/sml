@@ -6,16 +6,16 @@
 
 namespace TokenType {
     enum type {
-        _EOF = -1,
+        _EOF,
 
         // commands
-        DEF = -2,
-        EXTERN = -3,
+        DEF,
+        EXTERN,
 
         // primary
-        IDENTIFIER = -4,
-        STRING = -5,
-        NUMBER = -6,
+        IDENTIFIER,
+        STRING,
+        NUMBER,
 
         // operators
         LESS_THAN,
@@ -24,9 +24,9 @@ namespace TokenType {
         STAR,
 
         // SEPERATORS
-        LEFT_PAREN = -7,
-        RIGHT_PAREN = -8,
-        COMMA = -9
+        LEFT_PAREN,
+        RIGHT_PAREN,
+        COMMA
     };
 }
 
@@ -48,7 +48,7 @@ class Token {
     double get_num() const;
     std::string get_identifier() const;
     std::string to_str() const;
-    static std::string type_to_string(TokenType::type type);
+    std::string type_to_string() const;
 
     private:
     // identifiers and string literals

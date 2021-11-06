@@ -3,8 +3,7 @@
 #include <vector>
 #include <memory>
 #include <string>
-
-class ExprAST;
+#include "expr.h"
 
 /// PrototypeAST - This class represents the "prototype" for a function,
 /// which captures its name, and its argument names (thus implicitly the number
@@ -19,8 +18,9 @@ class PrototypeAST {
         : name(name), args(std::move(args)) {}
 
     const std::string &get_name() const { return name; }
+    const std::vector<std::string> &get_args() const { return args; }
 
-    private:
+    public:
     std::string name;
     std::vector<std::string> args;
 };
@@ -29,8 +29,11 @@ class PrototypeAST {
 class FunctionAST {
     public:
     FunctionAST(std::unique_ptr<PrototypeAST> prototype,
-              std::unique_ptr<ExprAST> Body)
+              std::unique_ptr<ExprAST> body)
     : prototype(std::move(prototype)), body(std::move(body)) {}
+
+    std::string get_name() const;
+    std::vector<std::string> get_args() const;
 
     private:
     std::unique_ptr<PrototypeAST> prototype;

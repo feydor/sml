@@ -69,6 +69,27 @@ Token::to_str() const
     return lexeme_;
 }
 
+std::string
+Token::type_to_string() const
+{
+    switch (this->get_type()) {
+        case TokenType::LEFT_PAREN: return "(";
+        case TokenType::RIGHT_PAREN: return ")";
+        case TokenType::COMMA: return ",";
+        case TokenType::MINUS: return "-";
+        case TokenType::PLUS: return "+";
+        case TokenType::STAR: return "*";
+        case TokenType::LESS_THAN: return "<";
+        case TokenType::IDENTIFIER: return this->get_identifier();
+        case TokenType::STRING: return this->get_lexeme();
+        case TokenType::NUMBER: return std::to_string(this->get_num());
+        case TokenType::DEF: return "DEF";
+        case TokenType::EXTERN: return "EXTERN";
+        case TokenType::_EOF: return "EOF";
+        default: return "Unidentified.";
+    }
+}
+
 
 /*
 TokenType::type
@@ -84,55 +105,5 @@ Token::char_to_type(char c) const
     }
 }
 
-std::string
-Token::type_to_string(TokenType::type type)
-{
-    switch (type) {
-        case Token::LEFT_PAREN: return "(";
-        case Token::RIGHT_PAREN: return ")";
-        case Token::LEFT_BRACE: return "{";
-        case Token::RIGHT_BRACE: return "}";
-        case Token::LEFT_BRACKET: return "[";
-        case Token::RIGHT_BRACKET: return "]";
-        case Token::COMMA: return ",";
-        case Token::DOT: return ".";
-        case Token::MINUS: return "-";
-        case Token::PLUS: return "+";
-        case Token::MINUS_MINUS: return "--";
-        case Token::PLUS_PLUS: return "++";
-        case Token::SEMICOLON: return ";";
-        case Token::SLASH: return "/";
-        case Token::STAR: return "*";
-        case Token::BANG: return "!";
-        case Token::QUESTION: return "?";
-        case Token::PERCENT: return "%";
-        case Token::BANG_EQUAL: return "!=";
-        case Token::EQUAL: return "=";
-        case Token::EQUAL_EQUAL: return "==";
-        case Token::GREATER: return ">";
-        case Token::GREATER_EQUAL: return ">=";
-        case Token::LESS: return "<";
-        case Token::LESS_EQUAL: return "<=";
-        case Token::IDENTIFIER: return "IDENTIFIER";
-        case Token::STRING: return "STRING";
-        case Token::NUMBER: return "NUMBER";
-        case Token::AND: return "AND";
-        case Token::ELSE: return "ELSE";
-        case Token::ELSE_IF: return "ELSE_IF";
-        case Token::FALSE: return "FALSE";
-        case Token::FN: return "FN";
-        case Token::FOR: return "FOR";
-        case Token::IF: return "IF";
-        case Token::NIL: return "NIL";
-        case Token::OR: return "OR";
-        case Token::SAY: return "SAY";
-        case Token::RETURN: return "RET";
-        case Token::TRUE: return "TRUE";
-        case Token::LET: return "LET";
-        case Token::WHILE: return "WHILE";
-        case Token::_EOF: return "EOF";
-        case Token::EOL: return "EOL";
-        default: return "Not yet identifed.";
-    }
-}
+
 */

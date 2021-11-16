@@ -24,7 +24,10 @@ class Parser {
     }
 
     void parse_syntax();
-    void code_gen();
+    void code_gen(llvm::LLVMContext &TheContext,
+                  llvm::IRBuilder<> &Builder,
+                  llvm::Module* TheModule,
+                  std::map<std::string, llvm::Value *> &NamedValues);
     void print_ast();
 
     private:

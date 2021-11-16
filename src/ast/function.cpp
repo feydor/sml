@@ -1,5 +1,6 @@
 #include "prototype.h"
 #include <map>
+#include <iostream>
 
 std::string
 FunctionAST::get_name() const
@@ -45,7 +46,7 @@ FunctionAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
         return nullptr;
     
     if (!the_function->empty())
-        return nullptr; // TODO: throw an error "function cannot be redefined"
+        throw std::invalid_argument("function cannot be redfined");
 
     // create a new basic block to start insertion into
     llvm::BasicBlock *BB = llvm::BasicBlock::Create(Context, "entry", the_function);

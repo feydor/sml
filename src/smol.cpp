@@ -11,7 +11,6 @@
 #include <vector>
 #include <chrono>
 #include <unistd.h>
-#include "llvm-includes.h"
 
 #define PROJECT_NAME "smol"
 #define VERSION "0.1.0"
@@ -56,10 +55,17 @@ void SMOL::run_file(std::string const &fname)
 
     std::fstream file;
     file.exceptions(std::fstream::failbit | std::fstream::badbit);
+
+    // the llvm context
+    llvm::LLVMContext *TheContext = new llvm::LLVMContext();
+    llvm::Module *TheModule = new llvm::Module("smol", *TheContext);
+    llvm::IRBuilder<> Builder(*TheContext);
+    std::map<std::string, llvm::Value *> NamedValues;
+
     try {
         file.open(fname);
         buf << file.rdbuf();
-        SMOL::eval(buf.str());
+        SMOL::eval(buf.str(), *TheContext, Builder, TheModule, NamedValues);
     } catch (std::fstream::failure& e) {
         std::cerr << "Exception opening/reading file.\n";
     }
@@ -74,12 +80,19 @@ void SMOL::run_prompt()
     std::cout << PROJECT_NAME << " " << VERSION << std::endl;
     std::string line("");
     SMOL::is_repl = true;
+
+    // the llvm context
+    llvm::LLVMContext *TheContext = new llvm::LLVMContext();
+    llvm::Module *TheModule = new llvm::Module("smol", *TheContext);
+    llvm::IRBuilder<> Builder(*TheContext);
+    std::map<std::string, llvm::Value *> NamedValues;
+
     for (;;) {
         std::cout << "> ";
         std::getline(std::cin, line);
         if (line.empty() || line.compare("quit") == 0)
             break;
-        SMOL::eval(line + "\n");
+        SMOL::eval(line + "\n", *TheContext, Builder, TheModule, NamedValues);
         SMOL::had_error = false;
     }
 }
@@ -105,7 +118,10 @@ void SMOL::print_version()
 }
 
 /* start interpretation */
-void SMOL::eval(std::string const &src)
+void SMOL::eval(std::string const &src, llvm::LLVMContext &TheContext,
+                                        llvm::IRBuilder<> &Builder,
+                                        llvm::Module* TheModule,
+                                        std::map<std::string, llvm::Value *> &NamedValues)
 {
     Lexer::lexer lexer(src);
     std::vector<Token> tokens = lexer.scan_tokens();
@@ -121,7 +137,7 @@ void SMOL::eval(std::string const &src)
     
     try {
         parser.parse_syntax(); // parser holds ownership of all statements
-        parser.code_gen();
+        parser.code_gen(TheContext, Builder, TheModule, NamedValues);
     } catch (Smol::ParserError& e) {
         e.print();
         exit(1);

@@ -23,19 +23,26 @@ Parser::parse_syntax()
 }
 
 void
-Parser::code_gen()
+Parser::code_gen(llvm::LLVMContext &TheContext,
+                 llvm::IRBuilder<> &Builder,
+                 llvm::Module* TheModule,
+                 std::map<std::string, llvm::Value *> &NamedValues)
 {
     // llvm variables
-    llvm::LLVMContext TheContext;
-    llvm::IRBuilder<> Builder(TheContext);
-    std::unique_ptr<llvm::Module> TheModule;
-    std::map<std::string, llvm::Value *> NamedValues;
+    //llvm::LLVMContext *TheContext = new llvm::LLVMContext();
+    //llvm::Module *TheModule = new llvm::Module("smol", *TheContext);
+    //llvm::IRBuilder<> Builder(*TheContext);
+    //std::map<std::string, llvm::Value *> NamedValues;
+
+    std::cout << "BEGIN Parser::code_gen(): \n";
 
     for (auto &expr : ast) {
-        expr->code_gen(TheContext, Builder, TheModule.get(), NamedValues);
+        std::cout << ASTPrinter::to_str(*expr) << std::endl;
+        expr->code_gen(TheContext, Builder, TheModule, NamedValues);
     }
 
     // print generated code
+    std::cout << "Now printing IR... \n";
     TheModule->print(llvm::errs(), nullptr);
 }
 

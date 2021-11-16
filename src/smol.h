@@ -2,6 +2,7 @@
 #define SMOL_H
 #include <memory>
 #include <string>
+#include "llvm-includes.h"
 
 struct SMOL {
     static bool had_error;
@@ -12,7 +13,10 @@ struct SMOL {
     SMOL() {};
     static void run_prompt();
     static void run_file(std::string const &fname);
-    static void eval(std::string const &src);
+    static void eval(std::string const &src, llvm::LLVMContext &TheContext,
+                                             llvm::IRBuilder<> &Builder,
+                                             llvm::Module* TheModule,
+                                             std::map<std::string, llvm::Value *> &NamedValues);
     static void print_usage();
     static void print_version();
 };

@@ -1,6 +1,4 @@
 #include "prototype.h"
-#include <map>
-#include <iostream>
 
 const std::string &
 PrototypeAST::get_name() const

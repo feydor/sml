@@ -125,19 +125,6 @@ lexer::double_peek()
     return src.at(this->curr + 1);
 }
 
-/* if the next character matches, consume the current + next character */
-bool
-lexer::next_is(char c)
-{
-    if (at_end())
-        return false;
-    if (src.at(this->curr) != c)
-        return false;
-
-    this->curr++;
-    return true;
-}
-
 /* handle string literals */
 /*void
 lexer::str()

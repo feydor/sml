@@ -150,11 +150,11 @@ Parser::primary()
 {
     switch (peek().get_type()) {
         case TokenType::IDENTIFIER:
-            return std::move(identifier());
+            return identifier();
         case TokenType::NUMBER:
-            return std::move(number_expr());
+            return number_expr();
         case TokenType::LEFT_PAREN:
-            return std::move(paren_expr());
+            return paren_expr();
         default:
             throw throwable_error("Unknown token found",  "expression", peek().get_lexeme(),
                                                                         peek().get_line());
@@ -180,7 +180,6 @@ Parser::identifier()
             args.push_back(std::move(arg));
         else
             return nullptr;
-        // advance(); // consume 'arg'
     }
 
     advance(); // consume ')'

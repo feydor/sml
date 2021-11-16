@@ -32,7 +32,6 @@ class lexer {
     bool add_identifier_as_keyword(const std::string &lexeme);
     char peek();
     char double_peek();
-    bool next_is(char c);
     void str();
     void num();
     void identifier();

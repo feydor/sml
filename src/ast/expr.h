@@ -3,19 +3,27 @@
 #include <vector>
 #include <memory>
 #include <string>
+#include <map>
+#include "llvm-includes.h"
 
 // ExprAST - Base class for all expression nodes
 class ExprAST {
     public:
         virtual ~ExprAST() = default;
-        virtual Value *codegen() = 0;
+        virtual llvm::Value *code_gen(llvm::LLVMContext &Context,
+                                      llvm::IRBuilder<> &Builder,
+                                      llvm::Module* Module,
+                                      std::map<std::string, llvm::Value *> &namedValues) = 0;
 };
 
 // NumberAST - Expression class for all numeric literals such as "1.9"
 class NumberExprAST : public ExprAST {
     public:
-        NumberExprAST(double val) : val(val) {}
-        virtual Value *codegen();
+        explicit NumberExprAST(double val) : val(val) {}
+        virtual llvm::Value *code_gen(llvm::LLVMContext &Context,
+                                      llvm::IRBuilder<> &Builder,
+                                      llvm::Module* Module,
+                                      std::map<std::string, llvm::Value *> &namedValues) override;
     private:
         double val;
 };
@@ -23,8 +31,11 @@ class NumberExprAST : public ExprAST {
 /// VariableExprAST - Expression class for referencing a variable, like "a".
 class VariableExprAST : public ExprAST {
     public:
-        VariableExprAST(const std::string &name) : name(name) {}
-        virtual Value *codegen();
+        explicit VariableExprAST(const std::string &name) : name(name) {}
+        virtual llvm::Value *code_gen(llvm::LLVMContext &Context,
+                                      llvm::IRBuilder<> &Builder,
+                                      llvm::Module* Module,
+                                      std::map<std::string, llvm::Value *> &namedValues) override;
     private: 
         std::string name;
 };
@@ -35,7 +46,10 @@ class BinaryExprAST : public ExprAST {
         BinaryExprAST(const std::string &op, std::unique_ptr<ExprAST> LHS,
                                              std::unique_ptr<ExprAST> RHS)
             : op(op), LHS(std::move(LHS)), RHS(std::move(RHS)) {}
-        virtual Value *codegen();
+        virtual llvm::Value *code_gen(llvm::LLVMContext &Context,
+                                      llvm::IRBuilder<> &Builder,
+                                      llvm::Module* Module,
+                                      std::map<std::string, llvm::Value *> &namedValues) override;
     private:
         std::string op;
         std::unique_ptr<ExprAST> LHS, RHS;
@@ -47,7 +61,10 @@ class CallExprAST : public ExprAST {
         CallExprAST(const std::string &callee,
                     std::vector<std::unique_ptr<ExprAST>> args)
             : callee(callee), args(std::move(args)) {}
-        virtual Value *codegen();
+        virtual llvm::Value *code_gen(llvm::LLVMContext &Context,
+                                      llvm::IRBuilder<> &Builder,
+                                      llvm::Module* Module,
+                                      std::map<std::string, llvm::Value *> &namedValues) override;
     private:
         std::string callee;
         std::vector<std::unique_ptr<ExprAST>> args;

@@ -8,6 +8,7 @@
 #include "expr.h"
 #include "prototype.h"
 #include "smol_error.h"
+#include "llvm-includes.h"
 
 class ExprAST;
 
@@ -23,6 +24,7 @@ class Parser {
     }
 
     void parse_syntax();
+    void code_gen();
     void print_ast();
 
     private:

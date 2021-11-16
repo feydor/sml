@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 #include "expr.h"
+#include "llvm-includes.h"
+
 
 /// PrototypeAST - This class represents the "prototype" for a function,
 /// which captures its name, and its argument names (thus implicitly the number
@@ -20,6 +22,9 @@ class PrototypeAST {
     const std::string &get_name() const { return name; }
     const std::vector<std::string> &get_args() const { return args; }
 
+    llvm::Function *code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
+                             llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues);
+
     public:
     std::string name;
     std::vector<std::string> args;
@@ -34,6 +39,8 @@ class FunctionAST {
 
     std::string get_name() const;
     std::vector<std::string> get_args() const;
+    llvm::Function *code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
+                             llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues);
 
     private:
     std::unique_ptr<PrototypeAST> prototype;

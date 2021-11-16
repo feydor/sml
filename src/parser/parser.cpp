@@ -22,6 +22,23 @@ Parser::parse_syntax()
     }
 }
 
+void
+Parser::code_gen()
+{
+    // llvm variables
+    llvm::LLVMContext TheContext;
+    llvm::IRBuilder<> Builder(TheContext);
+    std::unique_ptr<llvm::Module> TheModule;
+    std::map<std::string, llvm::Value *> NamedValues;
+
+    for (auto &expr : ast) {
+        expr->code_gen(TheContext, Builder, TheModule.get(), NamedValues);
+    }
+
+    // print generated code
+    TheModule->print(llvm::errs(), nullptr);
+}
+
 std::unique_ptr<FunctionAST>
 Parser::parse()
 {

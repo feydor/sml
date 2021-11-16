@@ -1,26 +1,29 @@
 #include "expr.h"
 #include <stdexcept>
 
-Value*
-NumberExprAST::codegen()
+llvm::Value*
+NumberExprAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
+                       llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues)
 {
-    return ConstantFP::get(TheContext, APFloat(val));
+    return llvm::ConstantFP::get(Context, llvm::APFloat(val));
 }
 
-Value*
-VariableExprAST::codegen()
+llvm::Value*
+VariableExprAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
+                          llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues)
 {
-    Value *val = NamedValues[name]; // look up this var
+    llvm::Value *val = namedValues[name]; // look up this var
     if (!val)
         throw std::invalid_argument("Unknown variabel name.");
     return val;
 }
 
-Value*
-BinaryExprAST::codegen()
+llvm::Value*
+BinaryExprAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
+                       llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues)
 {
-    Value *L = LHS->codegen();
-    Value *R = RHS->codegen();
+    llvm::Value *L = LHS->code_gen(Context, Builder, Module, namedValues);
+    llvm::Value *R = RHS->code_gen(Context, Builder, Module, namedValues);
     if (!L || !R) return nullptr;
 
     switch(op[0]) {
@@ -31,26 +34,27 @@ BinaryExprAST::codegen()
             L = Builder.CreateFCmpULT(L, R, "cmptmp");
 
             // Convert bool 0/1 to double 0.0 or 1.0
-            return Builder.CreateUIToFP(L, Type::getDoubleTy(TheContext), "booltmp");
+            return Builder.CreateUIToFP(L, llvm::Type::getDoubleTy(Context), "booltmp");
         }
         default: throw std::invalid_argument("Unknown binary operator.");
     }
 }
 
-Value*
-CallExprAST::codegen()
+llvm::Value*
+CallExprAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
+                     llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues)
 {
     // look up name in global module table
-    Function *calleef = TheModule->getFunction(callee);
+    llvm::Function *calleef = Module->getFunction(callee);
     if (!calleef)
         throw std::invalid_argument("Unknown function called.");
 
     if (calleef->arg_size() != args.size())
         throw std::invalid_argument("Incorrect # of arguments passed.");
 
-    std::vector<Value *> args_v;
+    std::vector<llvm::Value *> args_v;
     for (unsigned i = 0, e = args.size(); i != e; ++i) {
-        args_v.push_back(args[i]->codegen());
+        args_v.push_back(args[i]->code_gen(Context, Builder, Module, namedValues));
         if (!args_v.back())
             return nullptr;
     }

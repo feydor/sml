@@ -11,6 +11,7 @@
 #include <vector>
 #include <chrono>
 #include <unistd.h>
+#include "llvm-includes.h"
 
 #define PROJECT_NAME "smol"
 #define VERSION "0.1.0"
@@ -120,6 +121,7 @@ void SMOL::eval(std::string const &src)
     
     try {
         parser.parse_syntax(); // parser holds ownership of all statements
+        parser.code_gen();
     } catch (Smol::ParserError& e) {
         e.print();
         exit(1);

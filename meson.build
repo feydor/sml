@@ -28,6 +28,7 @@ exe = executable(
   src,
   include_directories: inc,
   install : true,
+  dependencies: llvm_dep,
 )
 
 test('basic', exe)

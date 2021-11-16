@@ -2,19 +2,31 @@
 #include <map>
 #include <iostream>
 
-std::string
+const std::string &
+PrototypeAST::get_name() const
+{
+    return name;
+}
+
+const std::vector<std::string> &
+PrototypeAST::get_args() const
+{
+    return args;
+}
+
+const std::string &
 FunctionAST::get_name() const
 {
-    return prototype->get_name();
+    return this->prototype->get_name();
 }
 
-std::vector<std::string>
+const std::vector<std::string> &
 FunctionAST::get_args() const
 {
-    return prototype->get_args();
+    return this->prototype->get_args();
 }
 
-llvm::Function*
+llvm::Function *
 PrototypeAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
                        llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues)
 {
@@ -32,7 +44,7 @@ PrototypeAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
     return f;
 }
 
-llvm::Function*
+llvm::Function *
 FunctionAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
                       llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues)
 {

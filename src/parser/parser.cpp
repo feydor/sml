@@ -3,7 +3,7 @@
 #include <iostream>
 
 namespace ASTPrinter {
-    std::string to_str(FunctionAST &fn_expr)
+    std::string to_str(DeclarationAST &fn_expr)
     {
         std::string out("");
         out += fn_expr.get_name() + " ";
@@ -28,14 +28,6 @@ Parser::code_gen(llvm::LLVMContext &TheContext,
                  llvm::Module* TheModule,
                  std::map<std::string, llvm::Value *> &NamedValues)
 {
-    // llvm variables
-    //llvm::LLVMContext *TheContext = new llvm::LLVMContext();
-    //llvm::Module *TheModule = new llvm::Module("smol", *TheContext);
-    //llvm::IRBuilder<> Builder(*TheContext);
-    //std::map<std::string, llvm::Value *> NamedValues;
-
-    std::cout << "BEGIN Parser::code_gen(): \n";
-
     for (auto &expr : ast) {
         std::cout << ASTPrinter::to_str(*expr) << std::endl;
         expr->code_gen(TheContext, Builder, TheModule, NamedValues);
@@ -46,11 +38,12 @@ Parser::code_gen(llvm::LLVMContext &TheContext,
     TheModule->print(llvm::errs(), nullptr);
 }
 
-std::unique_ptr<FunctionAST>
+std::unique_ptr<DeclarationAST>
 Parser::parse()
 {
     switch(peek().get_type()) {
         case TokenType::DEF: return function_definition();
+        case TokenType::EXTERN: return extern_definition();
         default: return toplevel_expr();
     }
     return nullptr;

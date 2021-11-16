@@ -31,12 +31,12 @@ class Parser {
     void print_ast();
 
     private:
-    std::vector<std::unique_ptr<FunctionAST>> ast;
+    std::vector<std::unique_ptr<DeclarationAST>> ast;
     std::vector<Token> tokens;
     std::map<TokenType::type, int> binary_op_precedences;
     int curr_token = 0;
 
-    std::unique_ptr<FunctionAST> parse();
+    std::unique_ptr<DeclarationAST> parse();
     std::unique_ptr<FunctionAST> function_definition();
     std::unique_ptr<FunctionAST> toplevel_expr();
     std::unique_ptr<ExprAST> expression();

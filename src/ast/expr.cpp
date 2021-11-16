@@ -14,7 +14,7 @@ VariableExprAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder
 {
     llvm::Value *val = namedValues[name]; // look up this var
     if (!val)
-        throw std::invalid_argument("Unknown variabel name.");
+        throw std::invalid_argument("Unknown variable name.");
     return val;
 }
 

@@ -2,15 +2,19 @@
 #include <stdexcept>
 
 llvm::Value*
-NumberExprAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
-                       llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues)
+NumberExprAST::code_gen(llvm::LLVMContext &Context,
+                        llvm::IRBuilder<> &Builder,
+                        llvm::Module* Module,
+                        std::map<std::string, llvm::Value *> &namedValues)
 {
     return llvm::ConstantFP::get(Context, llvm::APFloat(val));
 }
 
 llvm::Value*
-VariableExprAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
-                          llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues)
+VariableExprAST::code_gen(llvm::LLVMContext &Context,
+                          llvm::IRBuilder<> &Builder,
+                          llvm::Module* Module,
+                          std::map<std::string, llvm::Value *> &namedValues)
 {
     llvm::Value *val = namedValues[name]; // look up this var
     if (!val)

@@ -27,6 +27,7 @@ class Parser {
     void code_gen(llvm::LLVMContext &TheContext,
                   llvm::IRBuilder<> &Builder,
                   llvm::Module* TheModule,
+                  llvm::legacy::FunctionPassManager *TheFPM,
                   std::map<std::string, llvm::Value *> &NamedValues);
     void print_ast();
 

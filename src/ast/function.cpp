@@ -25,8 +25,11 @@ FunctionAST::get_args() const
 }
 
 llvm::Function *
-PrototypeAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
-                       llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues)
+PrototypeAST::code_gen(llvm::LLVMContext &Context,
+                       llvm::IRBuilder<> &Builder,
+                       llvm::Module* Module,
+                       llvm::legacy::FunctionPassManager *FPM,
+                       std::map<std::string, llvm::Value *> &namedValues)
 {
     // Make the function type:  double(double,double, ...)
     std::vector<llvm::Type*> doubles(args.size(), llvm::Type::getDoubleTy(Context));
@@ -43,14 +46,17 @@ PrototypeAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
 }
 
 llvm::Function *
-FunctionAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
-                      llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues)
+FunctionAST::code_gen(llvm::LLVMContext &Context,
+                      llvm::IRBuilder<> &Builder,
+                      llvm::Module* Module,
+                      llvm::legacy::FunctionPassManager *FPM,
+                      std::map<std::string, llvm::Value *> &namedValues)
 {
     // first, check for an existing function from a previous "extern" statement
     llvm::Function *the_function = Module->getFunction(prototype->get_name());
 
     if (!the_function)
-        the_function = prototype->code_gen(Context, Builder, Module, namedValues);
+        the_function = prototype->code_gen(Context, Builder, Module, FPM, namedValues);
     
     if (!the_function)
         return nullptr;
@@ -71,6 +77,7 @@ FunctionAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
     if (llvm::Value *ret_val = body->code_gen(Context, Builder, Module, namedValues)) {
         Builder.CreateRet(ret_val);
         llvm::verifyFunction(*the_function);
+        FPM->run(*the_function); // optimize the function
         return the_function;
     }
 

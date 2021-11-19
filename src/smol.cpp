@@ -60,12 +60,15 @@ void SMOL::run_file(std::string const &fname)
     llvm::LLVMContext *TheContext = new llvm::LLVMContext();
     llvm::Module *TheModule = new llvm::Module("smol", *TheContext);
     llvm::IRBuilder<> Builder(*TheContext);
+    llvm::legacy::FunctionPassManager *TheFPM = new llvm::legacy::FunctionPassManager(TheModule);
+    configure_FPM(TheFPM);
+    // auto TheFPM = std::make_unique<llvm::legacy::FunctionPassManager>(TheModule);
     std::map<std::string, llvm::Value *> NamedValues;
 
     try {
         file.open(fname);
         buf << file.rdbuf();
-        SMOL::eval(buf.str(), *TheContext, Builder, TheModule, NamedValues);
+        SMOL::eval(buf.str(), *TheContext, Builder, TheModule, TheFPM, NamedValues);
     } catch (std::fstream::failure& e) {
         std::cerr << "Exception opening/reading file.\n";
     }
@@ -85,6 +88,8 @@ void SMOL::run_prompt()
     llvm::LLVMContext *TheContext = new llvm::LLVMContext();
     llvm::Module *TheModule = new llvm::Module("smol", *TheContext);
     llvm::IRBuilder<> Builder(*TheContext);
+    llvm::legacy::FunctionPassManager *TheFPM = new llvm::legacy::FunctionPassManager(TheModule);
+    configure_FPM(TheFPM);
     std::map<std::string, llvm::Value *> NamedValues;
 
     for (;;) {
@@ -92,7 +97,7 @@ void SMOL::run_prompt()
         std::getline(std::cin, line);
         if (line.empty() || line.compare("quit") == 0)
             break;
-        SMOL::eval(line + "\n", *TheContext, Builder, TheModule, NamedValues);
+        SMOL::eval(line + "\n", *TheContext, Builder, TheModule, TheFPM, NamedValues);
         SMOL::had_error = false;
     }
 }
@@ -121,6 +126,7 @@ void SMOL::print_version()
 void SMOL::eval(std::string const &src, llvm::LLVMContext &TheContext,
                                         llvm::IRBuilder<> &Builder,
                                         llvm::Module* TheModule,
+                                        llvm::legacy::FunctionPassManager *TheFPM,
                                         std::map<std::string, llvm::Value *> &NamedValues)
 {
     Lexer::lexer lexer(src);
@@ -137,7 +143,7 @@ void SMOL::eval(std::string const &src, llvm::LLVMContext &TheContext,
     
     try {
         parser.parse_syntax(); // parser holds ownership of all statements
-        parser.code_gen(TheContext, Builder, TheModule, NamedValues);
+        parser.code_gen(TheContext, Builder, TheModule, TheFPM, NamedValues);
     } catch (Smol::ParserError& e) {
         e.print();
         exit(1);
@@ -177,4 +183,19 @@ void SMOL::eval(std::string const &src, llvm::LLVMContext &TheContext,
         std::cout << "Duration: " << ms_double.count() << "ms\n";
     }
     */
+}
+
+// Add optimization passes to the FunctionPassManager
+void SMOL::configure_FPM(llvm::legacy::FunctionPassManager *TheFPM)
+{
+    // Do simple "peephole" optimizations and bit-twiddling options.
+    TheFPM->add(llvm::createInstructionCombiningPass());
+    // Reassociate expressions
+    TheFPM->add(llvm::createReassociatePass());
+    // Eliminate Common SubExpressions
+    TheFPM->add(llvm::createGVNPass());
+    // Simplify the control flow graph (delete unreachable blocks, etc)
+    TheFPM->add(llvm::createCFGSimplificationPass());
+
+    TheFPM->doInitialization();
 }

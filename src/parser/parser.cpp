@@ -26,11 +26,12 @@ void
 Parser::code_gen(llvm::LLVMContext &TheContext,
                  llvm::IRBuilder<> &Builder,
                  llvm::Module* TheModule,
+                 llvm::legacy::FunctionPassManager *TheFPM,
                  std::map<std::string, llvm::Value *> &NamedValues)
 {
     for (auto &expr : ast) {
         std::cout << ASTPrinter::to_str(*expr) << std::endl;
-        expr->code_gen(TheContext, Builder, TheModule, NamedValues);
+        expr->code_gen(TheContext, Builder, TheModule, TheFPM, NamedValues);
     }
 
     // print generated code

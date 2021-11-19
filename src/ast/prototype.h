@@ -13,8 +13,9 @@ class DeclarationAST {
         virtual ~DeclarationAST() = default;
         virtual llvm::Function *code_gen(llvm::LLVMContext &Context,
                                          llvm::IRBuilder<> &Builder,
-                                         llvm::Module* Module, std::map<std::string,
-                                         llvm::Value *> &namedValues) = 0;
+                                         llvm::Module* Module,
+                                         llvm::legacy::FunctionPassManager *FPM,
+                                         std::map<std::string, llvm::Value *> &namedValues) = 0;
         virtual const std::string &get_name() const = 0;
         virtual const std::vector<std::string> &get_args() const = 0;
 };
@@ -35,8 +36,11 @@ class PrototypeAST : public DeclarationAST {
     const std::string &get_name() const override;
     const std::vector<std::string> &get_args() const override;
 
-    llvm::Function *code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
-                             llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues) override;
+    llvm::Function *code_gen(llvm::LLVMContext &Context,
+                             llvm::IRBuilder<> &Builder,
+                             llvm::Module* Module,
+                             llvm::legacy::FunctionPassManager *FPM,
+                             std::map<std::string, llvm::Value *> &namedValues) override;
 
     private:
     std::string name;
@@ -52,8 +56,11 @@ class FunctionAST : public DeclarationAST {
 
     const std::string &get_name() const override;
     const std::vector<std::string> &get_args() const override;
-    llvm::Function *code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
-                             llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues) override;
+    llvm::Function *code_gen(llvm::LLVMContext &Context,
+                             llvm::IRBuilder<> &Builder,
+                             llvm::Module* Module,
+                             llvm::legacy::FunctionPassManager *FPM,
+                             std::map<std::string, llvm::Value *> &namedValues) override;
 
     private:
     std::unique_ptr<PrototypeAST> prototype;

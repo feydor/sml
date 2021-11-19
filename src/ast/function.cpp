@@ -28,9 +28,9 @@ llvm::Function *
 PrototypeAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
                        llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues)
 {
-    // Make the function type:  double(double,double) etc.
+    // Make the function type:  double(double,double, ...)
     std::vector<llvm::Type*> doubles(args.size(), llvm::Type::getDoubleTy(Context));
-
+    
     llvm::FunctionType *ft = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), doubles, false);
 
     llvm::Function *f = llvm::Function::Create(ft, llvm::Function::ExternalLinkage, name, Module);
@@ -56,7 +56,7 @@ FunctionAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
         return nullptr;
     
     if (!the_function->empty())
-        throw std::invalid_argument("function cannot be redfined");
+        throw std::invalid_argument("function cannot be redefined");
 
     // create a new basic block to start insertion into
     llvm::BasicBlock *BB = llvm::BasicBlock::Create(Context, "entry", the_function);
@@ -70,7 +70,7 @@ FunctionAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
     // code_gen on body
     if (llvm::Value *ret_val = body->code_gen(Context, Builder, Module, namedValues)) {
         Builder.CreateRet(ret_val);
-        verifyFunction(*the_function);
+        llvm::verifyFunction(*the_function);
         return the_function;
     }
 

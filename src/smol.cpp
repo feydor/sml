@@ -15,15 +15,11 @@
 #define PROJECT_NAME "smol"
 #define VERSION "0.1.0"
 
-bool SMOL::had_error = false;
-bool SMOL::is_repl = false;
 bool SMOL::benchmark = false;
-std::string SMOL::fname;
 
 int main(int argc, char **argv) 
 {
     char c;
-    int i;
     while ((c = getopt(argc, argv, "vhb:")) != -1) {
         switch (c) {
             case 'v': SMOL::print_version(), exit(0);
@@ -38,42 +34,36 @@ int main(int argc, char **argv)
             default: abort();
         }
     }
-    i = (argc == 3) ? 2 : 1;
+    int i = (argc == 3) ? 2 : 1;
+
+    auto smol = std::make_unique<SMOL>();
 
     if (argc > 1)
-        SMOL::run_file(argv[i]);
+        smol->run_file(argv[i]);
     else
-        SMOL::run_prompt();
+        smol->run_prompt();
     return 0;
 }
 
 void SMOL::run_file(std::string const &fname)
 {
-    SMOL::fname = fname;
-    SMOL::is_repl = false;
+    this->fname = fname;
+    is_repl = false;
     std::stringstream buf;
 
     std::fstream file;
     file.exceptions(std::fstream::failbit | std::fstream::badbit);
 
-    // the llvm context
-    llvm::LLVMContext *TheContext = new llvm::LLVMContext();
-    llvm::Module *TheModule = new llvm::Module("smol", *TheContext);
-    llvm::IRBuilder<> Builder(*TheContext);
-    llvm::legacy::FunctionPassManager *TheFPM = new llvm::legacy::FunctionPassManager(TheModule);
-    configure_FPM(TheFPM);
-    std::map<std::string, llvm::Value *> NamedValues;
-
     try {
         file.open(fname);
         buf << file.rdbuf();
-        SMOL::eval(buf.str(), *TheContext, Builder, TheModule, TheFPM, NamedValues);
+        eval(buf.str());
     } catch (std::fstream::failure& e) {
         std::cerr << "Exception opening/reading file.\n";
     }
 
     /* reached after evaluation */
-    if (SMOL::had_error)
+    if (had_error)
         exit(65);
 }
 
@@ -81,31 +71,15 @@ void SMOL::run_prompt()
 {
     std::cout << PROJECT_NAME << " " << VERSION << std::endl;
     std::string line("");
-    SMOL::is_repl = true;
-
-    // the llvm context
-    llvm::LLVMContext *TheContext = new llvm::LLVMContext();
-    llvm::Module *TheModule = new llvm::Module("smol", *TheContext);
-    llvm::IRBuilder<> Builder(*TheContext);
-    llvm::legacy::FunctionPassManager *TheFPM = new llvm::legacy::FunctionPassManager(TheModule);
-    configure_FPM(TheFPM);
-    std::map<std::string, llvm::Value *> NamedValues;
-    
-    // llvm JIT initialization
-    llvm::InitializeNativeTarget();
-    llvm::InitializeNativeTargetAsmPrinter();
-    llvm::InitializeNativeTargetAsmParser();
-    auto TheJIT = SmolJIT::Create();
-
-    TheModule->setDataLayout(TheJIT.get()->getDataLayout());
+    is_repl = true;
 
     for (;;) {
         std::cout << "> ";
         std::getline(std::cin, line);
         if (line.empty() || line.compare("quit") == 0)
             break;
-        SMOL::eval(line + "\n", *TheContext, Builder, TheModule, TheFPM, *(TheJIT.get()), NamedValues);
-        SMOL::had_error = false;
+        eval(line + "\n");
+        had_error = false;
     }
 }
 
@@ -130,12 +104,7 @@ void SMOL::print_version()
 }
 
 /* start interpretation */
-void SMOL::eval(std::string const &src, llvm::LLVMContext &TheContext,
-                                        llvm::IRBuilder<> &Builder,
-                                        llvm::Module* TheModule,
-                                        llvm::legacy::FunctionPassManager *TheFPM,
-                                        SmolJIT* TheJIT,
-                                        std::map<std::string, llvm::Value *> &NamedValues)
+void SMOL::eval(std::string const &src)
 {
     Lexer::lexer lexer(src);
     std::vector<Token> tokens = lexer.scan_tokens();
@@ -151,7 +120,7 @@ void SMOL::eval(std::string const &src, llvm::LLVMContext &TheContext,
     
     try {
         parser.parse_syntax(); // parser holds ownership of all statements
-        parser.code_gen(TheContext, Builder, TheModule, TheFPM, NamedValues);
+        parser.code_gen(*TheContext.get(), *Builder.get(), TheModule.get(), TheFPM.get(), NamedValues);
     } catch (Smol::ParserError& e) {
         e.print();
         exit(1);
@@ -191,6 +160,19 @@ void SMOL::eval(std::string const &src, llvm::LLVMContext &TheContext,
         std::cout << "Duration: " << ms_double.count() << "ms\n";
     }
     */
+}
+
+void SMOL::init_jit(SmolJIT* JIT) {
+    // llvm JIT initialization
+    llvm::InitializeNativeTarget();
+    llvm::InitializeNativeTargetAsmPrinter();
+    llvm::InitializeNativeTargetAsmParser();
+    auto result = SmolJIT::Create();
+    if (auto err = result.takeError()) {
+        llvm::consumeError(std::move(err)); // TODO: handle error
+    }
+    this->TheJIT = std::move(*result);
+    this->TheModule->setDataLayout(this->TheJIT.get()->getDataLayout());
 }
 
 // Add optimization passes to the FunctionPassManager

@@ -6,6 +6,8 @@
 #include "expr.h"
 #include "llvm-includes.h"
 
+class SMOL;
+
 // DeclarationAST - This class represents either a function definition
 // or a prototype without a definition
 class DeclarationAST {
@@ -16,6 +18,7 @@ class DeclarationAST {
                                          llvm::Module* Module,
                                          llvm::legacy::FunctionPassManager *FPM,
                                          std::map<std::string, llvm::Value *> &namedValues) = 0;
+        virtual void compile(SMOL& compiler) = 0;
         virtual const std::string &get_name() const = 0;
         virtual const std::vector<std::string> &get_args() const = 0;
 };
@@ -41,6 +44,7 @@ class PrototypeAST : public DeclarationAST {
                              llvm::Module* Module,
                              llvm::legacy::FunctionPassManager *FPM,
                              std::map<std::string, llvm::Value *> &namedValues) override;
+    void compile(SMOL& compiler) override;
 
     private:
     std::string name;
@@ -61,6 +65,7 @@ class FunctionAST : public DeclarationAST {
                              llvm::Module* Module,
                              llvm::legacy::FunctionPassManager *FPM,
                              std::map<std::string, llvm::Value *> &namedValues) override;
+    void compile(SMOL& compiler) override;
 
     private:
     std::unique_ptr<PrototypeAST> prototype;

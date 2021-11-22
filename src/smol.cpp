@@ -16,6 +16,7 @@
 #define VERSION "0.1.0"
 
 bool SMOL::benchmark = false;
+std::string SMOL::fname = PROJECT_NAME;
 
 int main(int argc, char **argv) 
 {
@@ -47,7 +48,7 @@ int main(int argc, char **argv)
 
 void SMOL::run_file(std::string const &fname)
 {
-    this->fname = fname;
+    SMOL::fname = fname;
     is_repl = false;
     std::stringstream buf;
 
@@ -116,63 +117,29 @@ void SMOL::eval(std::string const &src)
     for (auto err : lexer.get_errors())
         err.print();
     
-    Parser parser(tokens);
+    Parser parser(tokens, *this);
     
     try {
         parser.parse_syntax(); // parser holds ownership of all statements
-        parser.code_gen(*TheContext.get(), *Builder.get(), TheModule.get(), TheFPM.get(), NamedValues);
+        code_gen(parser.get_ast());
     } catch (Smol::ParserError& e) {
         e.print();
         exit(1);
     } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
     }
-    /*
-
-    // set prelude constants and library functions
-    // TODO: Move to prelude.h
-    Env::set_var(std::string("PI"), std::make_unique<Obj::Number>(3.14159265359));
-    FnTable::set_fn(std::make_unique<Lib::to_str>());
-    FnTable::set_fn(std::make_unique<Lib::fopen>());
-    FnTable::set_fn(std::make_unique<Lib::smol_exit>());
-    FnTable::set_fn(std::make_unique<Lib::smol_getchar>());
-    FnTable::set_fn(std::make_unique<Lib::ascii>());
-
-    std::chrono::system_clock::time_point t1, t2;
-    if (SMOL::benchmark) {
-        t1 = std::chrono::high_resolution_clock::now();
-    }
-
-    for (const auto& stmt : parser.view_ast()) {
-        try {
-            stmt->exec();
-        } catch (const std::runtime_error& e) {
-            std::cout << e.what() << std::endl;
-        } catch (Obj::Object& ret_outside_fn) {
-            // TODO: catch a Smol::runtime_error here, but do not exit
-            std::cout << "Error: return statement outside a function.\n";
-        }
-    }
-
-    if (SMOL::benchmark) {
-        t2 = std::chrono::high_resolution_clock::now();
-        std::chrono::duration<double, std::milli> ms_double = t2 - t1;
-        std::cout << "Duration: " << ms_double.count() << "ms\n";
-    }
-    */
 }
 
-void SMOL::init_jit(SmolJIT* JIT) {
-    // llvm JIT initialization
-    llvm::InitializeNativeTarget();
-    llvm::InitializeNativeTargetAsmPrinter();
-    llvm::InitializeNativeTargetAsmParser();
-    auto result = SmolJIT::Create();
-    if (auto err = result.takeError()) {
-        llvm::consumeError(std::move(err)); // TODO: handle error
+void SMOL::code_gen(const std::vector<std::unique_ptr<DeclarationAST>> &ast)
+{
+    for (auto &expr : ast) {
+        expr->code_gen(*TheContext.get(), *Builder.get(), TheModule.get(), TheFPM.get(), NamedValues);
+        expr->compile(*this);
     }
-    this->TheJIT = std::move(*result);
-    this->TheModule->setDataLayout(this->TheJIT.get()->getDataLayout());
+
+    // print generated code
+    std::cout << "Now printing IR... \n";
+    TheModule->print(llvm::errs(), nullptr);
 }
 
 // Add optimization passes to the FunctionPassManager
@@ -188,4 +155,15 @@ void SMOL::configure_FPM(llvm::legacy::FunctionPassManager *TheFPM)
     TheFPM->add(llvm::createCFGSimplificationPass());
 
     TheFPM->doInitialization();
+}
+
+void SMOL::initialize_module_and_passmanager()
+{
+    TheContext = std::make_unique<llvm::LLVMContext>();
+    TheModule = std::make_unique<llvm::Module>("smol", *TheContext);
+    TheModule->setDataLayout(TheJIT->getDataLayout());
+    
+    Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
+    TheFPM = std::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
+    configure_FPM(TheFPM.get());
 }

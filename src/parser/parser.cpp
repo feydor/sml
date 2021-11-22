@@ -13,6 +13,12 @@ namespace ASTPrinter {
     }
 }
 
+std::vector<std::unique_ptr<DeclarationAST>>
+Parser::get_ast()
+{
+    return std::move(ast);
+}
+
 void
 Parser::parse_syntax()
 {   
@@ -20,23 +26,6 @@ Parser::parse_syntax()
         if (auto expr = parse())
             ast.push_back(std::move(expr));
     }
-}
-
-void
-Parser::code_gen(llvm::LLVMContext &TheContext,
-                 llvm::IRBuilder<> &Builder,
-                 llvm::Module* TheModule,
-                 llvm::legacy::FunctionPassManager *TheFPM,
-                 std::map<std::string, llvm::Value *> &NamedValues)
-{
-    for (auto &expr : ast) {
-        std::cout << ASTPrinter::to_str(*expr) << std::endl;
-        expr->code_gen(TheContext, Builder, TheModule, TheFPM, NamedValues);
-    }
-
-    // print generated code
-    std::cout << "Now printing IR... \n";
-    TheModule->print(llvm::errs(), nullptr);
 }
 
 std::unique_ptr<DeclarationAST>
@@ -69,24 +58,7 @@ std::unique_ptr<FunctionAST>
 Parser::toplevel_expr()
 {
     if (auto expr = expression()) {
-        if (expr->code_gen()) {
-            // JIT the module containing the anonymous expression, keeping a handle to free later
-            auto module_handle = TheJIT->addModule(std::move(TheModule));
-            initialize_module_and passmanager();
-
-            // search the JIT for the __anon_expr symbol
-            auto expr_symbol = TheJIT->findSymbol("__anon_expr");
-            assert(ExprSymbol && "Function not found");
-
-            // Get the symbol's address and cast it to the right type (no args, returns double)
-            // so it can be called as a native function
-            double (*fp)() = (double (*)())(intptr_t)expr_symbol.getAddress();
-            fprintf(stderr, "Evaluated to %f\n", fp());
-
-            // Delete the anonymous expression module from JIT
-            TheJIT->removeModule(module_handle);
-        }
-        auto anonymous_proto = std::make_unique<PrototypeAST>("", std::vector<std::string>());
+        auto anonymous_proto = std::make_unique<PrototypeAST>("__anon_expr", std::vector<std::string>());
         return std::make_unique<FunctionAST>(std::move(anonymous_proto), std::move(expr));
     }
     return nullptr;

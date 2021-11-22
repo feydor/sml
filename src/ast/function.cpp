@@ -1,4 +1,5 @@
 #include "prototype.h"
+#include "smol.h"
 
 const std::string &
 PrototypeAST::get_name() const
@@ -45,6 +46,12 @@ PrototypeAST::code_gen(llvm::LLVMContext &Context,
     return f;
 }
 
+void
+PrototypeAST::compile(SMOL& compiler)
+{
+    // do nothing for now
+}
+
 llvm::Function *
 FunctionAST::code_gen(llvm::LLVMContext &Context,
                       llvm::IRBuilder<> &Builder,
@@ -84,4 +91,32 @@ FunctionAST::code_gen(llvm::LLVMContext &Context,
     // error reading from body, remove function
     the_function->eraseFromParent();
     return nullptr;
+}
+
+void
+FunctionAST::compile(SMOL& compiler)
+{
+     if (body) {
+         llvm::ExitOnError llvm_exit_err;
+
+        // Create a ResourceTracker to track JIT'd memory allocated to our
+        // anonymous expression -- that way we can free it after executing
+        auto RT = compiler.TheJIT->getMainJITDylib().createResourceTracker();
+
+        auto TSM = llvm::orc::ThreadSafeModule(std::move(compiler.TheModule), std::move(compiler.TheContext));
+        llvm_exit_err(compiler.TheJIT->addModule(std::move(TSM), RT));
+        compiler.initialize_module_and_passmanager();
+
+        // search the JIT for the __anon_expr symbol
+        auto expr_symbol = llvm_exit_err(compiler.TheJIT->lookup("__anon_expr"));
+        // assert(expr_symbol.get() && "Function not found");
+
+        // Get the symbol's address and cast it to the right type (no args, returns double)
+        // so it can be called as a native function
+        double (*fp)() = (double (*)())(intptr_t)expr_symbol.getAddress();
+        fprintf(stderr, "Evaluated to %f\n", fp());
+
+        // Delete the anonymous expression module from JIT
+        llvm_exit_err(RT->remove());
+    }
 }

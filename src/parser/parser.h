@@ -9,12 +9,14 @@
 #include "prototype.h"
 #include "smol_error.h"
 #include "llvm-includes.h"
+#include "smol.h"
 
 class ExprAST;
 
 class Parser {
     public:
-    explicit Parser(const std::vector<Token> &tokens) : tokens(tokens){
+    explicit Parser(const std::vector<Token> &tokens, SMOL &compilerRef)
+        : tokens(tokens), compiler(compilerRef) {
         // install the standard binary operators
         // 1 is the lowest precedence
         binary_op_precedences[TokenType::LESS_THAN] = 10;
@@ -24,16 +26,13 @@ class Parser {
     }
 
     void parse_syntax();
-    void code_gen(llvm::LLVMContext &TheContext,
-                  llvm::IRBuilder<> &Builder,
-                  llvm::Module* TheModule,
-                  llvm::legacy::FunctionPassManager *TheFPM,
-                  std::map<std::string, llvm::Value *> &NamedValues);
+    std::vector<std::unique_ptr<DeclarationAST>> get_ast();
     void print_ast();
 
     private:
     std::vector<std::unique_ptr<DeclarationAST>> ast;
     std::vector<Token> tokens;
+    SMOL &compiler;
     std::map<TokenType::type, int> binary_op_precedences;
     int curr_token = 0;
 

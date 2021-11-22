@@ -19,12 +19,6 @@
 // mainly copied from https://github.com/llvm/llvm-project/blob/main/llvm/examples/Kaleidoscope/include/KaleidoscopeJIT.h
 class SmolJIT {
     public:
-        // 1. takes a JTMB, used by the IRCompiler, and a DataLayer
-        // 2. initialize ObjectLayer with ref to ES and a function object that will build a new
-        //    JIT memory manager for each module
-        // 3. initialize CompileLayer with: (1) A ref to ES,
-        //                                  (2) a ref to the ObjectLayer,
-        //                                  (3) an off-the-shelf compiler instance
         SmolJIT(std::unique_ptr<llvm::orc::TargetProcessControl> TPC,
                 std::unique_ptr<llvm::orc::ExecutionSession> ES,
                 llvm::orc::JITTargetMachineBuilder JTMB,
@@ -41,7 +35,7 @@ class SmolJIT {
                         DL.getGlobalPrefix()
                     )));
             }
-        
+    public:
         ~SmolJIT() {
             if (auto Err = ES->endSession())
                 ES->reportError(std::move(Err));

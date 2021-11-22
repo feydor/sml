@@ -13,5 +13,8 @@ ast_inc = include_directories('ast')
 parser_src = files(['parser/parser.cpp'])
 parser_inc = include_directories('parser')
 
-subsystems_src = [lexer_src, error_src, ast_src, parser_src]
-subsystems_inc = [lexer_inc, error_inc, ast_inc, parser_inc]
+jit_src = files(['jit/jit.hpp'])
+jit_inc = include_directories('jit')
+
+subsystems_src = [lexer_src, error_src, ast_src, parser_src, jit_src]
+subsystems_inc = [lexer_inc, error_inc, ast_inc, parser_inc, jit_inc]

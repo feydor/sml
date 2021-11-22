@@ -62,7 +62,6 @@ void SMOL::run_file(std::string const &fname)
     llvm::IRBuilder<> Builder(*TheContext);
     llvm::legacy::FunctionPassManager *TheFPM = new llvm::legacy::FunctionPassManager(TheModule);
     configure_FPM(TheFPM);
-    // auto TheFPM = std::make_unique<llvm::legacy::FunctionPassManager>(TheModule);
     std::map<std::string, llvm::Value *> NamedValues;
 
     try {
@@ -91,13 +90,21 @@ void SMOL::run_prompt()
     llvm::legacy::FunctionPassManager *TheFPM = new llvm::legacy::FunctionPassManager(TheModule);
     configure_FPM(TheFPM);
     std::map<std::string, llvm::Value *> NamedValues;
+    
+    // llvm JIT initialization
+    llvm::InitializeNativeTarget();
+    llvm::InitializeNativeTargetAsmPrinter();
+    llvm::InitializeNativeTargetAsmParser();
+    auto TheJIT = SmolJIT::Create();
+
+    TheModule->setDataLayout(TheJIT.get()->getDataLayout());
 
     for (;;) {
         std::cout << "> ";
         std::getline(std::cin, line);
         if (line.empty() || line.compare("quit") == 0)
             break;
-        SMOL::eval(line + "\n", *TheContext, Builder, TheModule, TheFPM, NamedValues);
+        SMOL::eval(line + "\n", *TheContext, Builder, TheModule, TheFPM, *(TheJIT.get()), NamedValues);
         SMOL::had_error = false;
     }
 }
@@ -127,6 +134,7 @@ void SMOL::eval(std::string const &src, llvm::LLVMContext &TheContext,
                                         llvm::IRBuilder<> &Builder,
                                         llvm::Module* TheModule,
                                         llvm::legacy::FunctionPassManager *TheFPM,
+                                        SmolJIT* TheJIT,
                                         std::map<std::string, llvm::Value *> &NamedValues)
 {
     Lexer::lexer lexer(src);

@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 #include "llvm-includes.h"
+#include "jit.h"
 
 struct SMOL {
     static bool had_error;
@@ -17,6 +18,7 @@ struct SMOL {
                                              llvm::IRBuilder<> &Builder,
                                              llvm::Module *TheModule,
                                              llvm::legacy::FunctionPassManager *TheFPM,
+                                             SmolJIT* TheJIT,
                                              std::map<std::string, llvm::Value *> &NamedValues);
     static void print_usage();
     static void print_version();

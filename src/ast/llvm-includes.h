@@ -20,4 +20,9 @@
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Transforms/Scalar/GVN.h"
 
+// JIT
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/ExecutionEngine/ExecutionEngine.h"
+
+
 #endif

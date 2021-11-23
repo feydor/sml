@@ -19,6 +19,7 @@ namespace TokenType {
 
         // operators
         LESS_THAN,
+        GREATER_THAN,
         PLUS,
         MINUS,
         STAR,

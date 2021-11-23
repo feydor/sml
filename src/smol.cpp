@@ -16,16 +16,18 @@
 #define VERSION "0.1.0"
 
 bool SMOL::benchmark = false;
+bool SMOL::emit_ir = false;
 std::string SMOL::fname = PROJECT_NAME;
 
 int main(int argc, char **argv) 
 {
     char c;
-    while ((c = getopt(argc, argv, "vhb:")) != -1) {
+    while ((c = getopt(argc, argv, "vhbi:")) != -1) {
         switch (c) {
             case 'v': SMOL::print_version(), exit(0);
             case 'h': SMOL::print_usage(), exit(0);
             case 'b': SMOL::benchmark = true; break;
+            case 'i': SMOL::emit_ir = true; break;
             case '?':
                 if (optopt == 'b')
                     std::cerr << "";
@@ -91,6 +93,7 @@ void SMOL::print_usage()
     std::cout << "Example: " << PROJECT_NAME << " -b examples/pascal.smol" << std::endl;
     std::cout << "Options:" << std::endl;
     std::cout << "  -v, --version     " << "display version information and exit" << std::endl;
+    std::cout << "  -i, --ir   " << "       emit IR" << std::endl;
     std::cout << "  -b, --benchmark   " << "activate benchmarking" << std::endl;
     std::cout << "  -h, --help        " << "display this help text and exit" << std::endl;
 }
@@ -99,9 +102,8 @@ void SMOL::print_version()
 {
     std::cout << PROJECT_NAME << " " << VERSION << std::endl;
     std::cout << "Copyright (C) 2021 Victor Reyes" << std::endl;
-    std::cout << "License MIT" << std::endl;
-    std::cout << "This is free software: you are free to change and redistribute it." << std::endl;
-    std::cout << "There is NO WARRANTY, to the extent permitted by law." << std::endl;
+    std::cout << "This program comes with ABSOLUTELY NO WARRANTY;" << std::endl;
+    std::cout << "This is free software, and you are welcome to redistribute it under certain conditions." << std::endl;
 }
 
 /* start interpretation */
@@ -109,10 +111,6 @@ void SMOL::eval(std::string const &src)
 {
     Lexer::lexer lexer(src);
     std::vector<Token> tokens = lexer.scan_tokens();
-    for (auto token : tokens) {
-        std::cout << "| " << token.type_to_string() << " |" << " ";
-    }
-    std::cout << "\n";
 
     for (auto err : lexer.get_errors())
         err.print();
@@ -133,16 +131,34 @@ void SMOL::eval(std::string const &src)
 void SMOL::code_gen(const std::vector<std::unique_ptr<DeclarationAST>> &ast)
 {
     for (auto &expr : ast) {
-        expr->code_gen(*TheContext.get(), *Builder.get(), TheModule.get(), TheFPM.get(), NamedValues);
+        expr->code_gen(*this);
         
         // print generated code
-        std::cout << "Now printing IR... \n";
-        TheModule->print(llvm::errs(), nullptr);
+        if (SMOL::emit_ir) {
+            std::cout << "Now printing IR... \n";
+            TheModule->print(llvm::errs(), nullptr);
+        }
     }
 
-    for (auto &expr : ast) {
-        expr->compile(*this);
+    for (auto &func : ast) {
+        func->compile(*this);
     }
+}
+
+llvm::Function* SMOL::get_function(const std::string &name)
+{
+    // first, check for the function in the current module
+    if (auto* func = TheModule->getFunction(name))
+        return func;
+
+    // std::cout << "SMOL::get_function(" << name << ")\n";
+
+    // otherwise, check whether we can codegen it
+    auto fi = FunctionPrototypes.find(name);
+    if (fi != FunctionPrototypes.end())
+        return fi->second->code_gen(*this);
+    
+    return nullptr;
 }
 
 // Add optimization passes to the FunctionPassManager

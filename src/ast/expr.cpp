@@ -3,60 +3,54 @@
 #include <iostream>
 
 llvm::Value*
-NumberExprAST::code_gen(llvm::LLVMContext &Context,
-                        llvm::IRBuilder<> &Builder,
-                        llvm::Module* Module,
-                        std::map<std::string, llvm::Value *> &namedValues)
+NumberExprAST::code_gen(SMOL &smol)
 {
-    return llvm::ConstantFP::get(Context, llvm::APFloat(val));
+    return llvm::ConstantFP::get(*smol.TheContext, llvm::APFloat(val));
 }
 
 llvm::Value*
-VariableExprAST::code_gen(llvm::LLVMContext &Context,
-                          llvm::IRBuilder<> &Builder,
-                          llvm::Module* Module,
-                          std::map<std::string, llvm::Value *> &namedValues)
+VariableExprAST::code_gen(SMOL &smol)
 {
-    llvm::Value *val = namedValues[name]; // look up this var
+    llvm::Value *val = smol.NamedValues[name]; // look up this var
     if (!val)
         throw std::invalid_argument("Unknown variable name.");
     return val;
 }
 
 llvm::Value*
-BinaryExprAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
-                       llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues)
+BinaryExprAST::code_gen(SMOL &smol)
 {
-    llvm::Value *L = LHS->code_gen(Context, Builder, Module, namedValues);
-    llvm::Value *R = RHS->code_gen(Context, Builder, Module, namedValues);
+    llvm::Value *L = LHS->code_gen(smol);
+    llvm::Value *R = RHS->code_gen(smol);
     if (!L || !R) return nullptr;
 
     // TODO: multi-character (non-ascii) operators?
     // store and switch by tokentype, not raw string
     switch(op[0]) {
-        case '+': return Builder.CreateFAdd(L, R, "addtmp");
-        case '-': return Builder.CreateFSub(L, R, "subtmp");
-        case '*': return Builder.CreateFMul(L, R, "multmp");
+        case '+': return smol.Builder->CreateFAdd(L, R, "addtmp");
+        case '-': return smol.Builder->CreateFSub(L, R, "subtmp");
+        case '*': return smol.Builder->CreateFMul(L, R, "multmp");
         case '<': {
-            L = Builder.CreateFCmpULT(L, R, "cmptmp"); // returns i1/boolean
+            L = smol.Builder->CreateFCmpULT(L, R, "cmptmp"); // returns i1/boolean
 
             // Convert bool 0/1 to double 0.0 or 1.0
-            return Builder.CreateUIToFP(L, llvm::Type::getDoubleTy(Context), "booltmp");
+            return smol.Builder->CreateUIToFP(L, llvm::Type::getDoubleTy(*smol.TheContext), "booltmp");
         }
         case '>': {
-            L = Builder.CreateFCmpUGT(L, R, "cmptmp");
-            return Builder.CreateUIToFP(L, llvm::Type::getDoubleTy(Context), "booltmp");
+            L = smol.Builder->CreateFCmpUGT(L, R, "cmptmp");
+            return smol.Builder->CreateUIToFP(L, llvm::Type::getDoubleTy(*smol.TheContext), "booltmp");
         }
         default: throw std::invalid_argument("Unknown binary operator.");
     }
 }
 
 llvm::Value*
-CallExprAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
-                     llvm::Module* Module, std::map<std::string, llvm::Value *> &namedValues)
+CallExprAST::code_gen(SMOL &smol)
 {
     // look up name in global module table
-    llvm::Function *calleef = Module->getFunction(callee);
+    llvm::Function *calleef = smol.get_function(callee);
+    
+    // std::cout << "CallExprAST::code_gen: " << callee << std::endl;
 
     if (!calleef)
         throw std::invalid_argument("Unknown function called.");
@@ -66,11 +60,11 @@ CallExprAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
 
     std::vector<llvm::Value *> args_v;
     for (unsigned i = 0, e = args.size(); i != e; ++i) {
-        args_v.push_back(args[i]->code_gen(Context, Builder, Module, namedValues));
+        args_v.push_back(args[i]->code_gen(smol));
         if (!args_v.back())
             return nullptr;
     }
-    return Builder.CreateCall(calleef, args_v, "calltmp");
+    return smol.Builder->CreateCall(calleef, args_v, "calltmp");
 }
 
 

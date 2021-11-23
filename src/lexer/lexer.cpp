@@ -27,6 +27,7 @@ lexer::scan_tokens()
             case '(': add_keyword(std::string(1, c), TokenType::LEFT_PAREN); break;
             case ')': add_keyword(std::string(1, c), TokenType::RIGHT_PAREN); break;
             case '<': add_keyword(std::string(1, c), TokenType::LESS_THAN); break;
+            case '>': add_keyword(std::string(1, c), TokenType::GREATER_THAN); break;
             case '+': add_keyword(std::string(1, c), TokenType::PLUS); break;
             case '-': add_keyword(std::string(1, c), TokenType::MINUS); break;
             case '*': add_keyword(std::string(1, c), TokenType::STAR); break;

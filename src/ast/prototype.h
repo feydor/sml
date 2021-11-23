@@ -7,17 +7,14 @@
 #include "llvm-includes.h"
 
 class SMOL;
+class ExprAST;
 
 // DeclarationAST - This class represents either a function definition
 // or a prototype without a definition
 class DeclarationAST {
     public:
         virtual ~DeclarationAST() = default;
-        virtual llvm::Function *code_gen(llvm::LLVMContext &Context,
-                                         llvm::IRBuilder<> &Builder,
-                                         llvm::Module* Module,
-                                         llvm::legacy::FunctionPassManager *FPM,
-                                         std::map<std::string, llvm::Value *> &namedValues) = 0;
+        virtual llvm::Function *code_gen(SMOL &smol) = 0;
         virtual void compile(SMOL& compiler) = 0;
         virtual const std::string &get_name() const = 0;
         virtual const std::vector<std::string> &get_args() const = 0;
@@ -39,11 +36,7 @@ class PrototypeAST : public DeclarationAST {
     const std::string &get_name() const override;
     const std::vector<std::string> &get_args() const override;
 
-    llvm::Function *code_gen(llvm::LLVMContext &Context,
-                             llvm::IRBuilder<> &Builder,
-                             llvm::Module* Module,
-                             llvm::legacy::FunctionPassManager *FPM,
-                             std::map<std::string, llvm::Value *> &namedValues) override;
+    llvm::Function *code_gen(SMOL &smol) override;
     void compile(SMOL& compiler) override;
 
     private:
@@ -60,11 +53,7 @@ class FunctionAST : public DeclarationAST {
 
     const std::string &get_name() const override;
     const std::vector<std::string> &get_args() const override;
-    llvm::Function *code_gen(llvm::LLVMContext &Context,
-                             llvm::IRBuilder<> &Builder,
-                             llvm::Module* Module,
-                             llvm::legacy::FunctionPassManager *FPM,
-                             std::map<std::string, llvm::Value *> &namedValues) override;
+    llvm::Function *code_gen(SMOL &smol) override;
     void compile(SMOL& compiler) override;
 
     private:

@@ -6,7 +6,10 @@
 #include "jit.hpp"
 #include "prototype.h"
 
-struct SMOL {
+class DeclarationAST;
+class PrototypeAST;
+
+class SMOL {
     public:
         SMOL() {
             // init llvm context
@@ -34,9 +37,11 @@ struct SMOL {
         std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
         std::unique_ptr<SmolJIT> TheJIT;
         std::map<std::string, llvm::Value *> NamedValues;
+        std::map<std::string, std::unique_ptr<PrototypeAST>> FunctionPrototypes;
 
     public:
         static bool benchmark;
+        static bool emit_ir;
         bool had_error;
         bool is_repl;
         static std::string fname;

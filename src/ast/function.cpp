@@ -27,18 +27,14 @@ FunctionAST::get_args() const
 }
 
 llvm::Function *
-PrototypeAST::code_gen(llvm::LLVMContext &Context,
-                       llvm::IRBuilder<> &Builder,
-                       llvm::Module* Module,
-                       llvm::legacy::FunctionPassManager *FPM,
-                       std::map<std::string, llvm::Value *> &namedValues)
+PrototypeAST::code_gen(SMOL &smol)
 {
     // Make the function type:  double(double,double, ...)
-    std::vector<llvm::Type*> doubles(args.size(), llvm::Type::getDoubleTy(Context));
+    std::vector<llvm::Type*> doubles(args.size(), llvm::Type::getDoubleTy(*smol.TheContext));
     
-    llvm::FunctionType *ft = llvm::FunctionType::get(llvm::Type::getDoubleTy(Context), doubles, false);
+    llvm::FunctionType *ft = llvm::FunctionType::get(llvm::Type::getDoubleTy(*smol.TheContext), doubles, false);
 
-    llvm::Function *f = llvm::Function::Create(ft, llvm::Function::ExternalLinkage, name, Module);
+    llvm::Function *f = llvm::Function::Create(ft, llvm::Function::ExternalLinkage, name, *smol.TheModule);
 
     // set names for all args
     unsigned idx = 0;
@@ -55,38 +51,38 @@ PrototypeAST::compile(__attribute__((unused)) SMOL& compiler)
 }
 
 llvm::Function *
-FunctionAST::code_gen(llvm::LLVMContext &Context,
-                      llvm::IRBuilder<> &Builder,
-                      llvm::Module* Module,
-                      llvm::legacy::FunctionPassManager *FPM,
-                      std::map<std::string, llvm::Value *> &namedValues)
+FunctionAST::code_gen(SMOL &smol)
 {
-    // first, check for an existing function from a previous "extern" statement
-    llvm::Function *the_function = Module->getFunction(prototype->get_name());
+    // Transfer ownership of the prototype to the FunctionProtos map, but keep a
+    // reference to it for use below.
+    auto &p = *prototype;
+    smol.FunctionPrototypes[prototype->get_name()] =
+        std::make_unique<PrototypeAST>(prototype->get_name(), prototype->get_args());
+    llvm::Function *the_function = smol.get_function(p.get_name());
 
-    if (!the_function)
-        the_function = prototype->code_gen(Context, Builder, Module, FPM, namedValues);
+    // if (!the_function)
+    //     the_function = prototype->code_gen(smol);
     
     if (!the_function)
         return nullptr;
     
-    if (!the_function->empty())
-        throw std::invalid_argument("function cannot be redefined");
+    // if (!the_function->empty())
+    //     throw std::invalid_argument("function cannot be redefined");
 
     // create a new basic block to start insertion into
-    llvm::BasicBlock *BB = llvm::BasicBlock::Create(Context, "entry", the_function);
-    Builder.SetInsertPoint(BB);
+    llvm::BasicBlock *BB = llvm::BasicBlock::Create(*smol.TheContext, "entry", the_function);
+    smol.Builder->SetInsertPoint(BB);
 
     // record function arguments in the NamedValues map
-    namedValues.clear();
+    smol.NamedValues.clear();
     for (auto &arg : the_function->args())
-        namedValues[std::string(arg.getName())] = &arg;
+        smol.NamedValues[std::string(arg.getName())] = &arg;
     
     // code_gen on body
-    if (llvm::Value *ret_val = body->code_gen(Context, Builder, Module, namedValues)) {
-        Builder.CreateRet(ret_val);
+    if (llvm::Value *ret_val = body->code_gen(smol)) {
+        smol.Builder->CreateRet(ret_val);
         llvm::verifyFunction(*the_function);
-        FPM->run(*the_function); // optimize the function
+        smol.TheFPM->run(*the_function); // optimize the function
         return the_function;
     }
 
@@ -98,15 +94,21 @@ FunctionAST::code_gen(llvm::LLVMContext &Context,
 void
 FunctionAST::compile(SMOL& compiler)
 {   
+    // std::cout << "compiling this\n";
+
     llvm::ExitOnError llvm_exit_err;
+
+    // std::cout << "FUNCTIONAST::COMPILE name = " << get_name() << std::endl;
     
-    if (this->body && this->get_name() != "__anon_expr") {
+    // handle definition
+    if (this->body && get_name() != "__anon_expr") {
+        // std::cout << "NO PROTOTYPE\n";
         auto RT = compiler.TheJIT->getMainJITDylib().createResourceTracker();
         auto TSM = llvm::orc::ThreadSafeModule(std::move(compiler.TheModule), std::move(compiler.TheContext));
         llvm_exit_err(compiler.TheJIT->addModule(std::move(TSM), RT));
         compiler.initialize_module_and_passmanager();
     } else
-    
+    // handle toplevel expression
     if (body) {
     
         // Create a ResourceTracker to track JIT'd memory allocated to our

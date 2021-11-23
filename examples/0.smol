@@ -1,4 +1,10 @@
-def f(n)
-  1 + n
+extern sin(x)
+extern cos(x)
 
-f(332)
+def square(x) x*x
+
+def foo(x)
+  square(sin(x)) + square(cos(x)) 
+
+# should be 1.0
+foo(4)

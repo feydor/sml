@@ -46,15 +46,16 @@ PrototypeAST::code_gen(SMOL &smol)
 void
 PrototypeAST::compile(__attribute__((unused)) SMOL& compiler)
 {
-    std::cout << "PrototypeAST::compile()\n";
-    // do nothing for now
+    // add to the compiler's FunctionPrototypes map
+    compiler.FunctionPrototypes[get_name()] =
+        std::make_unique<PrototypeAST>(get_name(), get_args());
 }
 
 llvm::Function *
 FunctionAST::code_gen(SMOL &smol)
 {
-    // Transfer ownership of the prototype to the FunctionProtos map, but keep a
-    // reference to it for use below.
+
+    // add to the compiler's FunctionPrototypes map, and make a reference of it
     auto &p = *prototype;
     smol.FunctionPrototypes[prototype->get_name()] =
         std::make_unique<PrototypeAST>(prototype->get_name(), prototype->get_args());

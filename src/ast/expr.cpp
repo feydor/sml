@@ -1,5 +1,6 @@
 #include "expr.h"
 #include <stdexcept>
+#include <iostream>
 
 llvm::Value*
 NumberExprAST::code_gen(llvm::LLVMContext &Context,
@@ -56,6 +57,7 @@ CallExprAST::code_gen(llvm::LLVMContext &Context, llvm::IRBuilder<> &Builder,
 {
     // look up name in global module table
     llvm::Function *calleef = Module->getFunction(callee);
+
     if (!calleef)
         throw std::invalid_argument("Unknown function called.");
 

@@ -121,25 +121,28 @@ void SMOL::eval(std::string const &src)
     
     try {
         parser.parse_syntax(); // parser holds ownership of all statements
-        code_gen(parser.get_ast());
     } catch (Smol::ParserError& e) {
         e.print();
         exit(1);
     } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
     }
+    code_gen(parser.get_ast());
 }
 
 void SMOL::code_gen(const std::vector<std::unique_ptr<DeclarationAST>> &ast)
 {
     for (auto &expr : ast) {
         expr->code_gen(*TheContext.get(), *Builder.get(), TheModule.get(), TheFPM.get(), NamedValues);
-        expr->compile(*this);
+        
+        // print generated code
+        std::cout << "Now printing IR... \n";
+        TheModule->print(llvm::errs(), nullptr);
     }
 
-    // print generated code
-    std::cout << "Now printing IR... \n";
-    TheModule->print(llvm::errs(), nullptr);
+    for (auto &expr : ast) {
+        expr->compile(*this);
+    }
 }
 
 // Add optimization passes to the FunctionPassManager

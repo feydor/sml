@@ -1,5 +1,6 @@
 #include "prototype.h"
 #include "smol.h"
+#include <iostream>
 
 const std::string &
 PrototypeAST::get_name() const
@@ -47,8 +48,9 @@ PrototypeAST::code_gen(llvm::LLVMContext &Context,
 }
 
 void
-PrototypeAST::compile(SMOL& compiler)
+PrototypeAST::compile(__attribute__((unused)) SMOL& compiler)
 {
+    std::cout << "PrototypeAST::compile()\n";
     // do nothing for now
 }
 
@@ -95,10 +97,18 @@ FunctionAST::code_gen(llvm::LLVMContext &Context,
 
 void
 FunctionAST::compile(SMOL& compiler)
-{
-     if (body) {
-         llvm::ExitOnError llvm_exit_err;
-
+{   
+    llvm::ExitOnError llvm_exit_err;
+    
+    if (this->body && this->get_name() != "__anon_expr") {
+        auto RT = compiler.TheJIT->getMainJITDylib().createResourceTracker();
+        auto TSM = llvm::orc::ThreadSafeModule(std::move(compiler.TheModule), std::move(compiler.TheContext));
+        llvm_exit_err(compiler.TheJIT->addModule(std::move(TSM), RT));
+        compiler.initialize_module_and_passmanager();
+    } else
+    
+    if (body) {
+    
         // Create a ResourceTracker to track JIT'd memory allocated to our
         // anonymous expression -- that way we can free it after executing
         auto RT = compiler.TheJIT->getMainJITDylib().createResourceTracker();
@@ -108,7 +118,7 @@ FunctionAST::compile(SMOL& compiler)
         compiler.initialize_module_and_passmanager();
 
         // search the JIT for the __anon_expr symbol
-        auto expr_symbol = llvm_exit_err(compiler.TheJIT->lookup("__anon_expr"));
+        auto expr_symbol = llvm_exit_err(compiler.TheJIT->lookup(this->get_name()));
         // assert(expr_symbol.get() && "Function not found");
 
         // Get the symbol's address and cast it to the right type (no args, returns double)

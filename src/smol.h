@@ -45,6 +45,7 @@ struct SMOL {
         void run_file(std::string const &fname);
         void eval(std::string const &src);
         void code_gen(const std::vector<std::unique_ptr<DeclarationAST>> &ast);
+        llvm::Function *get_function(const std::string &name);
         static void print_usage();
         static void print_version();
         void configure_FPM(llvm::legacy::FunctionPassManager *TheFPM);

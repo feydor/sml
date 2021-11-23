@@ -27,6 +27,7 @@ class SmolJIT {
               Mangle(*this->ES, this->DL),
               ObjectLayer(*this->ES,
                           []() { return std::make_unique<llvm::SectionMemoryManager>(); }),
+              
               CompileLayer(*this->ES, ObjectLayer,
                            std::make_unique<llvm::orc::ConcurrentIRCompiler>(std::move(JTMB))),
               MainJD(this->ES->createBareJITDylib("<main>")) {
@@ -79,11 +80,11 @@ class SmolJIT {
     private:
         std::unique_ptr<llvm::orc::TargetProcessControl> TPC;
         std::unique_ptr<llvm::orc::ExecutionSession> ES; // provides context for running JIT'd code
-        llvm::orc::RTDyldObjectLinkingLayer ObjectLayer; // adds object files
-        llvm::orc::IRCompileLayer CompileLayer;          // adds LLVM modules
-
         llvm::DataLayout DL;                  // Used for symbol mangling 
         llvm::orc::MangleAndInterner Mangle;  // ''
+
+        llvm::orc::RTDyldObjectLinkingLayer ObjectLayer; // adds object files
+        llvm::orc::IRCompileLayer CompileLayer;          // adds LLVM modules
 
         llvm::orc::JITDylib &MainJD;
 };

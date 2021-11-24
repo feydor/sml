@@ -3,8 +3,8 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include "expr.h"
 #include "llvm-includes.h"
+#include "expr.h"
 
 class SMOL;
 class ExprAST;

@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "expr.h"
 #include <cassert>
 #include <iostream>
 

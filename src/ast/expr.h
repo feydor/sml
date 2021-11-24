@@ -4,7 +4,6 @@
 #include <memory>
 #include <string>
 #include <map>
-#include "smol.h"
 #include "llvm-includes.h"
 
 class SMOL;

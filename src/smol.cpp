@@ -1,7 +1,5 @@
 #include "lexer.h"
 #include "parser.h"
-#include "token.h"
-#include "smol_error.h"
 #include "smol.h"
 #include <iostream>
 #include <fstream>
@@ -9,7 +7,6 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <chrono>
 #include <unistd.h>
 
 #define PROJECT_NAME "smol"
@@ -119,9 +116,6 @@ void SMOL::eval(std::string const &src)
     
     try {
         parser.parse_syntax(); // parser holds ownership of all statements
-    } catch (Smol::ParserError& e) {
-        e.print();
-        exit(1);
     } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
     }

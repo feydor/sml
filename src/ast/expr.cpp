@@ -1,4 +1,5 @@
 #include "expr.h"
+#include "smol.h"
 #include <stdexcept>
 #include <iostream>
 

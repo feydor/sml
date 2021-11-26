@@ -57,4 +57,19 @@ class CallExprAST : public ExprAST {
         std::vector<std::unique_ptr<ExprAST>> args;
 };
 
+// IfExprAST - Expression class for if/then/else
+class IfExprAST : public ExprAST {
+    public:
+        IfExprAST(std::unique_ptr<ExprAST> conditional,
+                  std::unique_ptr<ExprAST> then,
+                  std::unique_ptr<ExprAST> else_)
+        : conditional(std::move(conditional)), then(std::move(then)), else_(std::move(else_)) {}
+        
+        virtual llvm::Value *code_gen(SMOL &smol) override;
+    private:
+        std::unique_ptr<ExprAST> conditional;
+        std::unique_ptr<ExprAST> then;
+        std::unique_ptr<ExprAST> else_;
+};
+
 #endif

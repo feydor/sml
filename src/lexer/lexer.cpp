@@ -7,6 +7,9 @@ lexer::lexer(std::string const& src) : src(src)
 {
     this->keywords.emplace("def", TokenType::DEF);
     this->keywords.emplace("extern", TokenType::EXTERN);
+    this->keywords.emplace("if", TokenType::IF);
+    this->keywords.emplace("then", TokenType::THEN);
+    this->keywords.emplace("else", TokenType::ELSE);
 }
 
 /**

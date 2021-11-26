@@ -17,6 +17,11 @@ namespace TokenType {
         STRING,
         NUMBER,
 
+        // control
+        IF,
+        THEN,
+        ELSE,
+
         // operators
         LESS_THAN,
         GREATER_THAN,

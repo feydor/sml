@@ -14,6 +14,7 @@ ninja -C build
 The below code fragment is an example written in smol and demonstrates what is so far implemented:
 
 ```python
+# libm external function definitions
 extern sin(x)
 extern cos(x)
 def square(x) x*x
@@ -21,6 +22,15 @@ def foo(x)
   square(sin(x)) + square(cos(x))
 
 foo(4.0) # 1.0
+
+# compute nth fibonacci number; slow b/c no tail recursion yet
+def fib(n)
+  if (n < 3) then
+    1
+  else
+    fib(n-1) + fib(n-2)
+
+fib(40) # 102334155
 ```
 see more at [examples](examples/).
 

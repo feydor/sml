@@ -44,6 +44,7 @@ class Parser {
     std::unique_ptr<ExprAST> identifier();
     std::unique_ptr<ExprAST> number_expr();
     std::unique_ptr<ExprAST> paren_expr();
+    std::unique_ptr<ExprAST> if_expr();
     std::unique_ptr<PrototypeAST> prototype();
     std::unique_ptr<PrototypeAST> extern_definition();
 

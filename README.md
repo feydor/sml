@@ -3,7 +3,7 @@ A (wip) dynamic language with recursive descent parser, LLVM IR code generations
 
 ## Build
 1. Install meson and ninja (https://mesonbuild.com/).  
-2. Install the [dependencies](#Dependencies).  
+2. Install the [dependencies](#dependencies).  
 3. On linux and macos (not tested) run the following: 
 ```sh
 meson build
@@ -45,3 +45,6 @@ see more at [examples](examples/).
 
 ## Dependencies
 LLVM 12, Cmake
+
+## License
+See [COPYING](copying/).

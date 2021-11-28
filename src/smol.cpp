@@ -15,7 +15,7 @@
 #define VERSION "0.1.0"
 std::string SMOL::fname = PROJECT_NAME;
 
-int main(int argc, char **argv) 
+int main(int argc, char **argv)
 {
     ArgsParser args_parser(argc, argv);
     if (args_parser.cmd_opt_exists("-v") || args_parser.cmd_opt_exists("--version"))
@@ -87,7 +87,7 @@ void SMOL::eval(std::string const &src)
     for (auto err : lexer.get_errors())
         err.print();
     
-    Parser parser(tokens, *this);
+    Parser parser(std::move(tokens), *this);
     
     try {
         parser.parse_syntax(); // parser holds ownership of all statements
@@ -120,8 +120,6 @@ llvm::Function* SMOL::get_function(std::string_view name)
     // first, check for the function in the current module
     if (auto* func = TheModule->getFunction(name))
         return func;
-
-    // std::cout << "SMOL::get_function(" << name << ")\n";
 
     // otherwise, check whether we can codegen it
     auto fi = FunctionPrototypes.find(static_cast<std::string>(name));

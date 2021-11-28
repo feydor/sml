@@ -14,7 +14,7 @@ class ExprAST;
 
 class Parser {
     public:
-    explicit Parser(const std::vector<Token> &tokens, SMOL &compilerRef)
+    explicit Parser(const std::vector<Token> &&tokens, SMOL &compilerRef)
         : tokens(tokens), compiler(compilerRef) {
         // install the standard binary operators
         // 1 is the lowest precedence

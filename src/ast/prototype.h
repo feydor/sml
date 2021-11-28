@@ -30,7 +30,7 @@ class DeclarationAST {
 /// the “ExprAST” class would probably have a type field.
 class PrototypeAST : public DeclarationAST {
     public:
-    PrototypeAST(const std::string &name, std::vector<std::string> args)
+    PrototypeAST(const std::string &name, std::vector<std::string> &&args)
         : name(name), args(std::move(args)) {}
 
     const std::string &get_name() const override;

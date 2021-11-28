@@ -52,7 +52,7 @@ class BinaryExprAST : public ExprAST {
 class CallExprAST : public ExprAST {
     public:
         CallExprAST(const std::string &callee,
-                    std::vector<std::unique_ptr<ExprAST>> args)
+                    std::vector<std::unique_ptr<ExprAST>> &&args)
             : callee(callee), args(std::move(args)) {}
         virtual llvm::Value *code_gen(SMOL &smol) override;
     private:

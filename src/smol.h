@@ -40,8 +40,8 @@ class SMOL {
         std::map<std::string, std::unique_ptr<PrototypeAST>> FunctionPrototypes;
 
     public:
-        static bool benchmark;
-        static bool emit_ir;
+        bool benchmark;
+        bool emit_ir;
         bool had_error;
         bool is_repl;
         static std::string fname;

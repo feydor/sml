@@ -1,6 +1,7 @@
 #include "lexer.h"
 #include "parser.h"
 #include "smol.h"
+#include "ArgsParser.h"
 #include <iostream>
 #include <fstream>
 #include <memory>
@@ -11,37 +12,30 @@
 
 #define PROJECT_NAME "smol"
 #define VERSION "0.1.0"
-
-bool SMOL::benchmark = false;
-bool SMOL::emit_ir = false;
 std::string SMOL::fname = PROJECT_NAME;
 
 int main(int argc, char **argv) 
 {
-    char c;
-    while ((c = getopt(argc, argv, "vhbi:")) != -1) {
-        switch (c) {
-            case 'v': SMOL::print_version(), exit(0);
-            case 'h': SMOL::print_usage(), exit(0);
-            case 'b': SMOL::benchmark = true; break;
-            case 'i': SMOL::emit_ir = true; break;
-            case '?':
-                if (optopt == 'b')
-                    std::cerr << "";
-                else
-                    SMOL::print_usage();
-                exit(1);
-            default: abort();
-        }
-    }
-    int i = (argc == 3) ? 2 : 1;
+    ArgsParser args_parser(argc, argv);
+    if (args_parser.cmd_opt_exists("-v") || args_parser.cmd_opt_exists("--version"))
+        SMOL::print_version(), exit(0);
+    else if (args_parser.cmd_opt_exists("-h") || args_parser.cmd_opt_exists("--help"))
+        SMOL::print_usage(), exit(0);
+    
+    SMOL smol;
 
-    auto smol = std::make_unique<SMOL>();
-
-    if (argc > 1)
-        smol->run_file(argv[i]);
+    if (args_parser.cmd_opt_exists("-i") || args_parser.cmd_opt_exists("--emit"))
+        smol.emit_ir = true;
+    
+    if (args_parser.cmd_opt_exists("-b") || args_parser.cmd_opt_exists("--benchmark"))
+        smol.benchmark = true;
+    
+    const auto &filename = args_parser.get_cmd_opt("-f");
+    if (!filename.empty())
+        smol.run_file(filename);
     else
-        smol->run_prompt();
+        smol.run_prompt();
+
     return 0;
 }
 
@@ -87,12 +81,13 @@ void SMOL::print_usage()
 {
     std::cout << "Usage: " << PROJECT_NAME << " [OPTION] [FILE]" << std::endl;
     std::cout << "smol machine ordered language interpreter" << std::endl;
-    std::cout << "Example: " << PROJECT_NAME << " -b examples/pascal.smol" << std::endl;
+    std::cout << "Example: " << PROJECT_NAME << " -f examples/pascal.smol" << std::endl;
     std::cout << "Options:" << std::endl;
-    std::cout << "  -v, --version     " << "display version information and exit" << std::endl;
-    std::cout << "  -i, --ir   " << "       emit IR" << std::endl;
     std::cout << "  -b, --benchmark   " << "activate benchmarking" << std::endl;
+    std::cout << "  -i, --ir   " << "       emit IR" << std::endl;
+    std::cout << "  -f   " << "             evaluate the given file" << std::endl;
     std::cout << "  -h, --help        " << "display this help text and exit" << std::endl;
+    std::cout << "  -v, --version     " << "display version information and exit" << std::endl;
 }
 
 void SMOL::print_version()

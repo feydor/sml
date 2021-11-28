@@ -28,6 +28,11 @@ class SMOL {
             llvm::ExitOnError exitonerr;
             TheJIT = exitonerr(SmolJIT::Create());
             TheModule->setDataLayout(TheJIT.get()->getDataLayout());
+
+            emit_ir = false;
+            benchmark = false;
+            had_error = false;
+            is_repl = false;
         }
 
     public:

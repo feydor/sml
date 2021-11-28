@@ -18,6 +18,7 @@ class SmolError : public std::exception {
 		virtual std::string add_quotemarks(const std::string& s) const;
 		virtual std::string get_file_line(int n) const;
 		virtual void print_error_message() const;
+		virtual void print_error_message_and_found(const std::string& found) const;
 		virtual void print_error_line_number(int line) const;
 		virtual void print_line_from_file(int line) const;
 		virtual void print_line_from_file_bold(int line) const;
@@ -41,7 +42,6 @@ class SmolParserError : public SmolError {
 		void print() const override;
 			  
 	private:
-		void print_error_message_and_found() const;
 		std::string expected;
 		std::string found;
 		int line;
@@ -55,11 +55,20 @@ class SmolLexerError : public SmolError {
 
 		void print() const override;
 		
-
 	private:
-		void print_error_message_and_found() const;
 		std::string found;
 		int line;
+};
+
+class SmolCompilerError : public SmolError {
+	public:
+		SmolCompilerError(const std::string &message, const std::string &found)
+			: SmolError{message}, found(found) {}
+
+		void print() const override;
+		
+	private:
+		std::string found;
 };
 
 #endif

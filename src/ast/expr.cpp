@@ -14,7 +14,7 @@ VariableExprAST::code_gen(SMOL &smol)
 {
     llvm::Value *val = smol.NamedValues[name]; // look up this var
     if (!val)
-        throw std::invalid_argument("Unknown variable name.");
+        throw throwable_error("Unknown variable name", name);
     return val;
 }
 
@@ -41,7 +41,7 @@ BinaryExprAST::code_gen(SMOL &smol)
             L = smol.Builder->CreateFCmpUGT(L, R, "cmptmp");
             return smol.Builder->CreateUIToFP(L, llvm::Type::getDoubleTy(*smol.TheContext), "booltmp");
         }
-        default: throw std::invalid_argument("Unknown binary operator.");
+        default: throw throwable_error("Unknown binary operator", std::to_string(op[0]));
     }
 }
 
@@ -54,10 +54,10 @@ CallExprAST::code_gen(SMOL &smol)
     // std::cout << "CallExprAST::code_gen: " << callee << std::endl;
 
     if (!calleef)
-        throw std::invalid_argument("Unknown function called.");
+        throw throwable_error("Unknown function called", callee);
 
     if (calleef->arg_size() != args.size())
-        throw std::invalid_argument("Incorrect # of arguments passed.");
+        throw throwable_error("Incorrect # of arguments passed", std::to_string(args.size()));
 
     std::vector<llvm::Value *> args_v;
     for (unsigned i = 0, e = args.size(); i != e; ++i) {
@@ -124,4 +124,10 @@ IfExprAST::code_gen(SMOL &smol)
     phi_node->addIncoming(then_val, then_block);
     phi_node->addIncoming(else_val, else_block);
     return phi_node;
+}
+
+SmolCompilerError
+ExprAST::throwable_error(const std::string& message, const std::string& found)
+{
+    return SmolCompilerError(message, found);
 }

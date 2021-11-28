@@ -60,9 +60,6 @@ FunctionAST::code_gen(SMOL &smol)
     smol.FunctionPrototypes[prototype->get_name()] =
         std::make_unique<PrototypeAST>(prototype->get_name(), prototype->get_args());
     llvm::Function *the_function = smol.get_function(p.get_name());
-
-    // if (!the_function)
-    //     the_function = prototype->code_gen(smol);
     
     if (!the_function)
         return nullptr;

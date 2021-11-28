@@ -7,7 +7,7 @@
 void
 SmolParserError::print() const
 {
-	print_error_message_and_found();
+	print_error_message_and_found(this->found);
 	print_error_line_number(this->line);
 	print_line_from_file(this->line - 1);
 	print_line_from_file_bold(this->line);
@@ -18,11 +18,17 @@ SmolParserError::print() const
 void
 SmolLexerError::print() const
 {
-	print_error_message_and_found();
+	print_error_message_and_found(this->found);
 	print_error_line_number(this->line);
 	print_line_from_file(this->line - 1);
 	print_line_from_file_bold(this->line);
 	print_line_from_file(this->line + 1);
+}
+
+void
+SmolCompilerError::print() const
+{
+	print_error_message_and_found(this->found);
 }
 
 void
@@ -56,17 +62,10 @@ SmolError::print_abort_message() const
 }
 
 void
-SmolLexerError::print_error_message_and_found() const
+SmolError::print_error_message_and_found(const std::string& found) const
 {
 	std::cout << err << "error" << resetc << ": " << bold << this->message << resetf << " ";
-	std::cout << bold << add_quotemarks(this->found) << resetf << "\n";
-}
-
-void
-SmolParserError::print_error_message_and_found() const
-{
-	std::cout << err << "error" << resetc << ": " << bold << this->message << resetf << " ";
-	std::cout << bold << add_quotemarks(this->found) << resetf << "\n";
+	std::cout << bold << add_quotemarks(found) << resetf << "\n";
 }
 
 /**
@@ -97,52 +96,3 @@ SmolError::add_quotemarks(const std::string& s) const
 {
 	return "'" + s + "'";
 }
-
-/*
-namespace Smol {
-
-	void
-	SyntaxError::print() const throw()
-	{
-		ANSI::Modifier err(Color::FG_RED);
-    	ANSI::Modifier secondary(Color::FG_BLUE);
-    	ANSI::Modifier bold(Format::BOLD);
-    	ANSI::Modifier resetc(Color::FG_DEFAULT);
-    	ANSI::Modifier resetf(Format::NORMAL);
-
-		std::cout << err << "error" << resetc <<
-			": " << bold << this->msg << resetf << "\n" <<
-			secondary << "  --> " << resetc << SMOL::fname +
-			":" + std::to_string(this->nline) + "\n" <<
-
-			secondary << "  |\n" << "  |    " << resetc <<
-			"- expected " + add_quotemarks(this->expected) + ", but found " +
-			add_quotemarks(this->found) + ".\n" <<
-			secondary << std::to_string(this->nline) + " |    "
-			<< resetc << get_line(this->nline) + "\n" <<
-			secondary << "  |\n" << resetc;
-		std::cout << err << "error" << resetc << ": " << bold << "aborting due to previous errors.\n" << resetf;
-	}
-	
-
-	void
-	LexerError::print() const throw()
-	{
-		ANSI::Modifier err(Color::FG_RED);
-    	ANSI::Modifier secondary(Color::FG_BLUE);
-    	ANSI::Modifier bold(Format::BOLD);
-    	ANSI::Modifier resetc(Color::FG_DEFAULT);
-    	ANSI::Modifier resetf(Format::NORMAL);
-
-		std::cout << err << "error" << resetc <<
-			": " << bold << this->msg << resetf << "\n" <<
-			secondary << "  --> " << resetc << SMOL::fname +
-			":" + std::to_string(this->nline) + "\n" <<
-			secondary << "Found " + add_quotemarks(this->found) + ".\n" <<
-			std::to_string(this->nline) + " |    "
-			<< resetc << get_line(this->nline) + "\n" <<
-			secondary << "  |\n" << resetc;
-	}
-
-}
-*/

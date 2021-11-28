@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include "llvm-includes.h"
+#include "smol_error.h"
 
 class SMOL;
 
@@ -13,6 +14,8 @@ class ExprAST {
     public:
         virtual ~ExprAST() = default;
         virtual llvm::Value *code_gen(SMOL &smol) = 0;
+        static SmolCompilerError throwable_error(const std::string& message,
+                                                 const std::string& found);
 };
 
 // NumberAST - Expression class for all numeric literals such as "1.9"

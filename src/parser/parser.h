@@ -53,7 +53,7 @@ class Parser {
     bool at_end();
     int token_precedence(Token token);
     bool is_binary_op(Token token);
-    Smol::ParserError throwable_error(const std::string &msg, const std::string &expected,
+    SmolParserError throwable_error(const std::string &msg, const std::string &expected,
         const std::string &found, int line);
 };
 

@@ -57,7 +57,7 @@ lexer::scan_tokens()
                 } else {
                     // report unexpected characters
                     // TODO: combine these into a vector and report once
-                    add_error("Unexpected character.");
+                    add_error("Unexpected character");
                 }
                 break;
         }
@@ -220,7 +220,7 @@ lexer::add_error(const std::string &msg)
         this->src.substr(this->start, this->curr - this->start), this->line);
 }
 
-std::vector<Smol::LexerError>
+std::vector<SmolLexerError>
 lexer::get_errors()
 {
     return this->errors;

@@ -125,4 +125,3 @@ IfExprAST::code_gen(SMOL &smol)
     phi_node->addIncoming(else_val, else_block);
     return phi_node;
 }
-

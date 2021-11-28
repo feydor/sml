@@ -77,27 +77,6 @@ void SMOL::run_prompt()
     }
 }
 
-void SMOL::print_usage()
-{
-    std::cout << "Usage: " << PROJECT_NAME << " [OPTION] [FILE]" << std::endl;
-    std::cout << "smol machine ordered language interpreter" << std::endl;
-    std::cout << "Example: " << PROJECT_NAME << " -f examples/pascal.smol" << std::endl;
-    std::cout << "Options:" << std::endl;
-    std::cout << "  -b, --benchmark   " << "activate benchmarking" << std::endl;
-    std::cout << "  -i, --ir   " << "       emit IR" << std::endl;
-    std::cout << "  -f   " << "             evaluate the given file" << std::endl;
-    std::cout << "  -h, --help        " << "display this help text and exit" << std::endl;
-    std::cout << "  -v, --version     " << "display version information and exit" << std::endl;
-}
-
-void SMOL::print_version()
-{
-    std::cout << PROJECT_NAME << " " << VERSION << std::endl;
-    std::cout << "Copyright (C) 2021 Victor Reyes" << std::endl;
-    std::cout << "This program comes with ABSOLUTELY NO WARRANTY;" << std::endl;
-    std::cout << "This is free software, and you are welcome to redistribute it under certain conditions." << std::endl;
-}
-
 /* start interpretation */
 void SMOL::eval(std::string const &src)
 {
@@ -111,10 +90,10 @@ void SMOL::eval(std::string const &src)
     
     try {
         parser.parse_syntax(); // parser holds ownership of all statements
-    } catch (const std::exception& e) {
-        std::cout << e.what() << std::endl;
+        code_gen(parser.get_ast());
+    } catch (SmolError& e) {
+        e.print();
     }
-    code_gen(parser.get_ast());
 }
 
 void SMOL::code_gen(const std::vector<std::unique_ptr<DeclarationAST>> &ast)
@@ -174,4 +153,25 @@ void SMOL::initialize_module_and_passmanager()
     Builder = std::make_unique<llvm::IRBuilder<>>(*TheContext);
     TheFPM = std::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
     configure_FPM(TheFPM.get());
+}
+
+void SMOL::print_usage()
+{
+    std::cout << "Usage: " << PROJECT_NAME << " [OPTION] [FILE]" << std::endl;
+    std::cout << "smol machine ordered language interpreter" << std::endl;
+    std::cout << "Example: " << PROJECT_NAME << " -f examples/pascal.smol" << std::endl;
+    std::cout << "Options:" << std::endl;
+    std::cout << "  -b, --benchmark   " << "activate benchmarking" << std::endl;
+    std::cout << "  -i, --ir   " << "       emit IR" << std::endl;
+    std::cout << "  -f   " << "             evaluate the given file" << std::endl;
+    std::cout << "  -h, --help        " << "display this help text and exit" << std::endl;
+    std::cout << "  -v, --version     " << "display version information and exit" << std::endl;
+}
+
+void SMOL::print_version()
+{
+    std::cout << PROJECT_NAME << " " << VERSION << std::endl;
+    std::cout << "Copyright (C) 2021 Victor Reyes" << std::endl;
+    std::cout << "This program comes with ABSOLUTELY NO WARRANTY;" << std::endl;
+    std::cout << "This is free software, and you are welcome to redistribute it under certain conditions." << std::endl;
 }

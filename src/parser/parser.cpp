@@ -267,9 +267,9 @@ Parser::is_binary_op(Token token)
     return this->binary_op_precedences[token.get_type()] > 0;
 }
 
-Smol::ParserError
+SmolParserError
 Parser::throwable_error(const std::string &msg, const std::string &expected,
         const std::string &found, int line)
 {
-    return Smol::ParserError(msg, expected, found, line);
+    return SmolParserError(msg, expected, found, line);
 }

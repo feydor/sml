@@ -20,7 +20,7 @@ ArgsParser::ArgsParser(int &argc, char **argv)
  * @return const std::string&, if option not found or not trailed by an argument, returns an empty string
  */
 const std::string &
-ArgsParser::get_cmd_opt(const std::string &option) const
+ArgsParser::get_cmd_opt(std::string_view option) const
 {
     auto itr = std::find(this->tokens.begin(), this->tokens.end(), option);
     if (itr != this->tokens.end() && ++itr != this->tokens.end())
@@ -38,7 +38,7 @@ ArgsParser::get_cmd_opt(const std::string &option) const
  * @return false 
  */
 bool
-ArgsParser::cmd_opt_exists(const std::string &option) const
+ArgsParser::cmd_opt_exists(std::string_view option) const
 {
     return std::find(this->tokens.begin(), this->tokens.end(), option) != this->tokens.end();
 }

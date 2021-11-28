@@ -129,32 +129,6 @@ lexer::double_peek()
     return src.at(this->curr + 1);
 }
 
-/* handle string literals */
-/*void
-lexer::str()
-{
-    // consume characters until matching " mark
-    while (peek() != '"' && !at_end()) {
-        if (peek() == '\n')
-            this->line++;
-        advance();
-    }
-
-    if (at_end()) {
-        SMOL::error(this->line, "Unterminated string.");
-        return;
-    }
-
-    advance(); // consume the closing " mark
-
-    // trim the quote marks and last space
-    std::variant<double, std::string> literal(
-        this->src.substr(this->start+1, (this->curr - this->start) - 2)
-    );
-    add_token(Token::STRING, literal);
-}
-*/
-
 void
 lexer::num()
 {

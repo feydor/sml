@@ -6,6 +6,7 @@
 #include <fstream>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <sstream>
 #include <vector>
 #include <unistd.h>
@@ -104,6 +105,7 @@ void SMOL::code_gen(const std::vector<std::unique_ptr<DeclarationAST>> &ast)
         // print generated code
         if (SMOL::emit_ir) {
             std::cout << "Now printing IR... \n";
+            TheJIT->print_machine_info();
             TheModule->print(llvm::errs(), nullptr);
         }
     }
@@ -113,7 +115,7 @@ void SMOL::code_gen(const std::vector<std::unique_ptr<DeclarationAST>> &ast)
     }
 }
 
-llvm::Function* SMOL::get_function(const std::string &name)
+llvm::Function* SMOL::get_function(std::string_view name)
 {
     // first, check for the function in the current module
     if (auto* func = TheModule->getFunction(name))
@@ -122,7 +124,7 @@ llvm::Function* SMOL::get_function(const std::string &name)
     // std::cout << "SMOL::get_function(" << name << ")\n";
 
     // otherwise, check whether we can codegen it
-    auto fi = FunctionPrototypes.find(name);
+    auto fi = FunctionPrototypes.find(static_cast<std::string>(name));
     if (fi != FunctionPrototypes.end())
         return fi->second->code_gen(*this);
     

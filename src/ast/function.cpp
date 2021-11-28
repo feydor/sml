@@ -44,7 +44,7 @@ PrototypeAST::code_gen(SMOL &smol)
 }
 
 void
-PrototypeAST::compile(__attribute__((unused)) SMOL& compiler)
+PrototypeAST::compile(SMOL& compiler)
 {
     // add to the compiler's FunctionPrototypes map
     compiler.FunctionPrototypes[get_name()] =

@@ -10,8 +10,8 @@
 class ArgsParser {
     public:
         ArgsParser(int &argc, char **argv);
-        const std::string &get_cmd_opt(const std::string &option) const;
-        bool cmd_opt_exists(const std::string &option) const;
+        const std::string &get_cmd_opt(std::string_view option) const;
+        bool cmd_opt_exists(std::string_view option) const;
 
     private:
         std::vector<std::string> tokens;

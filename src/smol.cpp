@@ -3,6 +3,7 @@
 #include "smol.h"
 #include "ArgsParser.h"
 #include <iostream>
+#include <chrono>
 #include <fstream>
 #include <memory>
 #include <string>
@@ -99,6 +100,10 @@ void SMOL::eval(std::string const &src)
 
 void SMOL::code_gen(const std::vector<std::unique_ptr<DeclarationAST>> &ast)
 {
+    std::chrono::system_clock::time_point t1, t2;
+    if (this->benchmark)
+        t1 = std::chrono::high_resolution_clock::now();
+
     for (auto &expr : ast) {
         expr->code_gen(*this);
         
@@ -113,6 +118,12 @@ void SMOL::code_gen(const std::vector<std::unique_ptr<DeclarationAST>> &ast)
     for (auto &func : ast) {
         func->compile(*this);
     }
+
+    if (this->benchmark) {
+        t2 = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double, std::milli> ms_double = t2 - t1;
+        std::cout << "Duration: " << ms_double.count() << "ms\n";
+    }  
 }
 
 llvm::Function* SMOL::get_function(std::string_view name)
@@ -162,7 +173,7 @@ void SMOL::print_usage()
     std::cout << "Example: " << PROJECT_NAME << " -f examples/pascal.smol" << std::endl;
     std::cout << "Options:" << std::endl;
     std::cout << "  -b, --benchmark   " << "activate benchmarking" << std::endl;
-    std::cout << "  -i, --ir   " << "       emit IR" << std::endl;
+    std::cout << "  -i, --emit   " << "     emit IR" << std::endl;
     std::cout << "  -f   " << "             evaluate the given file" << std::endl;
     std::cout << "  -h, --help        " << "display this help text and exit" << std::endl;
     std::cout << "  -v, --version     " << "display version information and exit" << std::endl;

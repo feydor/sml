@@ -8,7 +8,7 @@ A (wip) dynamic language with recursive descent parser, LLVM IR code generations
 ```sh
 meson build
 ninja -C build
-./build/smol examples/0.smol
+./build/smol -f examples/0.smol
 ```
 ## Examples
 The below code fragment is an example written in smol and demonstrates what is so far implemented:
@@ -23,7 +23,8 @@ def foo(x)
 
 foo(4.0) # 1.0
 
-# compute nth fibonacci number; slow b/c no tail recursion yet
+# compute nth fibonacci number
+# slow b/c no tail recursion yet; about 430 ms on my machine
 def fib(n)
   if (n < 3) then
     1

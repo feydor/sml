@@ -146,6 +146,8 @@ Parser::primary()
             return number_expr();
         case TokenType::LEFT_PAREN:
             return paren_expr();
+        case TokenType::IF:
+            return if_expr();
         default:
             throw throwable_error("Unknown token found",  "expression", peek().get_lexeme(),
                                                                         peek().get_line());
@@ -203,6 +205,34 @@ Parser::paren_expr()
     return contents;
 }
 
+// if_expr => 'if' expression 'then' expression 'else' expression
+std::unique_ptr<ExprAST>
+Parser::if_expr()
+{
+    advance(); // consume 'if'
+    auto conditional = expression();
+    if (!conditional)
+        return nullptr;
+    
+    if (peek().get_type() != TokenType::THEN)
+        throw throwable_error("Syntax error", "then", peek().get_lexeme(), peek().get_line());
+    
+    advance(); // consume 'then'
+    auto then = expression();
+    if (!then)
+        return nullptr;
+
+    if (peek().get_type() != TokenType::ELSE)
+        throw throwable_error("Syntax error", "else", peek().get_lexeme(), peek().get_line());
+    
+    advance(); // consume 'else'
+    auto else_ = expression();
+    if (!else_)
+        return nullptr;
+    
+    return std::make_unique<IfExprAST>(std::move(conditional), std::move(then), std::move(else_));
+}
+
 Token
 Parser::peek()
 {
@@ -237,9 +267,9 @@ Parser::is_binary_op(Token token)
     return this->binary_op_precedences[token.get_type()] > 0;
 }
 
-Smol::ParserError
+SmolParserError
 Parser::throwable_error(const std::string &msg, const std::string &expected,
         const std::string &found, int line)
 {
-    return Smol::ParserError(msg, expected, found, line);
+    return SmolParserError(msg, expected, found, line);
 }

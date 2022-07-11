@@ -14,7 +14,7 @@ class ExprAST;
 
 class Parser {
     public:
-    explicit Parser(const std::vector<Token> &tokens, SMOL &compilerRef)
+    explicit Parser(const std::vector<Token> &&tokens, SMOL &compilerRef)
         : tokens(tokens), compiler(compilerRef) {
         // install the standard binary operators
         // 1 is the lowest precedence
@@ -44,6 +44,7 @@ class Parser {
     std::unique_ptr<ExprAST> identifier();
     std::unique_ptr<ExprAST> number_expr();
     std::unique_ptr<ExprAST> paren_expr();
+    std::unique_ptr<ExprAST> if_expr();
     std::unique_ptr<PrototypeAST> prototype();
     std::unique_ptr<PrototypeAST> extern_definition();
 
@@ -52,7 +53,7 @@ class Parser {
     bool at_end();
     int token_precedence(Token token);
     bool is_binary_op(Token token);
-    Smol::ParserError throwable_error(const std::string &msg, const std::string &expected,
+    SmolParserError throwable_error(const std::string &msg, const std::string &expected,
         const std::string &found, int line);
 };
 

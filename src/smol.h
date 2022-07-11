@@ -28,6 +28,11 @@ class SMOL {
             llvm::ExitOnError exitonerr;
             TheJIT = exitonerr(SmolJIT::Create());
             TheModule->setDataLayout(TheJIT.get()->getDataLayout());
+
+            emit_ir = false;
+            benchmark = false;
+            had_error = false;
+            is_repl = false;
         }
 
     public:
@@ -40,8 +45,8 @@ class SMOL {
         std::map<std::string, std::unique_ptr<PrototypeAST>> FunctionPrototypes;
 
     public:
-        static bool benchmark;
-        static bool emit_ir;
+        bool benchmark;
+        bool emit_ir;
         bool had_error;
         bool is_repl;
         static std::string fname;
@@ -50,7 +55,7 @@ class SMOL {
         void run_file(std::string const &fname);
         void eval(std::string const &src);
         void code_gen(const std::vector<std::unique_ptr<DeclarationAST>> &ast);
-        llvm::Function *get_function(const std::string &name);
+        llvm::Function *get_function(std::string_view name);
         static void print_usage();
         static void print_version();
         void configure_FPM(llvm::legacy::FunctionPassManager *TheFPM);

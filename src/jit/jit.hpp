@@ -14,6 +14,7 @@
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/LLVMContext.h"
 #include <memory>
+#include <iostream>
 
 // A JIT using LLVM's On-Request-Compilation(ORC) APIs
 // mainly copied from https://github.com/llvm/llvm-project/blob/main/llvm/examples/Kaleidoscope/include/KaleidoscopeJIT.h
@@ -75,6 +76,11 @@ class SmolJIT {
 
         llvm::Expected<llvm::JITEvaluatedSymbol> lookup(llvm::StringRef Name) {
             return ES->lookup({&MainJD}, Mangle(Name.str()));
+        }
+
+        void print_machine_info() const
+        {
+            std::cout << TPC->getTargetTriple().normalize() << std::endl;
         }
 
     private:

@@ -89,21 +89,3 @@ Token::type_to_string() const
         default: return "Unidentified.";
     }
 }
-
-
-/*
-TokenType::type
-Token::char_to_type(char c) const
-{
-    switch (c) {
-        case '+': return Token::PLUS;
-        case '-': return Token::MINUS;
-        case '/': return Token::SLASH;
-        case '*': return Token::STAR;
-        case '%': return Token::PERCENT;
-        default: throw std::runtime_error("char_to_type: type not implemented.");
-    }
-}
-
-
-*/

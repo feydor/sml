@@ -7,6 +7,9 @@ lexer::lexer(std::string const& src) : src(src)
 {
     this->keywords.emplace("def", TokenType::DEF);
     this->keywords.emplace("extern", TokenType::EXTERN);
+    this->keywords.emplace("if", TokenType::IF);
+    this->keywords.emplace("then", TokenType::THEN);
+    this->keywords.emplace("else", TokenType::ELSE);
 }
 
 /**
@@ -54,7 +57,7 @@ lexer::scan_tokens()
                 } else {
                     // report unexpected characters
                     // TODO: combine these into a vector and report once
-                    add_error("Unexpected character.");
+                    add_error("Unexpected character");
                 }
                 break;
         }
@@ -126,32 +129,6 @@ lexer::double_peek()
     return src.at(this->curr + 1);
 }
 
-/* handle string literals */
-/*void
-lexer::str()
-{
-    // consume characters until matching " mark
-    while (peek() != '"' && !at_end()) {
-        if (peek() == '\n')
-            this->line++;
-        advance();
-    }
-
-    if (at_end()) {
-        SMOL::error(this->line, "Unterminated string.");
-        return;
-    }
-
-    advance(); // consume the closing " mark
-
-    // trim the quote marks and last space
-    std::variant<double, std::string> literal(
-        this->src.substr(this->start+1, (this->curr - this->start) - 2)
-    );
-    add_token(Token::STRING, literal);
-}
-*/
-
 void
 lexer::num()
 {
@@ -217,7 +194,7 @@ lexer::add_error(const std::string &msg)
         this->src.substr(this->start, this->curr - this->start), this->line);
 }
 
-std::vector<Smol::LexerError>
+std::vector<SmolLexerError>
 lexer::get_errors()
 {
     return this->errors;

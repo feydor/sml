@@ -13,7 +13,7 @@ class lexer {
     std::string src;
     std::vector<Token> tokens;
     std::unordered_map<std::string, TokenType::type> keywords;
-    std::vector<Smol::LexerError> errors;
+    std::vector<SmolLexerError> errors;
     int start = 0; // first char of current lexeme in src file
     int curr = 0; // curr char of src file before consuming
     int line = 1; // curr line of src file
@@ -21,7 +21,7 @@ class lexer {
     public:
     explicit lexer(std::string const& src);
     std::vector<Token> scan_tokens();
-    std::vector<Smol::LexerError> get_errors();
+    std::vector<SmolLexerError> get_errors();
 
     private:
     char advance();

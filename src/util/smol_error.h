@@ -4,42 +4,71 @@
 #include <string>
 #include "ansi.h"
 
-namespace Smol {
-
-	class SyntaxError : public std::exception {
+class SmolError : public std::exception {
+	public:
+		~SmolError() = default;
+		virtual void print() const = 0;
+	
+	protected:
+		SmolError(const std::string& message)
+			: message(message),
+			  err(Color::FG_RED), secondary(Color::FG_BLUE), bold(Format::BOLD),
+			  resetc(Color::FG_DEFAULT), resetf(Format::NORMAL) {}
 		
-		public:
-		virtual ~SyntaxError() = default;
-		virtual void print() const throw();
+		virtual std::string add_quotemarks(const std::string& s) const;
+		virtual std::string get_file_line(int n) const;
+		virtual void print_error_message() const;
+		virtual void print_error_message_and_found(const std::string& found) const;
+		virtual void print_error_line_number(int line) const;
+		virtual void print_line_from_file(int line) const;
+		virtual void print_line_from_file_bold(int line) const;
+		virtual void print_abort_message() const;
 
-		protected:
-		SyntaxError(const std::string &msg, const std::string &expected,
-			const std::string &found, int nline)
-			: msg(msg), expected(expected), found(found), nline(nline) {};
+		std::string message;
+		ANSI::Modifier err;
+    	ANSI::Modifier secondary;
+    	ANSI::Modifier bold;
+    	ANSI::Modifier resetc;
+    	ANSI::Modifier resetf;
+};
 
-		std::string msg;
+class SmolParserError : public SmolError {
+	public:
+		SmolParserError(const std::string &message, const std::string &expected,
+						const std::string &found, int line)
+			: SmolError{message},
+			  expected(expected), found(found), line(line) {}
+		
+		void print() const override;
+			  
+	private:
 		std::string expected;
 		std::string found;
-		int nline;
-		virtual std::string add_quotemarks(const std::string& s) const;
-		virtual std::string get_line(int n) const;
-	};
+		int line;
+};
 
-	// ParserError - For syntax errors found during parsing
-	class ParserError : public SyntaxError {
-		public:
-		ParserError(const std::string &msg, const std::string &expected,
-			const std::string &found, int nline)
-			: SyntaxError{msg, expected, found, nline} {};
-	};
+class SmolLexerError : public SmolError {
+	public:
+		SmolLexerError(const std::string &message, const std::string &found, int line)
+			: SmolError{message},
+			  found(found), line(line) {}
 
-	class LexerError : public SyntaxError {
-		public:
-		LexerError(const std::string &msg, const std::string &found, int nline)
-			: SyntaxError{msg, "", found, nline} {};
+		void print() const override;
 		
-		void print() const throw() override;
-	};
+	private:
+		std::string found;
+		int line;
+};
 
-}
+class SmolCompilerError : public SmolError {
+	public:
+		SmolCompilerError(const std::string &message, const std::string &found)
+			: SmolError{message}, found(found) {}
+
+		void print() const override;
+		
+	private:
+		std::string found;
+};
+
 #endif

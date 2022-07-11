@@ -1,9 +1,6 @@
 # SMOL
 A (wip) dynamic language with recursive descent parser, LLVM IR code generations, and JIT compilation; kluged up and a first half-serious attempt.
 
-## Try it
-[smol-lang.netlify.app](https://smol-lang.netlify.app)
-
 ## Build
 1. Install meson and ninja (https://mesonbuild.com/).  
 2. Install the [dependencies](#dependencies).  

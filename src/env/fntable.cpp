@@ -1,8 +1,7 @@
 #include "fntable.h"
 #include <iostream>
 
-auto FnTable::fn_table =
-    std::unordered_map<std::string, std::shared_ptr<FFInterface>>();
+std::unordered_map<std::string, std::shared_ptr<FFInterface>> FnTable::fn_table = {};
 
 void
 FnTable::set_fn(std::shared_ptr<FFInterface> fn)

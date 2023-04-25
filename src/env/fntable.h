@@ -13,7 +13,6 @@ class FnTable {
     static bool exists(const std::string& name);
     static std::string to_str();
 
-    private:
     static std::unordered_map<std::string, std::shared_ptr<FFInterface>> fn_table;
 };
 

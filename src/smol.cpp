@@ -75,6 +75,7 @@ void SMOL::run_file(std::string const &fname)
 void SMOL::run_prompt()
 {
     std::cout << PROJECT_NAME << " " << VERSION << std::endl;
+    std::cout << "Type \"help()\" for a list of builtin functions\n";
     std::string line("");
     SMOL::is_repl = true;
     for (;;) {
@@ -147,6 +148,7 @@ void SMOL::eval(std::string const &src)
     FnTable::set_fn(std::make_unique<Lib::smol_exit>());
     FnTable::set_fn(std::make_unique<Lib::smol_getchar>());
     FnTable::set_fn(std::make_unique<Lib::ascii>());
+    FnTable::set_fn(std::make_unique<Lib::help>());
 
     std::chrono::system_clock::time_point t1, t2;
     if (SMOL::benchmark) {

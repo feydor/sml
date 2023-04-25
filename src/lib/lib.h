@@ -7,5 +7,6 @@
 #include "exit.h"
 #include "getchar.h"
 #include "ascii.h"
+#include "help.h"
 
 #endif
